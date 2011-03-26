@@ -1,3 +1,9 @@
+/* This program can extract the raw ASN.1 source from the MS Word for DOS
+ * file of the MAP ASN.1 spec, such as 380-6.DOC which is part of
+ * http://ftp.3gpp.org/specs/archive/09_series/09.02/0902-380.zip */
+
+/* (C) 2011 by Harald Welte <laforge@gnumonks.org> */
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -73,6 +79,11 @@ static void process(struct word_handle *wh)
 int main(int argc, char **argv)
 {
 	struct word_handle *wh;
+
+	if (argc < 2) {
+		fprintf(stderr, "You need to specify the file name of the DOC file\n");
+		exit(2);
+	}
 
 	wh = word_file_open(argv[1]);
 	if (!wh)
