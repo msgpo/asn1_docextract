@@ -11,7 +11,35 @@
 
 #include "word_util.h"
 
-static int handle_par_fmt_desc(struct word_handle *wh, struct word_par_fmt *pfmt,
+static void handle_text(struct word_handle *wh, uint32_t start_offs, uint32_t next_offs)
+{
+	uint8_t *cur;
+
+	for (cur = wh->base_addr + start_offs; cur < wh->base_addr + next_offs; cur++) {
+		switch (*cur) {
+		case 0x01:
+		case 0x02:
+		case 0x03:
+		case 0x04:	/* reserved */
+		case 0x05:	/* footnote */
+		case 0x0c:	/* form feed */
+		case 0x1f:	/* hyphenation conditional */
+		case 0xc4:	/* hyphenation protected */
+		case 0xff:	/* sapce protected */
+		case '\r':
+			break;
+		case 0x0b: /* line feed */
+			fputc('\n', stdout);
+			break;
+		case 0x09: /* tab */
+		case '\n':
+		default:
+			fputc(*cur, stdout);
+		}
+	}
+}
+
+static void handle_par_fmt_desc(struct word_handle *wh, struct word_par_fmt *pfmt,
 				uint32_t start_offs, uint32_t next_offs)
 {
 	fprintf(stderr, "Paragraph format (0x%08x-0x%08x):\n", start_offs, next_offs);
@@ -21,15 +49,8 @@ static int handle_par_fmt_desc(struct word_handle *wh, struct word_par_fmt *pfmt
 	fprintf(stderr, "\tStd Par Fmt: 0x%02x\n", pfmt->std_par_fmt);
 
 	if (pfmt->fmt_code == 0x4c && pfmt->std_par_fmt == 0x26) {
-		char *tmp = strndup(wh->base_addr + start_offs, next_offs-start_offs);
-		if (tmp) {
-			fprintf(stdout, tmp);
-			//fprintf(stderr, tmp);
-			free(tmp);
-		}
+		handle_text(wh, start_offs, next_offs);
 	}
-
-	return 0;
 }
 
 static void handle_fmt_block(struct word_handle *wh, uint16_t block_nr)
