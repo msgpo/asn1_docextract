@@ -1,4 +1,4 @@
---- MODULE 'MobileDomainDefinitions' START ---
+-- MODULE 'MobileDomainDefinitions' START
 MobileDomainDefinitions {
    ccitt (0) identified-organization (4) etsi (0) mobileDomainId (0)
    mobileDomainDefinitions (0) version1 (1)}
@@ -30,6 +30,7 @@ gsm-Messaging  OBJECT IDENTIFIER ::=
 	{mobileDomain gsm-MessagingId (4)}
 
 
+-- Common Component Ids for structuring Mobile Subdomains
 
 CommonComponentId ::= INTEGER (0..9)
 
@@ -44,9 +45,10 @@ moduleId  CommonComponentId ::= 3
 er-Id  CommonComponentId ::= 4
 
 
---- MODULE END ---
+END
+-- MODULE END
 
---- MODULE 'MAP-Frame' START ---
+-- MODULE 'MAP-Frame' START
 MAP-Frame
 
 DEFINITIONS ::=
@@ -77,9 +79,10 @@ FROM MAP-ApplicationContexts
 ZZZZ-Dummy ::= NULL
 
 
---- MODULE END ---
+END
+-- MODULE END
 
---- MODULE 'MAP-ApplicationContext' START ---
+-- MODULE 'MAP-ApplicationContext' START
 MAP-ApplicationContext {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-ApplicationContext (2) version2 (2)}
@@ -104,7 +107,7 @@ FROM MobileDomainDefinitions {
 
 -- application-context-names
 
-  OBJECT IDENTIFIER ::= {gsm-Network ac-Id}
+map-ac  OBJECT IDENTIFIER ::= {gsm-Network ac-Id}
 
 
 networkLocUpContext-v2  OBJECT IDENTIFIER ::=
@@ -124,7 +127,10 @@ roamingNumberEnquiryContext-v1  OBJECT IDENTIFIER ::=
 
 locationInfoRetrievalContext-v2  OBJECT IDENTIFIER ::=
 	{map-ac locInfoRetrieval(5) version2(2)}
-locationInfoRetrievalContext-v1resetContext-v2  OBJECT IDENTIFIER ::=
+locationInfoRetrievalContext-v1  OBJECT IDENTIFIER ::=
+	{map-ac locInfoRetrieval(5) version1(1)}
+
+resetContext-v2  OBJECT IDENTIFIER ::=
 	{map-ac reset(10) version2(2)}
 resetContext-v1  OBJECT IDENTIFIER ::=
 	{map-ac reset(10) version1(1)}
@@ -144,7 +150,7 @@ infoRetrievalContext-v2  OBJECT IDENTIFIER ::=
 infoRetrievalContext-v1  OBJECT IDENTIFIER ::=
 	{map-ac infoRetrieval(14) version1(1)}
 
-  OBJECT IDENTIFIER ::=
+interVlrInfoRetrievalContext-v2  OBJECT IDENTIFIER ::=
 	{map-ac interVlrInfoRetrieval (15) version2(2)}
 
 subscriberDataMngtContext-v2  OBJECT IDENTIFIER ::=
@@ -164,7 +170,10 @@ networkFunctionalSsContext-v1  OBJECT IDENTIFIER ::=
 
 networkUnstructuredSsContext-v2  OBJECT IDENTIFIER ::=
 	{map-ac networkUnstructuredSs(19) version2(2)}
-networkUnstructuredSsContext-v1shortMsgGatewayContext-v2  OBJECT IDENTIFIER ::=
+networkUnstructuredSsContext-v1  OBJECT IDENTIFIER ::=
+	{map-ac networkUnstructuredSs(19) version1(1)}
+
+shortMsgGatewayContext-v2  OBJECT IDENTIFIER ::=
 	{map-ac shortMsgGateway (20) version2(2)}
 shortMsgGatewayContext-v1  OBJECT IDENTIFIER ::=
 	{map-ac shortMsgGateway(20) version1(1)}
@@ -183,7 +192,7 @@ shortMsgMT-RelayContext-v2  OBJECT IDENTIFIER ::=
 	{map-ac shortMsgMT-Relay (25) version2(2)}
 
 
---- MODULE 'MAP-DialogueInformation' START ---
+-- MODULE 'MAP-DialogueInformation' START
 MAP-DialogueInformation {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-DialogueInformation (3) version2 (2)}
@@ -238,7 +247,11 @@ MAP-RefuseInfo ::= SEQUENCE {
 	reason	Reason,
 	plmn-specificInfo	[0] EXTERNAL	OPTIONAL}
 
-ReasonMAP-UserAbortInfo ::= SEQUENCE {
+Reason ::= ENUMERATED {
+	noReasonGiven  (0),
+	invalidDestinationReference  (1)}
+
+MAP-UserAbortInfo ::= SEQUENCE {
 	map-UserAbortChoice	MAP-UserAbortChoice,
 	plmn-specific	[0] EXTERNAL	OPTIONAL}
 
@@ -270,7 +283,7 @@ MAP-ProviderAbortReason ::= ENUMERATED {
 	invalidPDU  (1)}
 
 
---- MODULE 'MAP-Protocol' START ---
+-- MODULE 'MAP-Protocol' START
 MAP-Protocol {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-Protocol (4) version2 (2)}
@@ -288,7 +301,7 @@ IMPORTS
 	PurgeMS,
 	SendIdentification,
 --<B--	DetachIMSI,--B>--
---<B--	AttachIMSI,
+--<B--	AttachIMSI,--B>--
 --<B--	Page,--B>--
 --<B--	SearchForMS,--B>--
 --<B--	ProcessAccessRequest,--B>--
@@ -297,11 +310,11 @@ IMPORTS
 	ProcessAccessSignalling,
 	ForwardAccessSignalling,
 	PerformSubsequentHandover,
-	AllocateHandoverNumber,--B>--
+--<B--	AllocateHandoverNumber,--B>--
 --<B--	SendHandoverReport,--B>--
 --<B--	Authenticate,--B>--
 	SendAuthenticationInfo,
---<B--	SetCipheringMode,
+--<B--	SetCipheringMode,--B>--
 	CheckIMEI,
 --<B--	ObtainIMEI,--B>--
 	SendParameters,
@@ -325,10 +338,10 @@ FROM MAP-OperationAndMaintenanceOperations {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-OperationAndMaintenanceOperations (6) version2 (2)}
 
-	SendInfoForIncomingCall,--B>--
+--<B--	SendInfoForIncomingCall,--B>--
 --<B--	ConnectToFollowingAddress,--B>--
 --<B--	ProcessCallWaiting,--B>--
---<B--	SendInfoForOutgoingCall,
+--<B--	SendInfoForOutgoingCall,--B>--
 	SendRoutingInfo,
 	ProvideRoamingNumber--<B--,--B>--
 --<B--	CompleteCall--B>--
@@ -360,7 +373,7 @@ FROM MAP-SupplementaryServiceOperations {
 	NoteSubscriberPresent,
 	AlertServiceCentre,
 	InformServiceCentre,
-	SendInfoForMT-SMS,--B>--
+--<B--	SendInfoForMT-SMS,--B>--
 --<B--	SendInfoForMO-SMS,--B>--
 	ReadyForSM
 FROM MAP-ShortMessageServiceOperations {
@@ -377,7 +390,7 @@ FROM MAP-ShortMessageServiceOperations {
 	UnknownMSC,
 --<B--	UnknownLocArea,--B>--
 	UnidentifiedSubscriber,
---<B--	UnallocatedRoamingNumber,
+--<B--	UnallocatedRoamingNumber,--B>--
 	UnknownEquipment,
 	RoamingNotAllowed,
 	IllegalSubscriber,
@@ -394,7 +407,7 @@ FROM MAP-ShortMessageServiceOperations {
 --<B--	BusySubscriber,--B>--
 --<B--	NoSubscriberReply,--B>--
 --<B--	RadioCongestion,--B>--
-	ImpossibleCallCompletion,--B>--
+--<B--	ImpossibleCallCompletion,--B>--
 	CallBarred,
 	ForwardingViolation,
 	CUG-Reject,
@@ -428,7 +441,7 @@ sendIdentification  SendIdentification::= localValue 55
 
 -- handover operation codes
 
-  PerformHandover ::= localValue 28
+performHandover  PerformHandover ::= localValue 28
 sendEndSignal  SendEndSignal ::= localValue 29
 processAccessSignalling  ProcessAccessSignalling ::= localValue 33
 forwardAccessSignalling  ForwardAccessSignalling ::= localValue 34
@@ -448,7 +461,8 @@ checkIMEI  CheckIMEI ::= localValue 43
 
 -- subscriber management operation codes
 
-sendParameters-- NU>1 sendParameters must not be used in version greater 1
+sendParameters  SendParameters ::= localValue 9
+-- NU>1 sendParameters must not be used in version greater 1
 insertSubscriberData  InsertSubscriberData ::= localValue 7
 deleteSubscriberData  DeleteSubscriberData ::= localValue 8
 
@@ -458,7 +472,12 @@ deleteSubscriberData  DeleteSubscriberData ::= localValue 8
 reset  Reset ::= localValue 37
 forwardCheckSS-Indication  ForwardCheckSS-Indication ::= localValue 38
 restoreData  RestoreData ::= localValue 57
--- NU1 activateTraceMode  ActivateTraceMode ::= localValue 50
+-- NU1 restoreData must not be used in version 1
+
+
+-- operation and maintenance operation codes
+
+activateTraceMode  ActivateTraceMode ::= localValue 50
 deactivateTraceMode  DeactivateTraceMode ::= localValue 51
 traceSubscriberActivity  TraceSubscriberActivity ::= localValue 52
 noteInternalHandover  NoteInternalHandover ::= localValue 35
@@ -474,7 +493,7 @@ provideRoamingNumber  ProvideRoamingNumber ::= localValue 4
 
 -- supplementary service handling operation codes
 
-  RegisterSS ::= localValue 10
+registerSS  RegisterSS ::= localValue 10
 eraseSS  EraseSS ::= localValue 11
 activateSS  ActivateSS ::= localValue 12
 deactivateSS  DeactivateSS ::= localValue 13
@@ -482,7 +501,7 @@ interrogateSS  InterrogateSS ::= localValue 14
 processUnstructuredSS-Data  ProcessUnstructuredSS-Data ::= localValue 19
 -- NU>1 processUnstructuredSS-Data must not be used in version greater 1
 processSS-Request  ProcessSS-Request ::= localValue 59
--- processSS-Request must not be used in version 1
+-- NU1 processSS-Request must not be used in version 1
 ss-GetDigits  SS-GetDigits ::= localValue 60
 -- NU1 ss-GetDigits must not be used in version 1
 ss-GetString  SS-GetString ::= localValue 61
@@ -490,7 +509,7 @@ ss-GetString  SS-GetString ::= localValue 61
 unstructuredNotifySS  UnstructuredNotifySS ::= localValue 62
 -- NU1 unstructuredNotifySS must not be used in version 1
 registerPassword  RegisterPassword ::= localValue 17
-  GetPassword ::= localValue 18
+getPassword  GetPassword ::= localValue 18
 beginSubscriberActivity  BeginSubscriberActivity ::= localValue 54
 -- NU>1 beginSubscriberActivity must not be used in version greater 1
 
@@ -502,7 +521,7 @@ forwardSM  ForwardSM ::= localValue 46
 reportSM-DeliveryStatus  ReportSM-DeliveryStatus ::= localValue 47
 noteSubscriberPresent  NoteSubscriberPresent ::= localValue 48
 -- NU>1 noteSubscriberPresent must not be used in version greater 1
-  AlertServiceCentre ::= localValue 49
+alertServiceCentre  AlertServiceCentre ::= localValue 49
 informServiceCentre  InformServiceCentre ::= localValue 63
 -- NU1 informServiceCentre must not be used in version 1
 readyForSM  ReadyForSM ::= localValue 66
@@ -514,7 +533,7 @@ readyForSM  ReadyForSM ::= localValue 66
 systemFailure  SystemFailure ::= localValue 34
 dataMissing  DataMissing ::= localValue 35
 unexpectedDataValue  UnexpectedDataValue ::= localValue 36
-  FacilityNotSupported ::= localValue 21
+facilityNotSupported  FacilityNotSupported ::= localValue 21
 
 
 -- identification and numbering error codes
@@ -530,7 +549,8 @@ unknownEquipment  UnknownEquipment ::= localValue 7
 -- subscription error codes
 
 roamingNotAllowed  RoamingNotAllowed ::= localValue 8
-illegalSubscriberillegalEquipment  IllegalEquipment ::= localValue 12
+illegalSubscriber  IllegalSubscriber ::= localValue 9
+illegalEquipment  IllegalEquipment ::= localValue 12
 bearerServiceNotProvisioned  BearerServiceNotProvisioned ::= localValue 10
 teleserviceNotProvisioned  TeleserviceNotProvisioned ::= localValue 11
 
@@ -550,7 +570,7 @@ tracingBufferFull  TracingBufferFull ::= localValue 40
 
 -- call handling error codes
 
-  NoRoamingNumberAvailable ::= localValue 39
+noRoamingNumberAvailable  NoRoamingNumberAvailable ::= localValue 39
 absentSubscriber  AbsentSubscriber ::= localValue 27
 callBarred  CallBarred ::= localValue 13
 forwardingViolation  ForwardingViolation ::= localValue 14
@@ -562,12 +582,14 @@ cug-Reject  CUG-Reject ::= localValue 15
 illegalSS-Operation  IllegalSS-Operation ::= localValue 16
 ss-ErrorStatus  SS-ErrorStatus ::= localValue 17
 ss-NotAvailable  SS-NotAvailable ::= localValue 18
-ss-SubscriptionViolationss-Incompatibility  SS-Incompatibility ::= localValue 20
+ss-SubscriptionViolation  SS-SubscriptionViolation ::= localValue 19
+ss-Incompatibility  SS-Incompatibility ::= localValue 20
 ss-PartialAcceptance  SS-PartialAcceptance ::= localValue 41
 -- NU1 ss-PartialAcceptance must not be used in version 1
 ss-NotDelivered  SS-NotDelivered ::= localValue 42
 -- NU1 ss-NotDelivered must not be used in version 1
-pw-RegistrationFailurenegativePW-Check  NegativePW-Check ::= localValue 38
+pw-RegistrationFailure  PW-RegistrationFailure ::= localValue 37
+negativePW-Check  NegativePW-Check ::= localValue 38
 numberOfPW-AttemptsViolation  NumberOfPW-AttemptsViolation ::= localValue 43
 -- NU1 numberOfPW-AttemptsViolation must not be used in version 1
 
@@ -578,8 +600,21 @@ sm-DeliveryFailure  SM-DeliveryFailure ::= localValue 32
 messageWaitingListFull  MessageWaitingListFull ::= localValue 33
 
 
---- MODULE 'MAP-MobileServiceOperations' START ---
-MAP-MobileServiceOperations--<B--	UpdateLocationArea,--B>--
+-- MODULE 'MAP-MobileServiceOperations' START
+MAP-MobileServiceOperations {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-MobileServiceOperations (5) version2 (2)}
+
+DEFINITIONS
+
+::=
+
+BEGIN
+
+EXPORTS
+
+	-- location registration operations
+--<B--	UpdateLocationArea,--B>--
 	UpdateLocation,
 	CancelLocation,
 	PurgeMS,
@@ -588,7 +623,7 @@ MAP-MobileServiceOperations--<B--	UpdateLocationArea,--B>--
 --<B--	AttachIMSI,--B>--
 
 	-- paging management operations
---<B----B>--
+--<B--	Page,--B>--
 --<B--	SearchForMS,--B>--
 
 	-- access management operations
@@ -600,7 +635,8 @@ MAP-MobileServiceOperations--<B--	UpdateLocationArea,--B>--
 	ProcessAccessSignalling,
 	ForwardAccessSignalling,
 	PerformSubsequentHandover,
---<B--	AllocateHandoverNumber,--B>----<B--	SendHandoverReport,--B>--
+--<B--	AllocateHandoverNumber,--B>--
+--<B--	SendHandoverReport,--B>--
 
 	-- authentication management operations
 --<B--	Authenticate,--B>--
@@ -611,7 +647,7 @@ MAP-MobileServiceOperations--<B--	UpdateLocationArea,--B>--
 
 	-- IMEI management operations
 	CheckIMEI,
---<B----B>--
+--<B--	ObtainIMEI,--B>--
 
 	-- subscriber management operations
 	SendParameters,
@@ -638,13 +674,17 @@ FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
 	UnknownSubscriber,
 	UnknownBaseStation,
 	UnknownMSC,
---<B--	UnknownLocArea,--B>----<B--	IllegalSubscriber,--B>--
+--<B--	UnknownLocArea,--B>--
+	UnidentifiedSubscriber,
+	UnknownEquipment,
+	RoamingNotAllowed,
+--<B--	IllegalSubscriber,--B>--
 --<B--	IllegalEquipment,--B>--
 	InvalidTargetBaseStation,
 	NoRadioResourceAvailable,
 	NoHandoverNumberAvailable,
 	SubsequentHandoverFailure--<B--,--B>--
---<B----B>--
+--<B--	AbsentSubscriber,--B>--
 --<B--	BusySubscriber--B>--
 FROM MAP-Errors {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
@@ -656,13 +696,14 @@ FROM MAP-Errors {
 	CancelLocationArg,
 	PurgeMS-Arg,
 	SendIdentificationRes,
---<B--	PageArg,--B>----<B--	SearchForMS-Arg,--B>--
+--<B--	PageArg,--B>--
+--<B--	SearchForMS-Arg,--B>--
 --<B--	ProcessAccessRequestArg,--B>--
 --<B--	ProcessAccessRequestRes,--B>--
 	PerformHO-Arg,
 	PerformHO-Res,
 	PerformSubsequentHO-Arg,
---<B----B>--
+--<B--	AuthenticateArg,--B>--
 	SendAuthenticationInfoArg,
 	SendAuthenticationInfoRes,
 --<B--	SRES,--B>--
@@ -680,11 +721,13 @@ FROM MAP-MS-DataTypes {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-MS-DataTypes (11) version2 (2)}
 
---<B--	ISDN-AddressString,--B>----<B--	IMSI,--B>--
+--<B--	ISDN-AddressString,--B>--
+	ExternalSignalInfo,
+--<B--	IMSI,--B>--
 	TMSI,
 --<B--	SubscriberId,--B>--
 	IMEI--<B--,--B>--
---<B----B>--
+--<B--	LocAreaId--B>--
 FROM MAP-CommonDataTypes {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-CommonDataTypes (18) version2 (2)}
@@ -695,21 +738,29 @@ FROM MAP-CommonDataTypes {
 
 --<B--UpdateLocationArea ::= OPERATION				--Timer m----B>--
 --<B--	ARGUMENT--B>--
---<B--		updateLocationAreaArg	UpdateLocationAreaArg
+--<B--		updateLocationAreaArg	UpdateLocationAreaArg--B>--
 --<B--	RESULT zzzz-Empty	NULL--B>--
 --<B--	ERRORS {--B>--
 --<B--		SystemFailure,--B>--
-		DataMissing,--B>--
+--<B--		DataMissing,--B>--
 --<B--		-- NU1 DataMissing must not be used in version 1----B>--
 --<B--		UnexpectedDataValue,--B>--
-		UnknownSubscriber,--B>--
+--<B--		UnknownSubscriber,--B>--
 --<B--		UnknownLocArea,--B>--
 --<B--		RoamingNotAllowed,--B>--
---<B--		IllegalSubscriber,
+--<B--		IllegalSubscriber,--B>--
 --<B--		IllegalEquipment}--B>--
 --<B--		-- NU1 IllegalEquipment must not be used in version 1----B>--
 
-UpdateLocation ::= OPERATION				--Timer m--NU1 DataMissing must not be used in version 1
+UpdateLocation ::= OPERATION				--Timer m--
+	ARGUMENT
+		updateLocationArg	UpdateLocationArg
+	RESULT
+		updateLocationRes	UpdateLocationRes
+	ERRORS {
+		SystemFailure,
+		DataMissing,
+		-- NU1 DataMissing must not be used in version 1
 		UnexpectedDataValue,
 		UnknownSubscriber,
 		RoamingNotAllowed}
@@ -725,7 +776,7 @@ CancelLocation ::= OPERATION				--Timer m--
 		UnidentifiedSubscriber}
 		-- NU>1 UnidentifiedSubscriber must not be used in version 1
 
-PurgeMS--
+PurgeMS ::= OPERATION				--Timer m--
 	ARGUMENT
 		purgeMS-Arg	PurgeMS-Arg
 	RESULT zzzz-Empty	NULL
@@ -740,76 +791,79 @@ SendIdentification::= OPERATION				--Timer s--
 		UnidentifiedSubscriber}
 
 --<B--DetachIMSI ::= OPERATION				--Timer s----B>--
-	ARGUMENT--B>--
+--<B--	ARGUMENT--B>--
 --<B--		subscriberId		SubscriberId--B>--
 
 --<B--AttachIMSI ::= OPERATION				--Timer s----B>--
---<B----B>--
+--<B--	ARGUMENT--B>--
 --<B--		subscriberId		SubscriberId--B>--
 --<B--	RESULT zzzz-Empty	NULL--B>--
---<B--	ERRORS {--B>----<B--		SystemFailure,--B>--
+--<B--	ERRORS {--B>--
+--<B--		SystemFailure,--B>--
 --<B--		DataMissing,--B>--
---<B--		-- NU1 DataMissing must not be used in version 1----B>----<B--		UnexpectedDataValue,--B>--
+--<B--		-- NU1 DataMissing must not be used in version 1----B>--
+--<B--		UnexpectedDataValue,--B>--
 --<B--		UnknownSubscriber,--B>--
 --<B--		UnidentifiedSubscriber,--B>--
---<B----B>--
+--<B--		RoamingNotAllowed,--B>--
 --<B--		IllegalSubscriber}--B>--
 
 
 -- paging management operations
 
 --<B--Page ::= OPERATION				--Timer m----B>--
---<B--	ARGUMENT
+--<B--	ARGUMENT--B>--
 --<B--		pageArg	PageArg--B>--
 --<B--	ERRORS {--B>--
 --<B--		SystemFailure,--B>--
-		DataMissing,--B>--
+--<B--		DataMissing,--B>--
 --<B--		-- NU1 DataMissing must not be used in version 1----B>--
 --<B--		UnexpectedDataValue,--B>--
-		UnknownLocArea,--B>--
+--<B--		UnknownLocArea,--B>--
 --<B--		AbsentSubscriber,--B>--
 --<B--		BusySubscriber}--B>--
 
---<B--SearchForMS----B>--
+--<B--SearchForMS ::= OPERATION				--Timer m----B>--
 --<B--	ARGUMENT--B>--
 --<B--		searchForMS-Arg	SearchForMS-Arg--B>--
---<B--	RESULT--B>----<B--		currentLocAreaId	LocAreaId--B>--
+--<B--	RESULT--B>--
+--<B--		currentLocAreaId	LocAreaId--B>--
 --<B--	ERRORS {--B>--
 --<B--		SystemFailure,--B>--
---<B----B>--
+--<B--		DataMissing,--B>--
 --<B--		-- NU1 DataMissing must not be used in version 1----B>--
 --<B--		UnexpectedDataValue,--B>--
---<B----B>--
+--<B--		AbsentSubscriber,--B>--
 --<B--		BusySubscriber}--B>--
 
 
 -- access management operations
 
 --<B--ProcessAccessRequest ::= OPERATION				--Timer m----B>--
---<B--	ARGUMENT
+--<B--	ARGUMENT--B>--
 --<B--		proccessAccessRequestArg	ProcessAccessRequestArg--B>--
 --<B--	RESULT--B>--
 --<B--		processAccessRequestRes	ProcessAccessRequestRes--B>--
-	ERRORS {--B>--
+--<B--	ERRORS {--B>--
 --<B--		SystemFailure,--B>--
 --<B--		DataMissing,--B>--
---<B--		-- DataMissing must not be used in version 1----B>--
+--<B--		-- NU1 DataMissing must not be used in version 1----B>--
 --<B--		UnexpectedDataValue,--B>--
 --<B--		UnknownSubscriber,--B>--
---<B--		-- UnknownSubscriber must not be used in version greater 1----B>--
+--<B--		-- NU>1 UnknownSubscriber must not be used in version greater 1----B>--
 --<B--		UnknownLocArea,--B>--
 --<B--		-- NU1 UnknownLocArea must not be used in version 1----B>--
-		UnidentifiedSubscriber,--B>--
+--<B--		UnidentifiedSubscriber,--B>--
 --<B--		RoamingNotAllowed,--B>--
 --<B--		-- NU1 RoamingNotAllowed must not be used in version 1----B>--
-		IllegalSubscriber,--B>--
+--<B--		IllegalSubscriber,--B>--
 --<B--		IllegalEquipment}--B>--
 --<B--		-- NU1 IllegalEquipment must not be used in version 1----B>--
 
 
 -- handover operations
 
-PerformHandover--
+PerformHandover ::= OPERATION				--Timer s--
 	ARGUMENT
 		performHO-Arg	PerformHO-Arg
 	RESULT
@@ -831,7 +885,7 @@ ProcessAccessSignalling ::= OPERATION			--Timer s--
 	ARGUMENT
 		bss-APDU	ExternalSignalInfo
 
- ::= OPERATION			--Timer s--
+ForwardAccessSignalling ::= OPERATION			--Timer s--
 	ARGUMENT
 		bss-APDU	ExternalSignalInfo
 
@@ -849,25 +903,27 @@ PerformSubsequentHandover ::= OPERATION			--Timer m--
 		InvalidTargetBaseStation,
 		SubsequentHandoverFailure}
 
---<B--AllocateHandoverNumber ::= OPERATION			--Timer s----B>----<B--	ERRORS {--B>--
+--<B--AllocateHandoverNumber ::= OPERATION			--Timer s----B>--
+--<B--	ERRORS {--B>--
 --<B--		NoHandoverNumberAvailable}--B>--
 --<B--	LINKED {--B>--
---<B----B>--
+--<B--		SendHandoverReport}--B>--
 
 --<B--SendHandoverReport ::= OPERATION				--Timer l----B>--
 --<B--	ARGUMENT--B>--
---<B--		handoverNumber	ISDN-AddressString
+--<B--		handoverNumber	ISDN-AddressString--B>--
 --<B--	RESULT zzzz-Empty	NULL--B>--
 
 
 -- authentication management operations
 
 --<B--Authenticate ::= OPERATION				--Timer s----B>--
---<B--	ARGUMENT--B>----<B--		authenticateArg	AuthenticateArg--B>--
+--<B--	ARGUMENT--B>--
+--<B--		authenticateArg	AuthenticateArg--B>--
 --<B--	RESULT--B>--
 --<B--		sres		SRES--B>--
 
-SendAuthenticationInfo--
+SendAuthenticationInfo ::= OPERATION			--Timer m--
 	ARGUMENT
 		sendAuthenticationInfoArg	SendAuthenticationInfoArg
 	RESULT
@@ -883,7 +939,7 @@ SendAuthenticationInfo--
 
 --<B--SetCipheringMode ::= OPERATION				--Timer s----B>--
 --<B--	ARGUMENT--B>--
---<B--		setCipheringModeArg	SetCipheringModeArg
+--<B--		setCipheringModeArg	SetCipheringModeArg--B>--
 
 
 -- IMEI management operations
@@ -903,10 +959,11 @@ CheckIMEI ::= OPERATION					--Timer m--
 		-- NU>1 UnexpectedDataValue must not be used in version greater 1
 		UnknownEquipment}
 
---<B--ObtainIMEI----B>--
+--<B--ObtainIMEI ::= OPERATION				--Timer s----B>--
 --<B--	RESULT--B>--
 --<B--		imei	IMEI--B>--
---<B--	ERRORS {--B>----<B--		SystemFailure}--B>--
+--<B--	ERRORS {--B>--
+--<B--		SystemFailure}--B>--
 
 
 -- subscriber management operations
@@ -936,7 +993,7 @@ InsertSubscriberData ::= OPERATION				--Timer m--
 		UnexpectedDataValue,
 		UnidentifiedSubscriber}
 
- ::= OPERATION				--Timer m--
+DeleteSubscriberData ::= OPERATION				--Timer m--
 	ARGUMENT
 		deleteSubscriberDataArg	DeleteSubscriberDataArg
 	RESULT zzzz-Empty	NULL
@@ -949,21 +1006,26 @@ InsertSubscriberData ::= OPERATION				--Timer m--
 -- identity management operations
 
 --<B--ProvideIMSI ::= OPERATION				--Timer s----B>--
---<B--	RESULT--B>----<B--		imsi		IMSI--B>--
+--<B--	RESULT--B>--
+--<B--		imsi		IMSI--B>--
 --<B--	ERRORS {--B>--
 --<B--		DataMissing,--B>--
---<B--NU1 DataMissing must not be used in version 1----B>--
+--<B--		-- NU1 DataMissing must not be used in version 1----B>--
 --<B--		AbsentSubscriber}--B>--
 
 --<B--ForwardNewTMSI ::= OPERATION				--Timer s----B>--
-	ARGUMENT--B>--
+--<B--	ARGUMENT--B>--
 --<B--		tmsi		TMSI--B>--
 --<B--	RESULT zzzz-Empty	NULL--B>--
 
 
 -- fault recovery operations
 
-Reset ::= OPERATION					--Timer m--ForwardCheckSS-Indication ::= OPERATION			--Timer s--
+Reset ::= OPERATION					--Timer m--
+	ARGUMENT
+		resetArg	ResetArg
+
+ForwardCheckSS-Indication ::= OPERATION			--Timer s--
 
 RestoreData ::= OPERATION				--Timer m--
 	ARGUMENT
@@ -977,7 +1039,7 @@ RestoreData ::= OPERATION				--Timer m--
 		UnknownSubscriber}
 
 
---- MODULE 'MAP-OperationAndMaintenanceOperations' START ---
+-- MODULE 'MAP-OperationAndMaintenanceOperations' START
 MAP-OperationAndMaintenanceOperations {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-OperationAndMaintenanceOperations (6) version2 (2)}
@@ -1027,7 +1089,7 @@ FROM MAP-CommonDataTypes {
 ;
 
 
-ActivateTraceMode--
+ActivateTraceMode ::= OPERATION				--Timer m--
 	ARGUMENT
 		activateTraceModeArg	ActivateTraceModeArg
 	RESULT zzzz-Empty	NULL
@@ -1054,7 +1116,7 @@ TraceSubscriberActivity ::= OPERATION			--Timer s--
 	ARGUMENT
 		traceSubscriberActivityArg	TraceSubscriberActivityArg
 
- ::= OPERATION				--Timer s--
+NoteInternalHandover ::= OPERATION				--Timer s--
 	ARGUMENT
 		noteInternalHO-Arg	NoteInternalHO-Arg
 
@@ -1069,7 +1131,7 @@ SendIMSI ::= OPERATION					--Timer m--
 		UnknownSubscriber}
 
 
---- MODULE 'MAP-CallHandlingOperations' START ---
+-- MODULE 'MAP-CallHandlingOperations' START
 MAP-CallHandlingOperations {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-CallHandlingOperations (7) version2 (2)}
@@ -1081,10 +1143,12 @@ DEFINITIONS
 BEGIN
 
 EXPORTS
---<B----B>--
+--<B--	SendInfoForIncomingCall,--B>--
 --<B--	ConnectToFollowingAddress,--B>--
 --<B--	ProcessCallWaiting,--B>--
---<B--	SendInfoForOutgoingCall,--B>----<B--,--B>--
+--<B--	SendInfoForOutgoingCall,--B>--
+	SendRoutingInfo,
+	ProvideRoamingNumber--<B--,--B>--
 --<B--	CompleteCall--B>--
 ;
 
@@ -1099,14 +1163,15 @@ FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
 	UnknownSubscriber,
 	NumberChanged,
 --<B--	UnidentifiedSubscriber,--B>--
---<B----B>--
+--<B--	UnallocatedRoamingNumber,--B>--
 	BearerServiceNotProvisioned,
 	TeleserviceNotProvisioned,
 	NoRoamingNumberAvailable,
 	AbsentSubscriber,
 --<B--	BusySubscriber,--B>--
 --<B--	NoSubscriberReply,--B>--
---<B--	RadioCongestion,--B>----<B--	ImpossibleCallCompletion,--B>--
+--<B--	RadioCongestion,--B>--
+--<B--	ImpossibleCallCompletion,--B>--
 	CallBarred,
 	ForwardingViolation,
 	CUG-Reject
@@ -1116,62 +1181,88 @@ FROM MAP-Errors {
 
 --<B--	InfoForIC-Arg,--B>--
 --<B--	ConnectToFollowingAddressArg,--B>--
---<B----B>--
+--<B--	ProcessCallWaitingArg,--B>--
 --<B--	InfoForOC-Arg,--B>--
 	SendRoutingInfoArg,
 	SendRoutingInfoRes,
 	ProvideRoamingNumberArg--<B--,--B>--
---<B--	CompleteCallArg--B>----<B--SendInfoForIncomingCall ::= OPERATION			--Timer m----B>--
+--<B--	CompleteCallArg--B>--
+FROM MAP-CH-DataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-CH-DataTypes (13) version2 (2)}
+
+	ISDN-AddressString
+FROM MAP-CommonDataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+;
+
+
+--<B--SendInfoForIncomingCall ::= OPERATION			--Timer m----B>--
 --<B--	ARGUMENT--B>--
 --<B--		infoForIC-Arg	InfoForIC-Arg--B>--
-	ERRORS {--B>--
+--<B--	ERRORS {--B>--
 --<B--		SystemFailure,--B>--
 --<B--		DataMissing,--B>--
---<B--		UnexpectedDataValue,
+--<B--		UnexpectedDataValue,--B>--
 --<B--		UnknownSubscriber,--B>--
 --<B--		UnidentifiedSubscriber,--B>--
 --<B--		UnallocatedRoamingNumber,--B>--
-		AbsentSubscriber,--B>--
+--<B--		AbsentSubscriber,--B>--
 --<B--		ForwardingViolation,--B>--
 --<B--		ImpossibleCallCompletion}--B>--
---<B--	LINKED {
+--<B--	LINKED {--B>--
 --<B--		CompleteCall,--B>--
 --<B--		ProcessCallWaiting,--B>--
 --<B--		ConnectToFollowingAddress}--B>--
 
-ConnectToFollowingAddress ::= OPERATION			--Timer s----B>--
+--<B--ConnectToFollowingAddress ::= OPERATION			--Timer s----B>--
 --<B--	ARGUMENT--B>--
 --<B--		connectToFollowingAddressArg	ConnectToFollowingAddressArg--B>--
 
---<B-- ::= OPERATION				--Timer s----B>--
+--<B--ProcessCallWaiting ::= OPERATION				--Timer s----B>--
 --<B--	ARGUMENT--B>--
 --<B--		processCallWaitingArg	ProcessCallWaitingArg--B>--
---<B--		-- optional
+--<B--		-- optional----B>--
 --<B--		-- OA1 processCallWaitingArg must be absent in version 1----B>--
 --<B--	ERRORS {--B>--
---<B--		DataMissing,
+--<B--		DataMissing,--B>--
 --<B--		-- NU1 DataMissing must not be used in version 1----B>--
 --<B--		UnexpectedDataValue,--B>--
---<B--		-- UnexpectedDataValue must not be used in version 1----B>--
+--<B--		-- NU1 UnexpectedDataValue must not be used in version 1----B>--
 --<B--		BusySubscriber,--B>--
 --<B--		-- NU1 BusySubscriber must not be used in version 1----B>--
-		NoSubscriberReply}--B>--
+--<B--		NoSubscriberReply}--B>--
 --<B--		-- NU1 NoSubscriberReply must not be used in version 1----B>--
 
---<B--SendInfoForOutgoingCall ::= OPERATION			--Timer ml----B>----<B--	ARGUMENT--B>--
+--<B--SendInfoForOutgoingCall ::= OPERATION			--Timer ml----B>--
+--<B--	ARGUMENT--B>--
 --<B--		infoForOC-Arg	InfoForOC-Arg--B>--
 --<B--	ERRORS {--B>--
---<B----B>--
+--<B--		SystemFailure,--B>--
 --<B--		DataMissing,--B>--
 --<B--		UnexpectedDataValue,--B>--
---<B--		UnknownSubscriber,--B>----<B--		BearerServiceNotProvisioned,--B>--
+--<B--		UnknownSubscriber,--B>--
+--<B--		BearerServiceNotProvisioned,--B>--
 --<B--		TeleserviceNotProvisioned,--B>--
 --<B--		CallBarred,--B>--
---<B----B>--
+--<B--		CUG-Reject}--B>--
 --<B--	LINKED {--B>--
 --<B--		CompleteCall}--B>--
 
-SendRoutingInfo ::= OPERATION				--Timer m--NU1 NumberChanged must not be used in version 1
+SendRoutingInfo ::= OPERATION				--Timer m--
+	ARGUMENT
+		sendRoutingInfoArg	SendRoutingInfoArg
+	RESULT
+		sendRoutingInfoRes	SendRoutingInfoRes
+	ERRORS {
+		SystemFailure,
+		DataMissing,
+		UnexpectedDataValue,
+		FacilityNotSupported,
+		UnknownSubscriber,
+		NumberChanged,
+		-- NU1 NumberChanged must not be used in version 1
 	BearerServiceNotProvisioned,
 		TeleserviceNotProvisioned,
 		AbsentSubscriber,
@@ -1193,17 +1284,17 @@ ProvideRoamingNumber ::= OPERATION				--Timer m--
 		NoRoamingNumberAvailable}
 
 --<B--CompleteCall ::= OPERATION				--Timer ml----B>--
---<B--	ARGUMENT
+--<B--	ARGUMENT--B>--
 --<B--		completeCallArg	CompleteCallArg--B>--
 --<B--	ERRORS {--B>--
 --<B--		DataMissing,--B>--
-		UnexpectedDataValue,--B>--
+--<B--		UnexpectedDataValue,--B>--
 --<B--		BusySubscriber,--B>--
 --<B--		NoSubscriberReply,--B>--
---<B--		RadioCongestion}
+--<B--		RadioCongestion}--B>--
 
 
---- MODULE 'MAP-SupplementaryServiceOperations' START ---
+-- MODULE 'MAP-SupplementaryServiceOperations' START
 MAP-SupplementaryServiceOperations {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-SupplementaryServiceOperations (8) version2 (2)}
@@ -1285,7 +1376,18 @@ FROM MAP-SS-Code {
 
 -- supplementary service handling operations
 
-RegisterSS ::= OPERATION				--Timer m--NU>1 UnknownSubscriber must not be used in version greater 1
+RegisterSS ::= OPERATION				--Timer m--
+	ARGUMENT
+		registerSS-Arg	RegisterSS-Arg
+	RESULT
+		ss-Info	SS-Info
+		-- optional
+	ERRORS {
+		SystemFailure,
+		DataMissing,
+		UnexpectedDataValue,
+		UnknownSubscriber,
+		-- NU>1 UnknownSubscriber must not be used in version greater 1
 		BearerServiceNotProvisioned,
 		TeleserviceNotProvisioned,
 		CallBarred,
@@ -1310,7 +1412,9 @@ EraseSS ::= OPERATION					--Timer m--
 		-- NU1 DataMissing must not be used in version 1
 		UnexpectedDataValue,
 		UnknownSubscriber,
-		-- NU>1 NU1 CallBarred must not be used in version 1
+		-- NU>1 UnknownSubscriber must not be used in version greater 1
+		CallBarred,
+		-- NU1 CallBarred must not be used in version 1
 		IllegalSS-Operation,
 		SS-ErrorStatus,
 		SS-SubscriptionViolation}
@@ -1331,7 +1435,9 @@ ActivateSS ::= OPERATION				--Timer m--
 		BearerServiceNotProvisioned,
 		-- NU1 BearerServiceNotProvisioned must not be used in version 1
 		TeleserviceNotProvisioned,
-		-- NU1 NU1 CallBarred must not be used in version 1
+		-- NU1 TeleserviceNotProvisioned must not be used in version 1
+		CallBarred,
+		-- NU1 CallBarred must not be used in version 1
 		IllegalSS-Operation,
 		SS-ErrorStatus,
 		SS-NotAvailable,
@@ -1356,7 +1462,13 @@ DeactivateSS ::= OPERATION				--Timer m--
 		UnknownSubscriber,
 		-- NU>1 UnknownSubscriber must not be used in version greater 1
 		CallBarred,
-		-- NU1 NU1 NumberOfPW-AttemptsViolation must not be used in version 1
+		-- NU1 CallBarred must not be used in version 1
+		IllegalSS-Operation,
+		SS-ErrorStatus,
+		SS-SubscriptionViolation,
+		NegativePW-Check,
+		NumberOfPW-AttemptsViolation}
+		-- NU1 NumberOfPW-AttemptsViolation must not be used in version 1
 
 InterrogateSS ::= OPERATION				--Timer m--
 	ARGUMENT
@@ -1373,21 +1485,25 @@ InterrogateSS ::= OPERATION				--Timer m--
 		BearerServiceNotProvisioned,
 		-- NU1 BearerServiceNotProvisioned must not be used in version 1
 		TeleserviceNotProvisioned,
-		-- NU1 NU>1 SS-NotAvailable must not be used in version greater 1
+		-- NU1 TeleserviceNotProvisioned must not be used in version 1
+		CallBarred,
+		IllegalSS-Operation,
+		SS-NotAvailable}
+		-- NU>1 SS-NotAvailable must not be used in version greater 1
 
 --<B--InvokeSS ::= OPERATION					--Timer m----B>--
 --<B--	ARGUMENT--B>--
---<B--		ss-ForBS	SS-ForBS-Code
+--<B--		ss-ForBS	SS-ForBS-Code--B>--
 --<B--	RESULT zzzz-Empty	NULL--B>--
 --<B--	ERRORS {--B>--
 --<B--		SystemFailure,--B>--
-		DataMissing,--B>--
+--<B--		DataMissing,--B>--
 --<B--		UnexpectedDataValue,--B>--
 --<B--		CallBarred,--B>--
---<B--		-- CallBarred must not be used in version 1----B>--
+--<B--		-- NU1 CallBarred must not be used in version 1----B>--
 --<B--		IllegalSS-Operation,--B>--
 --<B--		SS-ErrorStatus,--B>--
---<B--		SS-NotAvailable}
+--<B--		SS-NotAvailable}--B>--
 
 ProcessUnstructuredSS-Data ::= OPERATION		--Timer m--
 	ARGUMENT
@@ -1413,7 +1529,13 @@ ProcessSS-Request ::= OPERATION				--Timer ml--
 		UnknownSubscriber,
 		CallBarred}
 
-SS-GetDigits ::= OPERATION				--Timer ml--SS-GetString ::= OPERATION				--Timer ml--
+SS-GetDigits ::= OPERATION				--Timer ml--
+	ARGUMENT
+		ss-GetDigitsArg	SS-GetDigitsArg
+	RESULT
+		ss-DigitString	SS-DigitString
+
+SS-GetString ::= OPERATION				--Timer ml--
 	ARGUMENT
 		ss-GetStringArg	SS-GetStringArg
 	RESULT
@@ -1441,7 +1563,7 @@ RegisterPassword ::= OPERATION				--Timer m--
 		-- NU1 DataMissing must not be used in version 1
 		UnexpectedDataValue,
 		CallBarred,
-		-- CallBarred must not be used in version 1
+		-- NU1 CallBarred must not be used in version 1
 		SS-SubscriptionViolation,
 		PW-RegistrationFailure,
 		NegativePW-Check,
@@ -1461,7 +1583,7 @@ BeginSubscriberActivity ::= OPERATION			--Timer m--
 		beginSubscriberActivityArg	BeginSubscriberActivityArg
 
 
---- MODULE 'MAP-ShortMessageServiceOperations' START ---
+-- MODULE 'MAP-ShortMessageServiceOperations' START
 MAP-ShortMessageServiceOperations {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-ShortMessageServiceOperations (9) version2 (2)}
@@ -1517,7 +1639,7 @@ FROM MAP-SM-DataTypes {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-SM-DataTypes (16) version2 (2)}
 
-	AddressString,--B>--
+--<B--	AddressString,--B>--
 	ISDN-AddressString,
 	IMSI
 FROM MAP-CommonDataTypes {
@@ -1548,7 +1670,13 @@ ForwardSM ::= OPERATION					--Timer m--
 	ERRORS {
 		SystemFailure,
 		DataMissing,
-		-- NU1 NU1 IllegalEquipment must not be used in version 1
+		-- NU1 DataMissing must not be used in version 1
+		UnexpectedDataValue,
+		FacilityNotSupported,
+		UnidentifiedSubscriber,
+		IllegalSubscriber,
+		IllegalEquipment,
+		-- NU1 IllegalEquipment must not be used in version 1
 		AbsentSubscriber,
 		SM-DeliveryFailure}
 
@@ -1567,7 +1695,7 @@ ReportSM-DeliveryStatus ::= OPERATION			--Timer s--
 		UnknownSubscriber,
 		MessageWaitingListFull}
 
-NoteSubscriberPresent--
+NoteSubscriberPresent ::= OPERATION				--Timer s--
 	ARGUMENT
 		imsi		IMSI
 
@@ -1579,7 +1707,9 @@ AlertServiceCentre ::= OPERATION				--Timer s--
 		-- OU>1 RESULT must be used in version greater 1
 	ERRORS {
 		SystemFailure,
-		-- NU1 NU1 DataMissing must not be used in version 1
+		-- NU1 SystemFailure must not be used in version 1
+		DataMissing,
+		-- NU1 DataMissing must not be used in version 1
 		UnexpectedDataValue}
 		-- NU1 UnexpectedDataValue must not be used in version 1
 
@@ -1588,34 +1718,42 @@ InformServiceCentre ::= OPERATION				--Timer s--
 		informServiceCentreArg	InformServiceCentreArg
 
 --<B--SendInfoForMT-SMS ::= OPERATION				--Timer s----B>--
-	ARGUMENT--B>--
+--<B--	ARGUMENT--B>--
 --<B--		sm-RP-DA	SM-RP-DA--B>--
 --<B--	RESULT--B>--
---<B--		msisdn	ISDN-AddressString
+--<B--		msisdn	ISDN-AddressString--B>--
 --<B--	ERRORS {--B>--
 --<B--		SystemFailure,--B>--
 --<B--		DataMissing,--B>--
-		UnexpectedDataValue,--B>--
+--<B--		UnexpectedDataValue,--B>--
 --<B--		UnknownSubscriber,--B>--
 --<B--		UnidentifiedSubscriber,--B>--
---<B--		IllegalSubscriber,
+--<B--		IllegalSubscriber,--B>--
 --<B--		IllegalEquipment,--B>--
 --<B--		AbsentSubscriber}--B>--
 
---<B--SendInfoForMO-SMS ::= OPERATION				--Timer s----B>----<B--	ARGUMENT--B>--
+--<B--SendInfoForMO-SMS ::= OPERATION				--Timer s----B>--
+--<B--	ARGUMENT--B>--
 --<B--		serviceCentreAddress	AddressString--B>--
 --<B--	RESULT--B>--
---<B----B>--
+--<B--		msisdn	ISDN-AddressString--B>--
 --<B--	ERRORS {--B>--
 --<B--		DataMissing,--B>--
---<B--		UnexpectedDataValue,--B>----<B--		TeleserviceNotProvisioned,--B>--
+--<B--		UnexpectedDataValue,--B>--
+--<B--		TeleserviceNotProvisioned,--B>--
 --<B--		CallBarred}--B>--
 
 ReadyForSM ::= OPERATION				--Timer m--
 	ARGUMENT
 		readyForSM-Arg	ReadyForSM-Arg
 	RESULT zzzz-Empty	NULL
---- MODULE 'MAP-Errors' START ---
+	ERRORS {
+		DataMissing,
+		UnexpectedDataValue,
+		UnknownSubscriber}
+
+
+-- MODULE 'MAP-Errors' START
 MAP-Errors {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-Errors (10) version2 (2)}
@@ -1663,10 +1801,10 @@ EXPORTS
 	-- call handling errors
 	NoRoamingNumberAvailable,
 	AbsentSubscriber,
-	BusySubscriber,--B>--
+--<B--	BusySubscriber,--B>--
 --<B--	NoSubscriberReply,--B>--
 --<B--	RadioCongestion,--B>--
---<B--	ImpossibleCallCompletion,
+--<B--	ImpossibleCallCompletion,--B>--
 	CallBarred,
 	ForwardingViolation,
 	CUG-Reject,
@@ -1719,7 +1857,12 @@ FROM MAP-CommonDataTypes {
 
 -- generic errors
 
-SystemFailureDataMissing ::= ERROR
+SystemFailure ::= ERROR
+	PARAMETER
+		networkResource	NetworkResource
+		-- optional
+
+DataMissing ::= ERROR
 
 UnexpectedDataValue ::= ERROR
 
@@ -1736,7 +1879,7 @@ UnknownBaseStation ::= ERROR
 
 UnknownMSC ::= ERROR
 
---<B--UnknownLocArea--B>--
+--<B--UnknownLocArea ::= ERROR--B>--
 
 UnidentifiedSubscriber ::= ERROR
 
@@ -1751,7 +1894,8 @@ RoamingNotAllowed ::= ERROR
 	PARAMETER
 		roamingNotAllowedCause	RoamingNotAllowedCause
 		-- optional
-		-- OA! OP>1 roamingNotAllowedCause must be present in version greater 1
+		-- OA! roamingNotAllowedCause must be absent in version 1
+		-- OP>1 roamingNotAllowedCause must be present in version greater 1
 
 IllegalSubscriber ::= ERROR
 
@@ -1770,7 +1914,7 @@ NoRadioResourceAvailable ::= ERROR
 
 NoHandoverNumberAvailable ::= ERROR
 
- ::= ERROR
+SubsequentHandoverFailure ::= ERROR
 
 
 -- operation and maintenance errors
@@ -1789,16 +1933,16 @@ AbsentSubscriber ::= ERROR
 		-- OA>1 mwd-Set must be absent in version greater 1
 
 --<B--BusySubscriber ::= ERROR--B>--
-	PARAMETER--B>--
+--<B--	PARAMETER--B>--
 --<B--		busySubscriberCause	BusySubscriberCause--B>--
 --<B--		-- optional----B>--
 
---<B--NoSubscriberReply--B>--
+--<B--NoSubscriberReply ::= ERROR--B>--
 
 --<B--RadioCongestion ::= ERROR--B>--
 
 --<B--ImpossibleCallCompletion ::= ERROR--B>--
---<B----B>--
+--<B--	PARAMETER--B>--
 --<B--		ss-List	SS-List--B>--
 --<B--		-- optional----B>--
 
@@ -1809,7 +1953,7 @@ CallBarred ::= ERROR
 
 ForwardingViolation ::= ERROR
 
- ::= ERROR
+CUG-Reject ::= ERROR
 	PARAMETER
 		cug-RejectCause	CUG-RejectCause
 		-- optional
@@ -1840,7 +1984,11 @@ SS-PartialAcceptance ::= ERROR
 
 SS-NotDelivered ::= ERROR
 
-PW-RegistrationFailureNegativePW-Check ::= ERROR
+PW-RegistrationFailure ::= ERROR
+	PARAMETER
+		pw-RegistrationFailureCause	PW-RegistrationFailureCause
+
+NegativePW-Check ::= ERROR
 
 NumberOfPW-AttemptsViolation ::= ERROR
 
@@ -1854,7 +2002,7 @@ SM-DeliveryFailure ::= ERROR
 MessageWaitingListFull ::= ERROR
 
 
---- MODULE 'MAP-MS-DataTypes' START ---
+-- MODULE 'MAP-MS-DataTypes' START
 MAP-MS-DataTypes {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-MS-DataTypes (11) version2 (2)}
@@ -1870,7 +2018,7 @@ BEGIN
 EXPORTS
 
 	-- location registration types
---<B----B>--
+--<B--	UpdateLocationAreaArg,--B>--
 	UpdateLocationArg,
 	UpdateLocationRes,
 	CancelLocationArg,
@@ -1880,7 +2028,10 @@ EXPORTS
 
 	-- page management types
 --<B--	PageArg,--B>--
---<B--	SearchForMS-Arg,--B>----<B--	ProcessAccessRequestArg,--B>--
+--<B--	SearchForMS-Arg,--B>--
+
+	-- access management types
+--<B--	ProcessAccessRequestArg,--B>--
 --<B--	ProcessAccessRequestRes,--B>--
 
 	-- handover types
@@ -1894,7 +2045,7 @@ EXPORTS
 	SendAuthenticationInfoRes,
 
 	-- security management types
---<B----B>--
+--<B--	SetCipheringModeArg,--B>--
 	CheckIMEI-Arg,
 
 	-- subscriber management types
@@ -1925,12 +2076,32 @@ FROM MAP-SS-DataTypes {
 	SubscriberId,
 	IMEI,
 --<B--	LocAreaId,--B>--
---<B--	LocAreaIdOrNone,--B>----<B--UpdateLocationAreaArg ::= SEQUENCE {--B>--
+--<B--	LocAreaIdOrNone,--B>--
+	LocationInfo,
+	HLR-List,
+	LMSI,
+	GlobalCellId,
+	NetworkResource,
+	Category,
+	BearerServiceList,
+	TeleserviceList,
+	BasicServiceList
+FROM MAP-CommonDataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+;
+
+
+-- location registration types
+
+--<B--UpdateLocationAreaArg ::= SEQUENCE {--B>--
 --<B--	subscriberId	SubscriberId,--B>--
 --<B--	previousLocAreaId	LocAreaIdOrNone,--B>--
-	targetLocAreaId	LocAreaId,--B>--
+--<B--	targetLocAreaId	LocAreaId,--B>--
 --<B--	cksn			CKSN			OPTIONAL}--B>--
---<B--	-- OP1 cksn must be present in version 1----B>--UpdateLocationArg ::= SEQUENCE {
+--<B--	-- OP1 cksn must be present in version 1----B>--
+
+UpdateLocationArg ::= SEQUENCE {
 	imsi		IMSI,
 	locationInfo	LocationInfo,
 	vlr-Number	ISDN-AddressString,
@@ -1952,7 +2123,9 @@ ZoneCodeList ::= SEQUENCE SIZE (1..maxNumOfZoneCodes)
 ZoneCode ::= TBCD-STRING (SIZE (3..8))
 	-- digits of MCC, MNC, VLRI, ZI are concatenated in this order.
 
-maxNumOfZoneCodesCancelLocationArg ::= CHOICE {
+maxNumOfZoneCodes  INTEGER ::= 10
+
+CancelLocationArg ::= CHOICE {
 	imsi			IMSI,
 	imsi-WithLMSI	IMSI-WithLMSI}
 
@@ -1980,40 +2153,43 @@ RAND ::= OCTET STRING (SIZE (16))
 
 SRES ::= OCTET STRING (SIZE (4))
 
- ::= OCTET STRING (SIZE (8))
+Kc ::= OCTET STRING (SIZE (8))
 
 
 -- page management types
 
 --<B--PageArg ::= SEQUENCE {--B>--
 --<B--	imsi			[0] IMSI,--B>--
---<B--	tmsi			[1] TMSI		OPTIONAL,--B>----<B--	locAreaId	[2] LocAreaId}--B>--
+--<B--	tmsi			[1] TMSI		OPTIONAL,--B>--
+--<B--	locAreaId	[2] LocAreaId}--B>--
 
 --<B--SearchForMS-Arg ::= SEQUENCE {--B>--
 --<B--	imsi			IMSI,--B>--
-	storedLocAreaId	LocAreaIdOrNone}--B>--
+--<B--	storedLocAreaId	LocAreaIdOrNone}--B>--
 
 
 -- access management types
 
 --<B--ProcessAccessRequestArg ::= SEQUENCE {--B>--
 --<B--	subscriberIdOrIMEI	SubscriberIdOrIMEI,--B>--
---<B----B>--
+--<B--	cm-ServiceType	CM-ServiceType,--B>--
 --<B--	accessConnectionStatus	AccessConnectionStatus,--B>--
 --<B--	cksn			CKSN,--B>--
---<B--	targetLocArea	LocAreaId	OPTIONAL}--B>--OA1 targetLocAreas must be absent in version 1
+--<B--	targetLocArea	LocAreaId	OPTIONAL}--B>--
+	-- OA1 targetLocAreas must be absent in version 1
 	-- OP>1 targetLocArea must be present in version greater 1
 
 --<B--SubscriberIdOrIMEI ::= CHOICE {--B>--
 --<B--	subscriberID	SubscriberId,--B>--
-	imei			[2] IMEI}--B>--
+--<B--	imei			[2] IMEI}--B>--
 	-- NU1 imei must not be used in version 1
 
 --<B--CM-ServiceType ::= ENUMERATED {--B>--
---<B--	mobileOriginatingCallorPacketMode  (1),--B>----<B--	emergencyCallEstablishment  (2),--B>--
+--<B--	mobileOriginatingCallorPacketMode  (1),--B>--
+--<B--	emergencyCallEstablishment  (2),--B>--
 --<B--	shortMessageService  (4),--B>--
 --<B--	ss-Activation  (8),--B>--
---<B----B>--
+--<B--	mobileOriginatingCallReestablishment  (9),--B>--
 --<B--	mobileTerminatingCall  (10)}--B>--
 
 --<B--AccessConnectionStatus ::= OCTET STRING (SIZE (1))--B>--
@@ -2032,11 +2208,11 @@ SRES ::= OCTET STRING (SIZE (4))
 	--	0  MM-connection existing and authenticated
 	--	1  MM-connection existing and not authenticated
 
---<B--ProcessAccessRequestRes--B>--
+--<B--ProcessAccessRequestRes ::= SEQUENCE {--B>--
 --<B--	imsi-OrIMEI	IMSI-OrIMEI,--B>--
 --<B--	msisdn		ISDN-AddressString	OPTIONAL}--B>--
 
---<B--IMSI-OrIMEI ::= CHOICE {
+--<B--IMSI-OrIMEI ::= CHOICE {--B>--
 --<B--	imsi			IMSI,--B>--
 --<B--	imei			[0] IMEI}--B>--
 	-- NU1 imei must not be used in version 1
@@ -2050,7 +2226,10 @@ PerformHO-Arg ::= SEQUENCE {
 	classmarkInfo	ClassmarkInfo,
 	handoverPriority	[11] HandoverPriority	OPTIONAL,
 	handoverReason	[13] HandoverReason	OPTIONAL,
-	-- OA1ChannelType ::= OCTET STRING (SIZE (1..10))
+	-- OA1 handoverReason must be absent in version 1
+	kc			[12] Kc		OPTIONAL}
+
+ChannelType ::= OCTET STRING (SIZE (1..10))
 	-- concatenation of
 	-- speech data indicator
 	-- channel rate
@@ -2081,11 +2260,17 @@ PerformSubsequentHO-Arg ::= SEQUENCE {
 
 -- authentication management types
 
---<B--AuthenticateArg ::= SEQUENCE {
+--<B--AuthenticateArg ::= SEQUENCE {--B>--
 --<B--	rand			RAND,--B>--
 --<B--	cksn			CKSN}--B>--
 
---<B--CKSN ::= OCTET STRING (SIZE (1))--B>--SendAuthenticationInfoArg ::= IMSI
+--<B--CKSN ::= OCTET STRING (SIZE (1))--B>--
+
+	-- bits 87654: 00000 (unused)
+
+	-- bits 321 coded as specified in GSM 04.08
+
+SendAuthenticationInfoArg ::= IMSI
 
 SendAuthenticationInfoRes ::= AuthenticationSetList
 
@@ -2095,11 +2280,12 @@ Ki ::= OCTET STRING (SIZE (16))
 -- security management types
 
 --<B--SetCipheringModeArg ::= SEQUENCE {--B>--
---<B--	cipheringMode	CipheringMode,--B>----<B--	kc			Kc			OPTIONAL}--B>--
+--<B--	cipheringMode	CipheringMode,--B>--
+--<B--	kc			Kc			OPTIONAL}--B>--
 
 --<B--CipheringMode ::= ENUMERATED {--B>--
 --<B--	noEncryption  (1),--B>--
-	version1-GSM  (2)}--B>--
+--<B--	version1-GSM  (2)}--B>--
 
 CheckIMEI-Arg ::= CHOICE {
 	equipmentStatus	EquipmentStatus,
@@ -2125,7 +2311,7 @@ SendParametersArg ::= SEQUENCE {
 RequestParameterList ::= SEQUENCE SIZE (1..2) OF
 				RequestParameter
 
- ::= ENUMERATED {
+RequestParameter ::= ENUMERATED {
 	requestIMSI  (0),
 	requestAuthenticationSet  (1),
 	requestSubscriberData  (2),
@@ -2162,7 +2348,11 @@ SubscriberStatus ::= ENUMERATED {
 	serviceGranted  (0),
 	operatorDeterminedBarring  (1)}
 
-ODB-DataODB-GeneralData ::= BIT STRING {
+ODB-Data ::= SEQUENCE {
+	odb-GeneralData	ODB-GeneralData,
+	odb-HPLMN-Data	ODB-HPLMN-Data	OPTIONAL}
+
+ODB-GeneralData ::= BIT STRING {
 	allOG-CallsBarred  (0),
 	internationalOGCallsBarred  (1),
 	internationalOGCallsNotToHPLMN-CountryBarred  (2),
@@ -2197,12 +2387,16 @@ ResetArg ::= SEQUENCE {
 	hlr-Number	ISDN-AddressString,
 	hlr-List		HLR-List		OPTIONAL}
 
-RestoreDataArgRestoreDataRes ::= SEQUENCE {
+RestoreDataArg ::= SEQUENCE {
+	imsi		IMSI,
+	lmsi			LMSI			OPTIONAL}
+
+RestoreDataRes ::= SEQUENCE {
 	COMPONENTS OF	HLR-NumberWithRoamingRestrictions,
 	msNotReachable	NULL			OPTIONAL}
 
 
---- MODULE 'MAP-OM-DataTypes' START ---
+-- MODULE 'MAP-OM-DataTypes' START
 MAP-OM-DataTypes {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-OM-DataTypes (12) version2 (2)}
@@ -2254,7 +2448,7 @@ DeactivateTraceModeArg ::= SEQUENCE {
 	imsi			[0] IMSI		OPTIONAL,
 	traceReference	[1] TraceReference}
 
- ::= SEQUENCE {
+TraceSubscriberActivityArg ::= SEQUENCE {
 	imsi			[0] IMSI		OPTIONAL,
 	traceReference	[1] TraceReference,
 	traceType	[2] TraceType,
@@ -2273,7 +2467,7 @@ HandoverType ::= ENUMERATED {
 	intraBSS  (1)}
 
 
---- MODULE 'MAP-CH-DataTypes' START ---
+-- MODULE 'MAP-CH-DataTypes' START
 MAP-CH-DataTypes {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-CH-DataTypes (13) version2 (2)}
@@ -2287,19 +2481,19 @@ IMPLICIT TAGS
 BEGIN
 
 EXPORTS
---<B--	InfoForIC-Arg,
+--<B--	InfoForIC-Arg,--B>--
 --<B--	ConnectToFollowingAddressArg,--B>--
 --<B--	ProcessCallWaitingArg,--B>--
 --<B--	InfoForOC-Arg,--B>--
 	SendRoutingInfoArg,
 	SendRoutingInfoRes,
-	ProvideRoamingNumberArg,--B>--
+	ProvideRoamingNumberArg--<B--,--B>--
 --<B--	CompleteCallArg--B>--
 ;
 
 IMPORTS
 --<B--	NoReplyConditionTime,--B>--
---<B--	CUG-Index,
+--<B--	CUG-Index,--B>--
 	CUG-Interlock,
 --<B--	SS-DataList,--B>--
 	ForwardingData
@@ -2312,7 +2506,7 @@ FROM MAP-SS-DataTypes {
 	IMSI,
 --<B--	IMEI,--B>--
 	LMSI--<B--,--B>--
-	Category,--B>--
+--<B--	Category,--B>--
 --<B--	BasicServiceCode--B>--
 FROM MAP-CommonDataTypes {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
@@ -2321,10 +2515,10 @@ FROM MAP-CommonDataTypes {
 
 
 --<B--InfoForIC-Arg ::= SEQUENCE {--B>--
---<B----B>--
+--<B--	roamingNumber	[0] ISDN-AddressString,--B>--
 --<B--	basicService	BasicServiceCode	OPTIONAL,--B>--
 --<B--		dialledNumber	[5] ISDN-AddressString	OPTIONAL,--B>--
---<B--	cug-CheckInfo	[6] CUG-CheckInfo	OPTIONAL,
+--<B--	cug-CheckInfo	[6] CUG-CheckInfo	OPTIONAL,--B>--
 	-- OA1 cug-CHeckInfo must be absent in version 1
 --<B--	numberOfForwarding	[7] NumberOfForwarding	OPTIONAL}--B>--
 
@@ -2334,27 +2528,28 @@ CUG-CheckInfo ::= SEQUENCE {
 
 NumberOfForwarding ::= INTEGER (1..5)
 
---<B--ConnectToFollowingAddressArg ::= SEQUENCE {
+--<B--ConnectToFollowingAddressArg ::= SEQUENCE {--B>--
 --<B--	forwardingData	ForwardingData,--B>--
 --<B--	msisdn		ISDN-AddressString	OPTIONAL,--B>--
 --<B--	cug-CheckInfo	CUG-CheckInfo	OPTIONAL}--B>--
-	-- cug-CheckInfo must be absent in version 1
+	-- OA1 cug-CheckInfo must be absent in version 1
 
 --<B--ProcessCallWaitingArg ::= SEQUENCE {--B>--
 --<B--	msisdn		[0] ISDN-AddressString,--B>--
---<B--	cug-Index	[1] CUG-Index	OPTIONAL,--B>----<B--	gsm-BearerCapability	[2] ExternalSignalInfo	OPTIONAL,--B>--
+--<B--	cug-Index	[1] CUG-Index	OPTIONAL,--B>--
+--<B--	gsm-BearerCapability	[2] ExternalSignalInfo	OPTIONAL,--B>--
 --<B--	networkSignalInfo	[3] ExternalSignalInfo	OPTIONAL,--B>--
 --<B--	noReplyConditionTime	[4] NoReplyConditionTime	OPTIONAL,--B>--
---<B----B>--
+--<B--	ss-DataList	[5] SS-DataList	OPTIONAL}--B>--
 
 --<B--InfoForOC-Arg ::= SEQUENCE {--B>--
 --<B--	calledNumber	[0] ISDN-AddressString,--B>--
---<B--	basicService	BasicServiceCode	OPTIONAL,
+--<B--	basicService	BasicServiceCode	OPTIONAL,--B>--
 --<B--	cug-Index	[4] CUG-Index	OPTIONAL,--B>--
 	-- OA1 cug-Index must be absent in version 1
 --<B--	supressPrefCUG	[5] NULL		OPTIONAL,--B>--
 	-- OA1 supressPrefCUG must be absent in version 1
-	supressOutgoingAccess	[6] NULL		OPTIONAL}--B>--
+--<B--	supressOutgoingAccess	[6] NULL		OPTIONAL}--B>--
 	-- OA1 supressOutgoingAccess must be absent in version 1
 
 SendRoutingInfoArg ::= SEQUENCE {
@@ -2370,7 +2565,11 @@ SendRoutingInfoRes ::= SEQUENCE {
 	cug-CheckInfo	CUG-CheckInfo	OPTIONAL}
 	-- OA1 cug-CheckInfo must be absent in version 1
 
-RoutingInfoProvideRoamingNumberArg ::= SEQUENCE {
+RoutingInfo ::= CHOICE {
+	roamingNumber	ISDN-AddressString,
+	forwardingData	ForwardingData}
+
+ProvideRoamingNumberArg ::= SEQUENCE {
 	imsi			[0] IMSI,
 	msc-Number	[1] ISDN-AddressString	OPTIONAL,
 	-- OP>1 msc-Number must be present in version greater 1
@@ -2381,23 +2580,25 @@ RoutingInfoProvideRoamingNumberArg ::= SEQUENCE {
 	networkSignalInfo	[6] ExternalSignalInfo	OPTIONAL}
 
 --<B--CompleteCallArg ::= SEQUENCE {--B>--
---<B--	msisdnOrIMEI	MSISDN-OrIMEI,--B>----<B--	category		[1] Category	OPTIONAL,--B>--
+--<B--	msisdnOrIMEI	MSISDN-OrIMEI,--B>--
+--<B--	category		[1] Category	OPTIONAL,--B>--
 --<B--	cug-Index	[2] CUG-Index	OPTIONAL,--B>--
 	-- NU1 cug-INDEX must not be used in version 1
---<B--	gsm-BearerCapability	[3] ExternalSignalInfo	OPTIONAL,--B>----<B--	networkSignalInfo	[7] ExternalSignalInfo	OPTIONAL,--B>--
+--<B--	gsm-BearerCapability	[3] ExternalSignalInfo	OPTIONAL,--B>--
+--<B--	networkSignalInfo	[7] ExternalSignalInfo	OPTIONAL,--B>--
 	-- OA1 networkSignalInfo must be absent in version 1
 --<B--	noReplyConditionTime	[4] NoReplyConditionTime	OPTIONAL,--B>--
 --<B--	ss-DataList	[5] SS-DataList	OPTIONAL,--B>--
---<B----B>--
+--<B--	cug-CheckInfo	[6] CUG-CheckInfo	OPTIONAL}--B>--
 	-- OA1 cug-CheckInfo must be absent in version 1
 
 --<B--MSISDN-OrIMEI ::= CHOICE {--B>--
 --<B--	msisdn		[0] ISDN-AddressString,--B>--
---<B--	imei			[8] IMEI}
+--<B--	imei			[8] IMEI}--B>--
 	-- NU1 imei must not be used in version 1
 
 
---- MODULE 'MAP-SS-DataTypes' START ---
+-- MODULE 'MAP-SS-DataTypes' START
 MAP-SS-DataTypes {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-SS-DataTypes (14) version2 (2)}
@@ -2415,7 +2616,7 @@ EXPORTS
 --<B--	NoReplyConditionTime,--B>--
 	SS-Info,
 	SS-Status,
---<B----B>--
+--<B--	CUG-Index,--B>--
 	CUG-Interlock,
 	SS-SubscriptionOption,
 	SS-ForBS-Code,
@@ -2474,7 +2675,7 @@ SS-Info ::= CHOICE {
 	cug-Info	[2] CUG-Info,
 	ss-Data		[3] SS-Data}
 
- ::= SEQUENCE {
+ForwardingInfo ::= SEQUENCE {
 	ss-Code		SS-Code		OPTIONAL,
 	forwardingFeatureList	ForwardingFeatureList}
 
@@ -2544,7 +2745,7 @@ ForwardingOptions ::= OCTET STRING (SIZE (1))
 
 CallBarringInfo ::= SEQUENCE {
 	ss-Code		SS-Code		OPTIONAL,
-	-- ss-Code must be present in version 1
+	-- OP1 ss-Code must be present in version 1
 	callBarringFeatureList	CallBarringFeatureList}
 
 CallBarringFeatureList ::= SEQUENCE SIZE (1..maxNumOfBasicServiceGroups) OF
@@ -2571,7 +2772,9 @@ CUG-Subscription ::= SEQUENCE {
 CUG-Index ::= INTEGER (0..32767)
 	-- The internal structure is defined in TS ETS 300 138:1991.
 
-CUG-InterlockIntraCUG-Options ::= ENUMERATED {
+CUG-Interlock ::= OCTET STRING (SIZE (4))
+
+IntraCUG-Options ::= ENUMERATED {
 	noCUG-Restrictions  (0),
 	cugIC-CallBarred  (1),
 	cugOG-CallBarred  (2)}
@@ -2602,7 +2805,9 @@ SS-Data ::= SEQUENCE {
 	ss-SubscriptionOption	SS-SubscriptionOption	OPTIONAL,
 	-- OA1 ss-SubscriptionOption must be absent in version 1
 	basicServiceGroupList	BasicServiceGroupList	OPTIONAL}
-	-- OA1 SS-SubscriptionOption ::= CHOICE {
+	-- OA1 basicServiceGroupList must be absent in version 1
+
+SS-SubscriptionOption ::= CHOICE {
 	presentationMode	[0] PresentationMode,
 	overrideCategory	[1] OverrideCategory}
 
@@ -2632,7 +2837,7 @@ ProcessSS-RequestArg ::= SEQUENCE {
 	equipmentType	EquipmentType	OPTIONAL,
 	ss-specificInfo	SS-SpecificInfo	OPTIONAL}
 
- ::= OCTET STRING (SIZE (1..2))
+SS-FeatureAccessCode ::= OCTET STRING (SIZE (1..2))
 
 EquipmentType ::= SEQUENCE {
 	displayDeviceExists	NULL			OPTIONAL,
@@ -2648,7 +2853,7 @@ SS-DigitString ::= IA5String
 	(FROM ("0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"|"*"|"#")|--)
 	--(--SIZE (1..maxNumOfDigits))
 
- ::= CHOICE {
+ToneOrDisplay ::= CHOICE {
 	nonRegisteredDisplay	[0] SS-DisplayString,
 	preRegisteredDisplay	[1] SS-StringReference,
 	tone			[2] Tone}
@@ -2671,7 +2876,9 @@ SS-GetStringArg ::= SEQUENCE {
 	toneOrDisplay	ToneOrDisplay,
 	stringLength	StringLength	OPTIONAL}
 
-StringLengthmaxStringLength  INTEGER ::= 200
+StringLength ::= INTEGER (1..maxStringLength)
+
+maxStringLength  INTEGER ::= 200
 
 SS-GetStringRes ::= PrintableString(SIZE (1..maxStringLength))
 
@@ -2686,7 +2893,11 @@ GuidanceInfo ::= ENUMERATED {
 	-- How this information is really delivered to the subscriber (display,
 	-- announcement, ...) is not part of this specification.
 
-BeginSubscriberActivityArgSS-List ::= SEQUENCE SIZE (1..maxNumOfSS) OF
+BeginSubscriberActivityArg ::= SEQUENCE {
+	imsi			IMSI,
+	originatingEntityNumber	ISDN-AddressString}
+
+SS-List ::= SEQUENCE SIZE (1..maxNumOfSS) OF
 				SS-Code
 
 maxNumOfSS  INTEGER ::= 30
@@ -2695,7 +2906,9 @@ SS-InfoList ::= SEQUENCE SIZE (1..maxNumOfSS) OF
 				SS-Info
 
 --<B--SS-DataList ::= SEQUENCE SIZE (1..maxNumOfSS) OF--B>--
---<B--				SS-Data--B>--ForwardingData ::= SEQUENCE {
+--<B--				SS-Data--B>--
+
+ForwardingData ::= SEQUENCE {
 	forwardedToNumber	[5] ISDN-AddressString	OPTIONAL,
 	-- OP1 forwardedToNumber must be present in version 1 
 	forwardedToSubaddress	[4] ISDN-SubaddressString	OPTIONAL,
@@ -2703,7 +2916,7 @@ SS-InfoList ::= SEQUENCE SIZE (1..maxNumOfSS) OF
 	forwardingOptions	[6] ForwardingOptions	OPTIONAL}
 
 
---- MODULE 'MAP-SS-Code' START ---
+-- MODULE 'MAP-SS-Code' START
 MAP-SS-Code {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-SS-Code (15) version2 (2)}
@@ -2714,7 +2927,15 @@ DEFINITIONS
 
 BEGIN
 
-SS-CodeallSS			SS-Code ::= '00000000'B
+SS-Code ::= OCTET STRING (SIZE (1))
+	-- This type is used to represent the code identifying a single supplementary
+	-- service, a group of supplementary services, or all supplementary services.
+	-- The services and abbreviations used are defined in GSM02.04.
+	-- The internal structure is defined as follows:
+
+	-- bits 87654321: group (bits 8765), and specific service (bits 4321)
+
+allSS			SS-Code ::= '00000000'B
 	-- all SS
 
 allLineIdentificationSS	SS-Code ::= '00010000'B
@@ -2732,7 +2953,7 @@ mci			SS-Code ::= '00010101'B
 
 allForwardingSS	SS-Code ::= '00100000'B
 	--    all forwarding SS
-			SS-Code ::= '00100001'B
+cfu			SS-Code ::= '00100001'B
 	--        call forwarding unconditional
 allCondForwardingSS	SS-Code ::= '00101000'B
 	--      all conditional forwarding SS
@@ -2750,7 +2971,9 @@ ct				SS-Code ::= '00110001'B
 mah			SS-Code ::= '00110010'B
 	--        mobile access hunting
 
-allCallCompletionSScw				SS-Code ::= '01000001'B
+allCallCompletionSS	SS-Code ::= '01000000'B
+	--    all Call completion SS
+cw				SS-Code ::= '01000001'B
 	--        call waiting
 hold			SS-Code ::= '01000010'B
 	--        call hold
@@ -2769,7 +2992,7 @@ cug			SS-Code ::= '01100001'B
 
 allChargingSS	SS-Code ::= '01110000'B
 	--    all charging SS
-i			SS-Code ::= '01110001'B
+aoci			SS-Code ::= '01110001'B
 	--        advice of charge information
 aocc			SS-Code ::= '01110010'B
 	--        advice of charge charging
@@ -2787,7 +3010,10 @@ baoc			SS-Code ::= '10010010'B
 	--        barring of all outgoing calls
 boic			SS-Code ::= '10010011'B
 	--        barring of outgoing international calls
-boicExHCbarringOfIncomingCalls	SS-Code ::= '10011001'B
+boicExHC		SS-Code ::= '10010100'B
+	--        barring of outgoing international calls except those directed
+	--        to the home PLMN
+barringOfIncomingCalls	SS-Code ::= '10011001'B
 	--      barring of incoming calls
 baic			SS-Code ::= '10011010'B
 	--        barring of all incoming calls
@@ -2800,7 +3026,7 @@ allPLMN-specificSS	SS-Code ::= '11110000'B
 plmn-specificSS-1	SS-Code ::= '11110001'B
 plmn-specificSS-2	SS-Code ::= '11110010'B
 plmn-specificSS-3	SS-Code ::= '11110011'B
-	SS-Code ::= '11110100'B
+plmn-specificSS-4	SS-Code ::= '11110100'B
 plmn-specificSS-5	SS-Code ::= '11110101'B
 plmn-specificSS-6	SS-Code ::= '11110110'B
 plmn-specificSS-7	SS-Code ::= '11110111'B
@@ -2808,12 +3034,13 @@ plmn-specificSS-8	SS-Code ::= '11111000'B
 plmn-specificSS-9	SS-Code ::= '11111001'B
 plmn-specificSS-A	SS-Code ::= '11111010'B
 plmn-specificSS-B	SS-Code ::= '11111011'B
-plmn-specificSS-Cplmn-specificSS-D	SS-Code ::= '11111101'B
+plmn-specificSS-C	SS-Code ::= '11111100'B
+plmn-specificSS-D	SS-Code ::= '11111101'B
 plmn-specificSS-E	SS-Code ::= '11111110'B
 plmn-specificSS-F	SS-Code ::= '11111111'B
 
 
---- MODULE 'MAP-SM-DataTypes' START ---
+-- MODULE 'MAP-SM-DataTypes' START
 MAP-SM-DataTypes {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-SM-DataTypes (16) version2 (2)}
@@ -2830,7 +3057,21 @@ EXPORTS
 	RoutingInfoForSM-Arg,
 	RoutingInfoForSM-Res,
 	ForwardSM-Arg,
---<B--	SM-RP-DA,--B>--	TeleserviceCode, (CR202)
+--<B--	SM-RP-DA,--B>--
+	ReportSM-DeliveryStatusArg,
+	AlertServiceCentreArg,
+	InformServiceCentreArg,
+	ReadyForSM-Arg
+;
+
+IMPORTS
+	AddressString,
+	ISDN-AddressString,
+	SignalInfo,
+	IMSI,
+	SubscriberId,
+	LocationInfo,
+	TeleserviceCode, (CR202)
 	LMSI
 FROM MAP-CommonDataTypes {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
@@ -2867,7 +3108,7 @@ ForwardSM-Arg ::= SEQUENCE {
 	sm-RP-OA		SM-RP-OA,
 	sm-RP-UI		SignalInfo,
 	moreMessagesToSend	NULL			OPTIONAL}
-	-- moreMessagesToSend must be absent in version 1
+	-- OA1 moreMessagesToSend must be absent in version 1
 
 SM-RP-DA ::= CHOICE {
 	imsi			[0] IMSI,
@@ -2888,7 +3129,9 @@ ReportSM-DeliveryStatusArg ::= SEQUENCE {
 	serviceCentreAddress	AddressString,
 	sm-DeliveryOutcome	SM-DeliveryOutcome	OPTIONAL}
 	-- OA1 sm-DeliveryOutcome must be absent in version 1
-	-- OP>1 SM-DeliveryOutcome ::= ENUMERATED {
+	-- OP>1 sm-DeliveryOutcome must be present in version greater 1
+
+SM-DeliveryOutcome ::= ENUMERATED {
 	memoryCapacityExceeded  (0),
 	absentSubscriber  (1),
 	successfulTransfer  (2)}
@@ -2915,7 +3158,7 @@ AlertReason ::= ENUMERATED {
 	memoryAvailable  (1)}
 
 
---- MODULE 'MAP-ER-DataTypes' START ---
+-- MODULE 'MAP-ER-DataTypes' START
 MAP-ER-DataTypes {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-ER-DataTypes (17) version2 (2)}
@@ -2963,7 +3206,7 @@ RoamingNotAllowedCause ::= ENUMERATED {
 	operatorDeterminedBarring  (3)}
 
 --<B--BusySubscriberCause ::= ENUMERATED {--B>--
---<B----B>--
+--<B--	networkDeterminedUserBusy  (0),--B>--
 --<B--	moreCallsAllowed  (1),--B>--
 --<B--	userDeterminedUserBusy  (2)}--B>--
 
@@ -2971,7 +3214,16 @@ CallBarringCause ::= ENUMERATED {
 	barringServiceActive  (0),
 	operatorBarring  (1)}
 
-CUG-RejectCauseNU1 calledPartySS-InteractionViolation must not be used in version 1
+CUG-RejectCause ::= ENUMERATED {
+	incomingCallsBarredWithinCUG  (0),
+	subscriberNotMemberOfCUG  (1),
+	outgoingCallsBarredWithinCUG  (2),
+	indexIncompatibleWithRequestedBasicService  (3),
+	unknownCUG-Index  (4),
+	requestedBasicServiceViolatesCUG-Constraints  (5),
+	noCUG-Selected  (6),
+	calledPartySS-InteractionViolation  (7)}
+	-- NU1 calledPartySS-InteractionViolation must not be used in version 1
 
 SS-IncompatibilityCause ::= SEQUENCE {
 	ss-Code		[1] SS-Code	OPTIONAL,
@@ -2993,7 +3245,7 @@ SM-DeliveryFailureCause ::= ENUMERATED {
 	subscriberNotSC-Subscriber  (6)} 
 
 
---- MODULE 'MAP-CommonDataTypes' START ---
+-- MODULE 'MAP-CommonDataTypes' START
 MAP-CommonDataTypes {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-CommonDataTypes (18) version2 (2)}
@@ -3022,7 +3274,7 @@ EXPORTS
 	TMSI,
 	SubscriberId,
 	IMEI,
---<B----B>--
+--<B--	LocAreaId,--B>--
 --<B--	LocAreaIdOrNone,--B>--
 	LocationInfo,
 	HLR-List,
@@ -3110,7 +3362,9 @@ maxAddressLength  INTEGER ::= 20
 ISDN-AddressString ::= AddressString (SIZE (1..maxISDN-AddressLength))
 	-- This type is used to represent ISDN numbers.
 
-maxISDN-AddressLengthISDN-SubaddressString ::= OCTET STRING (SIZE (1..maxISDN-SubaddressLength))
+maxISDN-AddressLength  INTEGER ::= 9
+
+ISDN-SubaddressString ::= OCTET STRING (SIZE (1..maxISDN-SubaddressLength))
 	-- This type is used to represent ISDN subaddresses.
 
 maxISDN-SubaddressLength  INTEGER ::= 21
@@ -3153,7 +3407,7 @@ IMSI ::= TBCD-STRING (SIZE (3..8))
 
 TMSI ::= OCTET STRING (SIZE (1..4))
 
- ::= CHOICE {
+SubscriberId ::= CHOICE {
 	imsi			[0] IMSI,
 	tmsi			[1] TMSI}
 
@@ -3173,7 +3427,7 @@ IMEI ::= TBCD-STRING (SIZE (8))
 	--	Location Area Code:	2 octets according to GSM 04.08
 
 --<B--LocAreaIdOrNone ::= CHOICE {--B>--
---<B----B>--
+--<B--	locAreaId	LocAreaId,--B>--
 --<B--	noLocAreaId	NULL}--B>--
 
 LocationInfo ::= CHOICE {
@@ -3184,7 +3438,7 @@ LocationInfo ::= CHOICE {
 HLR-Id ::= IMSI
 	-- leading digits of IMSI
 
-HLR-List ::= SEQUENCE SIZE (1..maxNumOfHLRId) OF
+HLR-List ::= SEQUENCE SIZE (1..maxNumOfHLR-Id) OF
 				HLR-Id
 
 maxNumOfHLR-Id  INTEGER ::= 50
@@ -3219,7 +3473,9 @@ Category ::= OCTET STRING (SIZE (1))
 BearerServiceList ::= SEQUENCE SIZE (1..maxNumOfBearerServices) OF
 				BearerServiceCode
 
-maxNumOfBearerServicesTeleserviceList ::= SEQUENCE SIZE (1..maxNumOfTeleservices) OF
+maxNumOfBearerServices  INTEGER ::= 50
+
+TeleserviceList ::= SEQUENCE SIZE (1..maxNumOfTeleservices) OF
 				TeleserviceCode
 
 maxNumOfTeleservices  INTEGER ::= 20
@@ -3239,7 +3495,7 @@ BasicServiceGroupList ::= SEQUENCE SIZE (1..maxNumOfBasicServiceGroups) OF
 maxNumOfBasicServiceGroups  INTEGER ::= 13
 
 
---- MODULE 'MAP-TS-Code' START ---
+-- MODULE 'MAP-TS-Code' START
 MAP-TS-Code {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-TS-Code (19) version2 (2)}
@@ -3265,7 +3521,8 @@ telephony		TeleserviceCode ::= '00010001'B
 emergencyCalls	TeleserviceCode ::= '00010010'B
 
 allShortMessageServices	TeleserviceCode ::= '00100000'B
-shortMessageMT-PPshortMessageMO-PP	TeleserviceCode ::= '00100010'B 
+shortMessageMT-PP	TeleserviceCode ::= '00100001'B
+shortMessageMO-PP	TeleserviceCode ::= '00100010'B 
 
 
 allTeletextTransmissionServices	TeleserviceCode ::= '01010000'B
@@ -3276,7 +3533,7 @@ teletexISDN		TeleserviceCode ::= '01010010'B
 allFacsimileTransmissionServices	TeleserviceCode ::= '01100000'B
 facsimileGroup3AndAlterSpeech	TeleserviceCode ::= '01100001'B
 automaticFacsimileGroup3	TeleserviceCode ::= '01100010'B
-	TeleserviceCode ::= '01100011'B
+facsimileGroup4	TeleserviceCode ::= '01100011'B
 -- NU1 facsimileGroup4 must not be used in version 1
 
 allPLMN-specificTS	TeleserviceCode ::= '11010000'B
@@ -3285,7 +3542,7 @@ plmn-specificTS-1	TeleserviceCode ::= '11010001'B
 plmn-specificTS-2	TeleserviceCode ::= '11010010'B
 plmn-specificTS-3	TeleserviceCode ::= '11010011'B
 plmn-specificTS-4	TeleserviceCode ::= '11010100'B
-	TeleserviceCode ::= '11010101'B
+plmn-specificTS-5	TeleserviceCode ::= '11010101'B
 plmn-specificTS-6	TeleserviceCode ::= '11010110'B
 plmn-specificTS-7	TeleserviceCode ::= '11010111'B
 plmn-specificTS-8	TeleserviceCode ::= '11011000'B
@@ -3293,11 +3550,12 @@ plmn-specificTS-9	TeleserviceCode ::= '11011001'B
 plmn-specificTS-A	TeleserviceCode ::= '11011010'B
 plmn-specificTS-B	TeleserviceCode ::= '11011011'B
 plmn-specificTS-C	TeleserviceCode ::= '11011100'B
-plmn-specificTS-Dplmn-specificTS-E	TeleserviceCode ::= '11011110'B
+plmn-specificTS-D	TeleserviceCode ::= '11011101'B
+plmn-specificTS-E	TeleserviceCode ::= '11011110'B
 plmn-specificTS-F	TeleserviceCode ::= '11011111'B
 
 
---- MODULE 'MAP-BS-Code' START ---
+-- MODULE 'MAP-BS-Code' START
 MAP-BS-Code {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-BS-Code (20) version2 (2)}
@@ -3330,7 +3588,7 @@ BearerServiceCode ::= OCTET STRING (SIZE (1))
 allBearerServices	BearerServiceCode ::= '00000000'B
 
 allDataCDA-Services	BearerServiceCode ::= '00010000'B
-	BearerServiceCode ::= '00010001'B
+dataCDA-300bps	BearerServiceCode ::= '00010001'B
 dataCDA-1200bps	BearerServiceCode ::= '00010010'B
 dataCDA-1200-75bps	BearerServiceCode ::= '00010011'B
 dataCDA-2400bps	BearerServiceCode ::= '00010100'B
@@ -3339,7 +3597,8 @@ dataCDA-9600bps	BearerServiceCode ::= '00010110'B
 
 allDataCDS-Services	BearerServiceCode ::= '00011000'B
 dataCDS-1200bps	BearerServiceCode ::= '00011010'B
-dataCDS-2400bpsdataCDS-4800bps	BearerServiceCode ::= '00011101'B
+dataCDS-2400bps	BearerServiceCode ::= '00011100'B
+dataCDS-4800bps	BearerServiceCode ::= '00011101'B
 dataCDS-9600bps		BearerServiceCode ::= '00011110'B
 
 allPadAccessCA-Services	BearerServiceCode ::= '00100000'B
@@ -3348,7 +3607,7 @@ padAccessCA-1200bps	BearerServiceCode ::= '00100010'B
 padAccessCA-1200-75bps	BearerServiceCode ::= '00100011'B
 padAccessCA-2400bps	BearerServiceCode ::= '00100100'B
 padAccessCA-4800bps	BearerServiceCode ::= '00100101'B
-	BearerServiceCode ::= '00100110'B
+padAccessCA-9600bps	BearerServiceCode ::= '00100110'B
 
 allDataPDS-Services	BearerServiceCode ::= '00101000'B
 dataPDS-2400bps	BearerServiceCode ::= '00101100'B
@@ -3361,7 +3620,9 @@ allAlternateSpeech-DataCDS	BearerServiceCode ::= '00111000'B
 
 allSpeechFollowedByDataCDA	BearerServiceCode ::= '01000000'B
 
-allSpeechFollowedByDataCDSallUnrestrictedDigital-12-kbps	BearerServiceCode ::= '01111000'B
+allSpeechFollowedByDataCDS	BearerServiceCode ::= '01001000'B
+
+allUnrestrictedDigital-12-kbps	BearerServiceCode ::= '01111000'B
 
 allPLMN-specificBS	BearerServiceCode ::= '11010000'B
 -- NU1 *plmn-specific* must not be used in version 1
@@ -3370,7 +3631,7 @@ plmn-specificBS-2	BearerServiceCode ::= '11010010'B
 plmn-specificBS-3	BearerServiceCode ::= '11010011'B
 plmn-specificBS-4	BearerServiceCode ::= '11010100'B
 plmn-specificBS-5	BearerServiceCode ::= '11010101'B
-	BearerServiceCode ::= '11010110'B
+plmn-specificBS-6	BearerServiceCode ::= '11010110'B
 plmn-specificBS-7	BearerServiceCode ::= '11010111'B
 plmn-specificBS-8	BearerServiceCode ::= '11011000'B
 plmn-specificBS-9	BearerServiceCode ::= '11011001'B
@@ -3378,5 +3639,6 @@ plmn-specificBS-A	BearerServiceCode ::= '11011010'B
 plmn-specificBS-B	BearerServiceCode ::= '11011011'B
 plmn-specificBS-C	BearerServiceCode ::= '11011100'B
 plmn-specificBS-D	BearerServiceCode ::= '11011101'B
-plmn-specificBS-Eplmn-specificBS-F	BearerServiceCode ::= '11011111'B
+plmn-specificBS-E	BearerServiceCode ::= '11011110'B
+plmn-specificBS-F	BearerServiceCode ::= '11011111'B
 
