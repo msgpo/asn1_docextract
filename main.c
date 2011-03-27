@@ -183,13 +183,6 @@ static void handle_fmt_block(struct word_handle *wh, uint16_t block_nr,
 	fprintf(stderr, "Number of format table entries: %u\n", num_fmts);
 
 	for (i = 0; i < num_fmts; i++) {
-		if (i == num_fmts -1) {
-			/* in the last entry, check if there is another block */
-			if (fmt_tbl[i].ptr_text == offset_next) {
-				handle_fmt_block(wh, block_nr+1, type);
-				continue;
-			}
-		}
 		fprintf(stderr, "Format tbl entry Text Ptr: %u (0x%x), Fmt: %u\n",
 			fmt_tbl[i].ptr_text, fmt_tbl[i].ptr_text, fmt_tbl[i].offset_fmt);
 		if (fmt_tbl[i].offset_fmt != 0xffff)
@@ -205,6 +198,13 @@ static void handle_fmt_block(struct word_handle *wh, uint16_t block_nr,
 			break;
 		}
 		last_fmt_start = fmt_tbl[i].ptr_text;
+
+		if (i == num_fmts -1) {
+			/* in the last entry, check if there is another block */
+			if (fmt_tbl[i].ptr_text == offset_next) {
+				handle_fmt_block(wh, block_nr+1, type);
+			}
+		}
 	}
 }
 

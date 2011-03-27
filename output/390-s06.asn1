@@ -4,6 +4,7 @@ BEGIN
 
 EXPORTS
 
+-- exports operations types	
 
 -- Location management
 UpdateLocationArea, UpdateLocation, CancelLocation, DetachIMSI, AttachIMSI,
@@ -11,6 +12,7 @@ DeregisterMobileSubscriber,
 
 -- Subscriber data management
 InsertSubscriberData, DeleteSubscriberData, SendParameters,
+
 -- Supplementary Services Handling
 RegisterSS, EraseSS, ActivateSS,
 DeactivateSS, InterrogateSS, InvokeSS, ForwardSsNotification,
@@ -18,6 +20,7 @@ RegisterPassword, GetPassword, ProcessUnstructuredSsData,
 
 -- Call set-up
 SendInfoForIncomingCall, SendInfoForOutgoingCall,
+SendRoutingInformation, ProvideRoamingNumber, CompleteCall,
 ConnectToFollowingAddress, ProcessCallWaiting,
 
 -- Paging
@@ -25,6 +28,7 @@ ConnectToFollowingAddress, ProcessCallWaiting,
 
 -- Handover
  PerformHandover, SendEndSignal,
+PerformSubsequentHandover, AllocateHandoverNumber,
 SendHandoverReport, ProcessAccessSignalling,
 ForwardAccessSignalling,
 
@@ -32,6 +36,7 @@ ForwardAccessSignalling,
 RegisterChargingInformation,
 
 -- Fault recovery
+Reset, ForwardCheckSsIndication,
 
 -- Tracing
 ActivateTraceMode, DeactivateTraceMode, TraceSubscriberActivity,
@@ -39,6 +44,7 @@ NoteInternalHandover,
 
 -- Equipment management
 CheckIMEI,
+
 -- Authentication and security
 Authenticate, ProvideIMSI, ForwardNewTMSI, SetCipheringMode,
 
@@ -46,6 +52,7 @@ Authenticate, ProvideIMSI, ForwardNewTMSI, SetCipheringMode,
 SendRoutingInfoForSM, ForwardShortMessage, SetMessageWaitingData, NoteMSPresent, AlertServiceCentre,
 
 -- Access request
+ProcessAccessRequest, BeginSubscriberActivity;
 
 
 IMPORTS
@@ -53,6 +60,7 @@ OPERATION FROM TCAPMessages {ccitt recommendation q 773 moduleA(0)}
 
 -- imports data types
 
+AddressString, IsdnAddressString, ExternalSignalInfo,
 IMSI, TMSI, SubscriberId, IMEI, LMsId, LocAreaId, GlobalCellId,
 LocationInfo, HlrList, Category, EquipStatus, BasicServiceList,
 BasicServiceCode, BearerServiceCode, TeleserviceCode,
@@ -60,6 +68,7 @@ SubscriberData, SS-Information, SS-DataList, SS-Code,
 SS-CodeList, SS-Status, SS-Notification, Password, ChannelType,
 NoReplyConditionTime, UserToUserServiceIndicator,
 CUG-Index, CUG-Interlock, NumberOfConferees, NumberOfForwarding, ForwardingData, ForwardingFeatureList, ForwardingOptions, ClassmarkInformation, HandoverType, HandoverPriority, CallReference, CallType, CallDateTime, CallStatus, CallDuration, PacketDataVolume, ChargingUnit, Charge, SS-ChargingInfo,
+TraceReference, TraceType, NetworkResource, CmServiceType,
 AccessConnectionStatus, Rand, Sres, CipheringMode, Kc, CKSN,
 SS-UserData, RequestParameters, SentParameters, SM-RP-OA,
 SM-RP-DA, SM-RP-UI, GuidanceInfo FROM MAP-DataTypes
@@ -67,6 +76,7 @@ SM-RP-DA, SM-RP-UI, GuidanceInfo FROM MAP-DataTypes
 -- imports errors types
 
 UnknownSubscriber, UnknownBaseStation, UnknownMSC,
+UnknownLocArea, UnidentifiedSubscriber,
 UnallocatedRoamingNumber, UnknownEquipment,
 RoamingNotAllowed, IllegalMS, BearerServiceNotProvisioned,
 TeleserviceNotProvisioned, InsufficientBearerCapabilities,
@@ -74,12 +84,15 @@ CallBarred, ForwardingViolation, CUG-Reject, IllegalSS-Operation,
 SS-ErrorStatus, SS-NotAvailable, SS-SubscriptionViolation,
 SS-Incompatibility, InvalidTargetBaseStation,
 NoRadioResourceAvailable, NoHandoverNumberAvailable,
+SubsequentHandoverFailure, AbsentSubscriber, BusySubscriber,
 NoSubscriberReply, RadioCongestion, ImpossibleCallCompletion,
 SystemFailure, DataMissing, UnexpectedDataValue,
 PasswordRegistrationFailure, NegativePasswordCheck,
 NoRoamingNumberAvailable, TracingBufferFull, FacilityNotSupported, SM-DeliveryFailure, MessageWaitingListFull FROM MAP-Errors;
 
+
 -- operation types definitions
+-- Location management operations
 
 UpdateLocationArea ::= OPERATION
 PARAMETER	SEQUENCE{
@@ -87,6 +100,7 @@ PARAMETER	SEQUENCE{
 	previousLocAreaId	CHOICE{
 				LocAreaId,
 				NULL},
+	targetLocAreaId	LocAreaId,
 	cksn		CKSN }
 
 RESULT
@@ -94,6 +108,7 @@ RESULT
 ERRORS	
 	{UnknownSubscriber,
 	UnknownLocArea,
+	RoamingNotAllowed,
 	IllegalMS,
 	SystemFailure,
 	UnexpectedDataValue}
@@ -101,6 +116,7 @@ ERRORS
 --
 UpdateLocation ::= OPERATION
 PARAMETER	SEQUENCE{
+	imsi		IMSI,
 	locationInfo		LocationInfo,	
 	vlrNumber		IsdnAddressString,
 	lmsId		[10] IMPLICIT LMsId OPTIONAL}
@@ -108,6 +124,7 @@ PARAMETER	SEQUENCE{
 RESULT
 	hlrNumber		IsdnAddressString
 
+ERRORS	
 	{UnknownSubscriber,
 	RoamingNotAllowed,
 	SystemFailure,
@@ -115,6 +132,7 @@ RESULT
 
 --
 CancelLocation ::= OPERATION
+PARAMETER	CHOICE{
 	imsi		IMSI,
 			SEQUENCE{
 	imsi			IMSI,
@@ -122,6 +140,7 @@ CancelLocation ::= OPERATION
 
 RESULT
 
+ERRORS
 	{UnidentifiedSubscriber,
 	UnexpectedDataValue}
 
@@ -131,6 +150,7 @@ DetachIMSI ::= OPERATION
 PARAMETER
 	subscriberId	SubscriberId
 
+--
 AttachIMSI ::= OPERATION
 PARAMETER
 	subscriberId	SubscriberId
@@ -138,6 +158,7 @@ PARAMETER
 RESULT
 
 ERRORS
+	{UnknownSubscriber,
 	UnidentifiedSubscriber,
 	IllegalMS,
 	RoamingNotAllowed,
@@ -145,6 +166,7 @@ ERRORS
 	UnexpectedDataValue}
 
 --
+DeregisterMobileSubscriber ::= OPERATION
 PARAMETER
 	imsi		IMSI
 
@@ -152,6 +174,7 @@ RESULT
 
 ERRORS
 	{AbsentSubscriber,
+	UnknownSubscriber,
 	FacilityNotSupported,
 	UnexpectedDataValue}
 
@@ -159,6 +182,7 @@ ERRORS
 
 -- Subscriber data management
 
+InsertSubscriberData ::= OPERATION
 PARAMETER	SEQUENCE{
 	imsi		[0] IMPLICIT IMSI OPTIONAL,
 			COMPONENTS OF SubscriberData}
@@ -166,6 +190,7 @@ PARAMETER	SEQUENCE{
 RESULT
 
 ERRORS
+	{UnidentifiedSubscriber,
 	DataMissing,
 	UnexpectedDataValue}
 
@@ -173,6 +198,7 @@ ERRORS
 DeleteSubscriberData ::= OPERATION
 PARAMETER	SEQUENCE{
 	imsi 		[0] IMPLICIT IMSI,
+	basicService	[1] IMPLICIT BasicServiceList OPTIONAL,
 	ss-Code		[2] IMPLICIT SS-CodeList OPTIONAL}
 
 RESULT
@@ -180,6 +206,7 @@ RESULT
 ERRORS
 	{UnidentifiedSubscriber,
 	DataMissing,
+	UnexpectedDataValue}
 
 
 --
@@ -187,6 +214,7 @@ SendParameters ::= OPERATION
 PARAMETER	SEQUENCE{
 	subscriberId	SubscriberId,
 	requestParameters	RequestParameters}
+
 RESULT
 	sentParameters	SentParameters
 	-- optional (nothing is returned, if the requested
@@ -194,6 +222,7 @@ RESULT
 
 ERRORS
 	{UnknownSubscriber,
+	UnidentifiedSubscriber,
 	UnexpectedDataValue}
 
 
@@ -202,6 +231,7 @@ ERRORS
 RegisterSS ::= OPERATION
 PARAMETER	SEQUENCE{
 	ss-Code		SS-Code,
+	basicService	BasicServiceCode OPTIONAL,
 	forwardedToNumber	[4] IMPLICIT IsdnAddressString OPTIONAL,
 	noReplyConditionTime	[5] IMPLICIT NoReplyConditionTime OPTIONAL}
 
@@ -209,6 +239,7 @@ RESULT
 	ss-Information	SS-Information -- optional
 
 ERRORS
+	{UnknownSubscriber,
 	IllegalSS-Operation,
 	SS-ErrorStatus,
 	SS-NotAvailable,
@@ -216,6 +247,7 @@ ERRORS
 	TeleServiceNotProvisioned,
 	SS-SubscriptionViolation,
 	SS-Incompatibility,
+	NegativePasswordCheck,
 	UnexpectedDataValue,
 	DataMissing,
 	SystemFailure}
@@ -223,21 +255,6 @@ ERRORS
 
 --
 EraseSS ::= OPERATION
-	ss-Code		SS-Code,
-	basicService	BasicServiceCode OPTIONAL}
-
-RESULT
-	ss-Information	SS-Information -- optional
-
-ERRORS
-	NegativePasswordCheck,
-	IllegalSS-Operation,
-	SS-ErrorStatus,
-	SS-SubscriptionViolation,
-	UnexpectedDataValue,
-	SystemFailure}
-
---
 PARAMETER	SEQUENCE{
 	ss-Code		SS-Code,
 	basicService	BasicServiceCode OPTIONAL}
@@ -245,6 +262,26 @@ PARAMETER	SEQUENCE{
 RESULT
 	ss-Information	SS-Information -- optional
 
+ERRORS
+	{UnknownSubscriber,
+	NegativePasswordCheck,
+	IllegalSS-Operation,
+	SS-ErrorStatus,
+	SS-SubscriptionViolation,
+	UnexpectedDataValue,
+	SystemFailure}
+
+
+--
+ActivateSS ::= OPERATION
+PARAMETER	SEQUENCE{
+	ss-Code		SS-Code,
+	basicService	BasicServiceCode OPTIONAL}
+
+RESULT
+	ss-Information	SS-Information -- optional
+
+ERRORS
 	{UnknownSubscriber,
 	NegativePasswordCheck,
 	IllegalSS-Operation,
@@ -252,6 +289,7 @@ RESULT
 	SS-NotAvailable,
 	SS-SubscriptionViolation,
 	SS-Incompatibility,
+	UnexpectedDataValue,
 	SystemFailure}
 
 --
@@ -260,18 +298,22 @@ PARAMETER	SEQUENCE{
 	ss-Code		SS-Code,
 	basicService	BasicServiceCode OPTIONAL}
 
+
 RESULT
 	ss-Information	SS-Information -- optional
 
 ERRORS
 	{UnknownSubscriber,
 	IllegalSS-Operation,
+	SS-ErrorStatus,
 	SS-SubscriptionViolation,
 	NegativePasswordCheck,
 	UnexpectedDataValue,
 	SystemFailure}
 
+
 --
+InterrogateSS ::= OPERATION
 PARAMETER	SEQUENCE{
 	ss-Code		SS-Code,
 	basicService	BasicServiceCode OPTIONAL}
@@ -279,6 +321,7 @@ PARAMETER	SEQUENCE{
 RESULT 		CHOICE{
 	ss-Status		[0] IMPLICIT SS-Status,
 	forwardedToNumber	[1] IMPLICIT IsdnAddressString,	
+	activesBasicServices	[2] IMPLICIT BasicServiceList,
 	forwardingFeatureList	[3] IMPLICIT ForwardingFeatureList}
 
 
@@ -286,6 +329,7 @@ ERRORS
 	{UnknownSubscriber,
 	NegativePasswordCheck,
 	IllegalSS-Operation,
+	SS-NotAvailable,
 	UnexpectedDataValue,
 	SystemFailure}
 
@@ -293,12 +337,14 @@ ERRORS
 InvokeSS ::= OPERATION
 PARAMETER	SEQUENCE{
 	ss-Code		SS-Code,
+	basicService	BasicServiceCode OPTIONAL,
 	userToUserServiceIndicator	[4] IMPLICIT UserToUserServiceIndicator OPTIONAL, 	
 	cug-Index		[5] IMPLICIT CUG-Index OPTIONAL,
 	numberOfConferees	[6] IMPLICIT NumberOfConferees OPTIONAL}
 
 RESULT
 	cug-Interlock	CUG-Interlock -- optional
+
 
 ERRORS
 	{IllegalSS-Operation,
@@ -307,6 +353,7 @@ ERRORS
 	SS-SubscriptionViolation,
 	SS-Incompatibility,
 	CUG-Reject,
+	DataMissing,
 	UnexpectedDataValue,
 	SystemFailure}
 
@@ -316,6 +363,7 @@ PARAMETER	SEQUENCE{
 	imsi		[0] IMPLICIT IMSI OPTIONAL,
 	ss-Code		[1] IMPLICIT SS-Code OPTIONAL,
 	teleservice		[2] IMPLICIT TeleserviceCode OPTIONAL,
+	bearerService	[3] IMPLICIT BearerServiceCode OPTIONAL,
 	ss-Status		[4] IMPLICIT SS-Status OPTIONAL,
 	ss-Notification	[5] IMPLICIT SS-Notification OPTIONAL}
 
@@ -323,6 +371,7 @@ PARAMETER	SEQUENCE{
 RegisterPassword ::= OPERATION
 
 PARAMETER
+	ss-Code		SS-Code
 
 RESULT
 	newPassword 	Password
@@ -330,6 +379,7 @@ RESULT
 ERRORS
 	{NegativePasswordCheck,
 	PasswordRegistrationFailure,
+	SS-SubscriptionViolation,
 	UnexpectedDataValue,
 	SystemFailure}
 
@@ -337,6 +387,7 @@ LINKED
 	{GetPassword}
 
 --
+GetPassword ::= OPERATION
 PARAMETER
 	guidanceInfo	GuidanceInfo
 
@@ -344,6 +395,7 @@ RESULT
 	currentPassword	Password
 
 --
+ProcessUnstructuredSsData ::= OPERATION
 PARAMETER
 	ss-UserData		SS-UserData	
 
@@ -351,6 +403,7 @@ RESULT
 	ss-UserData		SS-UserData -- optional
 
 ERRORS
+	{UnexpectedDataValue,
 	SystemFailure}
 	-- UnexpectedDataValue is used when data from MS does not correspond
 	-- to any service implemented in HLR
@@ -358,6 +411,7 @@ ERRORS
 
 -- Call set-up
 --
+SendInfoForIncomingCall ::= OPERATION
 PARAMETER		SEQUENCE{
 	incomingId		CHOICE{
 	roamingNumber	[0] IMPLICIT IsdnAddressString,
@@ -365,6 +419,7 @@ PARAMETER		SEQUENCE{
 	bearerService	[2] IMPLICIT BearerServiceCode OPTIONAL,
 	teleservice		[3] IMPLICIT TeleserviceCode OPTIONAL,
 	lMsId		[4] IMPLICIT LMsId OPTIONAL,
+	dialledNumber	[5] IMPLICIT IsdnAddressString OPTIONAL,
 	cug-Interlock	[6] IMPLICIT CUG-Interlock OPTIONAL,
 	numberOfForwarding	[7] IMPLICIT NumberOfForwarding OPTIONAL}
 
@@ -372,6 +427,7 @@ ERRORS
 	UnallocatedRoamingNumber,
 	UnknownSubscriber,
 	UnidentifiedSubscriber,
+	AbsentSubscriber,
 	ImpossibleCallCompletion,
 	ForwardingViolation,
 	UnexpectedDataValue,
@@ -379,6 +435,7 @@ ERRORS
 	SystemFailure}
 
 LINKED
+	CompleteCall,
 	ProcessCallWaiting,
 	ConnectToFollowingAddress}
 
@@ -386,6 +443,7 @@ LINKED
 SendInfoForOutgoingCall ::= OPERATION
 PARAMETER	SEQUENCE{
 	calledNumber	[0] IMPLICIT IsdnAddressString,
+	bearerService	[2] IMPLICIT BearerServiceCode OPTIONAL,
 	teleService		[3] IMPLICIT TeleserviceCode OPTIONAL}
 
 ERRORS
@@ -393,6 +451,7 @@ ERRORS
 	BearerServiceNotProvisioned,
 	TeleserviceNotProvisioned,
 	CallBarred,
+	CUG-Reject,
 	DataMissing,
 	UnexpectedDataValue,
 	SystemFailure}
@@ -400,7 +459,9 @@ ERRORS
 LINKED
 	{CompleteCall}
 
+
 SendRoutingInformation ::= OPERATION
+PARAMETER	SEQUENCE{
 	msIsdn		[0]  IMPLICIT IsdnAddressString,
 	cug-Interlock	[1]  IMPLICIT CUG-Interlock OPTIONAL,
 	numberOfForwarding	[2]  IMPLICIT NumberOfForwarding OPTIONAL,
@@ -408,6 +469,7 @@ SendRoutingInformation ::= OPERATION
 
 -- If available from the network the ISDN Bearer Capabilities and the ISDN High Layer
 -- Compatibility and Low Layer Compatibility information elements are included in
+-- the networkSignalInfo parameter as defined in section 6.4.3.8.9.
 -- The information is passed according to the rules specified in GSM 09.07.
 
 RESULT		SEQUENCE{
@@ -415,6 +477,7 @@ RESULT		SEQUENCE{
 	routingInfo		CHOICE{
 	roamingNumber		IsdnAddressString,
 	forwardingData		ForwardingData}}
+	
 ERRORS
 	UnknownSubscriber,
 	CallBarred,
@@ -422,12 +485,15 @@ ERRORS
 	BearerServiceNotProvisioned,
 	TeleServiceNotProvisioned,
 	FacilityNotSupported,
+	AbsentSubscriber,
 	ForwardingViolation,
 	SystemFailure,
 	DataMissing,
 	UnexpectedDataValue}
 
+
 ProvideRoamingNumber ::= OPERATION
+
 PARAMETER	SEQUENCE{
 	imsi		[0] IMPLICIT IMSI,
 	mscNumber		[1] IMPLICIT IsdnAddressString OPTIONAL,
@@ -435,6 +501,7 @@ PARAMETER	SEQUENCE{
 	previousRoamingNumber  [3] IMPLICIT IsdnAddressString OPTIONAL,
 	lMsId		[4] IMPLICIT LMsId OPTIONAL,
 	gSM-BearerCapability	[5] IMPLICIT ExternalSignalInfo OPTIONAL,
+	networkSignalInfo	[6] IMPLICIT ExternalSignalInfo OPTIONAL}
 
 -- If available from the network the ISDN High Layer Compatibility information element is
 -- carried in the networkSignalInfo parameter as shown in section 6.4.3.8.9.
@@ -442,6 +509,7 @@ PARAMETER	SEQUENCE{
 
 RESULT
 	roamingNumber	IsdnAddressString
+
 ERRORS
 	{AbsentSubscriber,
 	NoRoamingNumberAvailable,
@@ -449,6 +517,7 @@ ERRORS
 	SystemFailure,
 	DataMissing,
 	UnexpectedDataValue}
+--
 CompleteCall ::= OPERATION
 PARAMETER	SEQUENCE{
 	msIsdn		[0] IMPLICIT IsdnAddressString,
@@ -456,6 +525,7 @@ PARAMETER	SEQUENCE{
 	cug-Index		[2] IMPLICIT CUG-Index OPTIONAL,
 	gSM-BearerCapability	[3] IMPLICIT ExternalSignalInfo OPTIONAL,
 	noReplyConditionTime	[4] IMPLICIT NoReplyConditionTime OPTIONAL,
+	ss-DataList		[5] IMPLICIT SS-DataList OPTIONAL}
 
 ERRORS
 	{NoSubscriberReply,
@@ -463,6 +533,7 @@ ERRORS
 	BusySubscriber,
 	DataMissing,
 	UnexpectedDataValue}
+--
 ConnectToFollowingAddress ::= OPERATION
 PARAMETER	SEQUENCE{
 	forwardingData	ForwardingData,
@@ -470,7 +541,9 @@ PARAMETER	SEQUENCE{
 --
 ProcessCallWaiting ::= OPERATION
 
+
 -- Paging
+--
 Page ::= OPERATION
 PARAMETER	SEQUENCE{
 	imsi		[0] IMPLICIT IMSI,
@@ -478,6 +551,7 @@ PARAMETER	SEQUENCE{
 	locAreaId		[2] IMPLICIT LocAreaId}
 
 
+ERRORS
 	{AbsentSubscriber,
 	UnknownLocArea,
 	BusySubscriber,
@@ -485,6 +559,7 @@ PARAMETER	SEQUENCE{
 	UnexpectedDataValue}
 
 
+--
 SearchForMobileSubscriber ::= OPERATION
 PARAMETER	SEQUENCE{
 	imsi		IMSI,
@@ -492,6 +567,7 @@ PARAMETER	SEQUENCE{
 				LocAreaId,
 				NULL}}
 
+RESULT
 	currentLocAreaId	LocAreaId
 
 
@@ -499,6 +575,7 @@ ERRORS
 	{AbsentSubscriber,
 	BusySubscriber,
 	SystemFailure,
+	UnexpectedDataValue}
 
 --
 
@@ -508,6 +585,7 @@ ERRORS
 PerformHandover ::= OPERATION
 PARAMETER	SEQUENCE{
 	targetCellId		GlobalCellId,
+	servingCellId	GlobalCellId,
 	channelType	ChannelType,
 	classmarkInformation	ClassmarkInformation,
 	handoverPriority 	[11] IMPLICIT HandoverPriority OPTIONAL,
@@ -515,6 +593,7 @@ PARAMETER	SEQUENCE{
 
 RESULT		SEQUENCE{
 	handoverNumber	IsdnAddressString,
+	accessSignalInfo	ExternalSignalInfo}
 	-- protocolId for ExternalSignalInfo
 	-- should indicate "gsm-04.08-version1"
 
@@ -522,6 +601,7 @@ ERRORS
 	{UnknownBaseStation,
 	InvalidTargetBaseStation,
 	NoRadioResourceAvailable,
+	NoHandoverNumberAvailable,
 	SystemFailure,
 	UnexpectedDataValue}
 
@@ -529,6 +609,7 @@ ERRORS
 --
 SendEndSignal ::= OPERATION
 
+RESULT
 
 
 --
@@ -536,6 +617,7 @@ PerformSubsequentHandover ::= OPERATION
 PARAMETER	SEQUENCE{
 	targetCellId		GlobalCellId,
 	servingCellId	GlobalCellId,
+	targetMscNumber	IsdnAddressString,
 	classmarkInformation	[10] IMPLICIT ClassmarkInformation OPTIONAL}
 
 RESULT
@@ -543,19 +625,23 @@ RESULT
 -- protocolId should indicate "gsm-04.08-version1"}
 
 
+ERRORS
 	{UnknownBaseStation,
 	InvalidTargetBaseStation,
 	UnknownMSC,
 	SubsequentHandoverFailure,
 	UnexpectedDataValue}
 
+
 --
+AllocateHandoverNumber ::= OPERATION
 
 ERRORS
 	{NoHandoverNumberAvailable}
 
 LINKED
 	{SendHandoverReport}
+
 
 --
 SendHandoverReport ::= OPERATION
@@ -564,11 +650,13 @@ PARAMETER
 
 RESULT
 
+
 --
 ProcessAccessSignalling ::= OPERATION
 PARAMETER
 	bss-APDU		ExternalSignalInfo
 -- protocolId should indicate "gsm-0806-version1"
+
 
 
 
@@ -579,6 +667,8 @@ PARAMETER
 -- protocolId should indicate "gsm-0806-version1"
 
 
+
+
 -- Charging
 --
 RegisterChargingInformation ::= OPERATION
@@ -586,6 +676,7 @@ PARAMETER	SEQUENCE{
 	msIsdn		IsdnAddressString,
 	mscNumber		IsdnAddressString,
 	imsi		IMSI,
+	callReference	CallReference,
 	callType		CallType,
 	callStatus		CallStatus,
 	callDateTime	CallDateTime,
@@ -593,6 +684,7 @@ PARAMETER	SEQUENCE{
 	bearerServiceCode	[10] IMPLICIT BearerServiceCode OPTIONAL,
 	teleserviceCode 	[11] IMPLICIT TeleserviceCode OPTIONAL,
 	calledNumber 	[12] IMPLICIT IsdnAddressString OPTIONAL,
+	callingNumber	[13] IMPLICIT IsdnAddressString OPTIONAL,
 	packetDataVolume	[14] IMPLICIT PacketDataVolume OPTIONAL,
 	chargingUnit		[15] IMPLICIT ChargingUnit OPTIONAL,
 	charge		[16] IMPLICIT Charge OPTIONAL,
@@ -600,13 +692,16 @@ PARAMETER	SEQUENCE{
 
 RESULT
 
+ERRORS
 	{UnknownSubscriber,
 	DataMissing,
 	UnexpectedDataValue}
 
 
 
+
 -- Fault recovery
+--
 Reset ::= OPERATION
 PARAMETER	SEQUENCE{
 	networkResource	NetworkResource,
@@ -614,6 +709,7 @@ PARAMETER	SEQUENCE{
 	hlrId		HlrList OPTIONAL}
 
 
+--
 
 ForwardCheckSsIndication ::= OPERATION
 
@@ -621,6 +717,7 @@ ForwardCheckSsIndication ::= OPERATION
 
 -- Tracing
 --
+ActivateTraceMode ::= OPERATION
 PARAMETER	SEQUENCE{
 	imsi		[0] IMPLICIT IMSI OPTIONAL,
 	traceReference	[1] IMPLICIT TraceReference ,
@@ -629,12 +726,14 @@ PARAMETER	SEQUENCE{
 
 RESULT	
 
+
 ERRORS
 	{UnidentifiedSubscriber,
 	FacilityNotSupported,
 	TracingBufferFull,
 	SystemFailure,
 	DataMissing,
+	UnexpectedDataValue}
 
 --
 DeactivateTraceMode ::= OPERATION
@@ -642,6 +741,7 @@ PARAMETER	SEQUENCE{
 	imsi		[0] IMPLICIT IMSI OPTIONAL,
 	traceReference	[1] IMPLICIT TraceReference}
 
+RESULT
 
 ERRORS
 	{UnidentifiedSubscriber,
@@ -650,12 +750,14 @@ ERRORS
 	DataMissing,
 	UnexpectedDataValue}
 
+
 --
 TraceSubscriberActivity ::= OPERATION
 PARAMETER	SEQUENCE{
 	imsi		[0] IMPLICIT IMSI OPTIONAL,
 	traceReference	[1] IMPLICIT TraceReference,
 	traceType		[2] IMPLICIT TraceType,
+	omcId 		[3] IMPLICIT AddressString OPTIONAL,
 	callReference	[4] IMPLICIT CallReference OPTIONAL}
 
 --
@@ -663,6 +765,7 @@ NoteInternalHandover ::= OPERATION
 
 PARAMETER	SEQUENCE{
 	handoverType	HandoverType,
+	targetCellId		[1] IMPLICIT GlobalCellId OPTIONAL,
 	channelId		[2] IMPLICIT ExternalSignalInfo OPTIONAL}
 
 
@@ -671,6 +774,7 @@ PARAMETER	SEQUENCE{
 CheckIMEI ::= OPERATION
 PARAMETER
 	imei		IMEI
+
 RESULT
 	equipStatus		EquipStatus
 
@@ -680,12 +784,15 @@ ERRORS
 	UnexpectedDataValue}
 
 
+
+
 -- Authentication and security
 --
 Authenticate ::= OPERATION
 PARAMETER	SEQUENCE{
 	rand		Rand,
 	cksn		CKSN}
+
 RESULT
 	sres		Sres
 
@@ -693,6 +800,7 @@ RESULT
 
 --
 ProvideIMSI ::= OPERATION
+
 RESULT
 	imsi		IMSI
 
@@ -700,6 +808,8 @@ ERRORS
 	{AbsentSubscriber}
 
 
+
+--
 ForwardNewTMSI ::= OPERATION
 PARAMETER
 	tmsi		TMSI
@@ -707,13 +817,16 @@ PARAMETER
 RESULT
 
 --
+SetCipheringMode ::= OPERATION
 PARAMETER	SEQUENCE{
 	cipheringMode	CipheringMode,
 	kc		Kc OPTIONAL}
 -- Kc should be included when cipheringMode indicates
 -- that ciphering must be performed
 
+
 -- Short messages
+
 SendRoutingInfoForSM ::= OPERATION
 PARAMETER	SEQUENCE{
 	msIsdn		[0] IMPLICIT IsdnAddressString,
@@ -721,6 +834,7 @@ PARAMETER	SEQUENCE{
 	serviceCentreAddress	[2] IMPLICIT AddressString,
 	cug-Interlock	[3] IMPLICIT CUG-Interlock OPTIONAL,
 	teleserviceCode	[5] IMPLICIT TeleserviceCode OPTIONAL}
+
 RESULT		SEQUENCE{
 	imsi		IMSI,
 			CHOICE{
@@ -728,6 +842,7 @@ RESULT		SEQUENCE{
 	locationInfo				LocationInfo,
 	lMsId				LMsId OPTIONAL},
 	forwardingData		[1] IMPLICIT ForwardingData},
+	mwd-Set			[2] IMPLICIT BOOLEAN OPTIONAL}
 
 ERRORS
 	{UnknownSubscriber,
@@ -735,6 +850,7 @@ ERRORS
 	CUG-Reject,
 	TeleServiceNotProvisioned,
 	AbsentSubscriber,
+	FacilityNotSupported,
 	SystemFailure,
 	DataMissing,
 	UnexpectedDataValue}
@@ -742,6 +858,7 @@ ERRORS
 
 --
 ForwardShortMessage ::= OPERATION
+PARAMETER	SEQUENCE{
 	sm-RP-DA		SM-RP-DA,
 	sm-RP-OA		SM-RP-OA,
 	sm-RP-UI		SM-RP-UI}
@@ -749,6 +866,7 @@ ForwardShortMessage ::= OPERATION
 RESULT
 
 ERRORS
+	{UnidentifiedSubscriber,
 	AbsentSubscriber,
 	FacilityNotSupported,
 	IllegalMS,
@@ -756,12 +874,14 @@ ERRORS
 	UnexpectedDataValue,
 	SM-DeliveryFailure}
 
+--
 SetMessageWaitingData ::= OPERATION
 PARAMETER	SEQUENCE{
 	msIsdn		IsdnAddressString,
 	serviceCentreAddress	AddressString}
 
 RESULT
+
 
 ERRORS
 	{UnknownSubscriber,
@@ -770,6 +890,7 @@ ERRORS
 
 
 --
+NoteMSPresent ::= OPERATION
 
 PARAMETER
 	imsi		IMSI
@@ -777,12 +898,15 @@ PARAMETER
 
 --
 AlertServiceCentre ::= OPERATION
+PARAMETER	SEQUENCE{
 	msIsdn		IsdnAddressString,
 	serviceCentreAddress	AddressString}
 
 
 
+
 -- Access request
+--
 ProcessAccessRequest ::= OPERATION
 PARAMETER	SEQUENCE{
 	subscriberId		SubscriberId,
@@ -790,6 +914,7 @@ PARAMETER	SEQUENCE{
 	accessConnectionStatus	AccessConnectionStatus,
 	cksn		CKSN}
 
+RESULT		SEQUENCE{
 	imsi 		IMSI,
 	msIsdn 		IsdnAddressString OPTIONAL}
 
@@ -797,6 +922,7 @@ ERRORS
 	{IllegalMS,
 	UnknownSubscriber,
 	UnidentifiedSubscriber,
+	SystemFailure,
 	UnexpectedDataValue }
 
 
@@ -804,6 +930,7 @@ ERRORS
 --
 BeginSubscriberActivity ::= OPERATION
 PARAMETER	SEQUENCE{
+	imsi		IMSI,
 	originatingEntityNumber	IsdnAddressString}
 
 
@@ -811,9 +938,11 @@ PARAMETER	SEQUENCE{
 
 END   -- End of operation types definitions --
 
+
 MAP-Errors DEFINITIONS ::=
 
 BEGIN
+
 
 EXPORTS
 UnknownSubscriber, UnknownBaseStation,UnknownMSC,
@@ -821,6 +950,7 @@ UnknownLocArea, UnidentifiedSubscriber,
 UnallocatedRoamingNumber, UnknownEquipment, RoamingNotAllowed,
 IllegalMS, BearerServiceNotProvisioned,
 TeleserviceNotProvisioned, InsufficientBearerCapabilities,
+CallBarred, ForwardingViolation, CUG-Reject,
 IllegalSS-Operation, SS-ErrorStatus, SS-NotAvailable,
 SS-SubscriptionViolation, SS-Incompatibility, FacilityNotSupported, InvalidTargetBaseStation,
 NoRadioResourceAvailable, NoHandoverNumberAvailable,
@@ -828,6 +958,7 @@ SubsequentHandoverFailure,
 AbsentSubscriber, BusySubscriber, NoSubscriberReply,
 RadioCongestion, ImpossibleCallCompletion, SM-DeliveryFailure,
 MessageWaitingListFull, SystemFailure, DataMissing,
+UnexpectedDataValue, PasswordRegistrationFailure,
 NegativePasswordCheck, NoRoamingNumberAvailable,
 TracingBufferFull;
 
@@ -835,6 +966,7 @@ IMPORTS
 ERROR FROM TCAPMessages {ccitt recommendation q 773 moduleA(0)}
 
 SS-Code, SS-CodeList, SS-Status, SS-SubscriptionOption, BasicServiceCode,
+NetworkResource FROM MAP-DataTypes;
 
 
 -- error types definitions
@@ -842,6 +974,7 @@ SS-Code, SS-CodeList, SS-Status, SS-SubscriptionOption, BasicServiceCode,
 UnknownSubscriber ::= ERROR
 
 UnknownBaseStation ::= ERROR
+
 UnknownMSC ::= ERROR
 
 UnknownLocArea ::= ERROR
@@ -849,6 +982,7 @@ UnknownLocArea ::= ERROR
 
 UnidentifiedSubscriber ::= ERROR
 
+UnallocatedRoamingNumber ::= ERROR
 
 UnknownEquipment ::= ERROR
 
@@ -856,6 +990,7 @@ RoamingNotAllowed ::= ERROR
 
 IllegalMS ::= ERROR
 
+BearerServiceNotProvisioned ::= ERROR
 
 TeleServiceNotProvisioned ::= ERROR
 
@@ -863,6 +998,7 @@ InsufficientBearerCapabilities ::= ERROR
 
 CallBarred ::= ERROR
 PARAMETER
+	cause ENUMERATED {
 		barringServiceActive (0),
 		operatorBarring (1)} -- optional
 
@@ -870,6 +1006,7 @@ PARAMETER
 ForwardingViolation ::= ERROR
 
 --
+CUG-Reject ::= ERROR
 PARAMETER
 	cause ENUMERATED {
 		incomingCallBarred(0),
@@ -877,6 +1014,7 @@ PARAMETER
 
 --
 IllegalSS-Operation ::= ERROR
+
 --
 SS-ErrorStatus ::= ERROR
 PARAMETER
@@ -884,12 +1022,15 @@ PARAMETER
 
 --
 SS-NotAvailable ::= ERROR
+
 SS-SubscriptionViolation ::= ERROR
 PARAMETER	
 	ss-SubscriptionOption SS-SubscriptionOption -- optional
 
 
+
 --
+SS-Incompatibility ::= ERROR
 PARAMETER 		SEQUENCE{
 	ss-Code		[1] IMPLICIT SS-Code OPTIONAL,
 	basicService 	BasicServiceCode OPTIONAL,
@@ -897,12 +1038,14 @@ PARAMETER 		SEQUENCE{
 
 --
 FacilityNotSupported ::= ERROR
+
 --
 InvalidTargetBaseStation ::= ERROR
 
 NoRadioResourceAvailable ::= ERROR
 
 NoHandoverNumberAvailable ::= ERROR
+
 
 SubsequentHandoverFailure ::= ERROR
 
@@ -911,6 +1054,7 @@ AbsentSubscriber ::= ERROR
 PARAMETER	
 	mwd-Set		BOOLEAN -- optional
 
+BusySubscriber ::= ERROR
 
 NoSubscriberReply ::= ERROR
 
@@ -918,6 +1062,7 @@ RadioCongestion ::= ERROR
 
 ImpossibleCallCompletion ::= ERROR
 PARAMETER		
+	activeSupplServices	SS-CodeList -- optional
 
 SM-DeliveryFailure ::= ERROR
 PARAMETER
@@ -925,13 +1070,16 @@ PARAMETER
 		msProtocolError (1),
 		msNotEquiped (2),
 		unknownServiceCentre (3),
+		scCongestion (4),
 		invalidSmeAddress (5),
 		msNotScSubscriber (6)}
 
 MessageWaitingListFull ::= ERROR
 
 
+
 --
+SystemFailure ::= ERROR
 PARAMETER	NetworkResource -- optional
 
 DataMissing ::= ERROR
@@ -939,6 +1087,7 @@ DataMissing ::= ERROR
 UnexpectedDataValue ::= ERROR
 
 PasswordRegistrationFailure ::= ERROR
+PARAMETER	
 	diagnostic  ENUMERATED{undetermined (0),
 		invalidFormat (1),
 		newPasswordsMismatch (2)}
@@ -946,15 +1095,18 @@ PasswordRegistrationFailure ::= ERROR
 
 NegativePasswordCheck ::= ERROR
 
+NoRoamingNumberAvailable ::= ERROR
 
 TracingBufferFull ::= ERROR
 
 
 END  -- End of error types definitions
+
 MAP-Constants DEFINITIONS ::=
 
 BEGIN
 
+EXPORTS
 
 maxSignalInfoLength,
 maxNumberOfTeleServices,
@@ -962,6 +1114,7 @@ maxNumberOfBearerServices,
 maxNumberOfSupplServices,
 
 maxNumberOfCUG,
+maxNumberOfBasicServices,
 maxNumberOfForwardingFeatures,
 maxNumberOfCallBarringFeatures,
 maxNumberOfHlrId,
@@ -969,6 +1122,7 @@ maxPacketDataVolume,
 maxNumberOfChargingUnit,
 maxCallDuration,
 maxAddressLength,
+maxNumberOfSentParameters;
 
 -- value assignment
 
@@ -976,6 +1130,7 @@ maxSignalInfoLength INTEGER  ::= 200
 -- this NamedValue represent the theoretical maximum number
 -- of octets which available to carry a single data type, without
 -- requiring segmentation to cope with the network layer service.
+-- However the actual maximum size available for a data type
 -- may be lower, especially when other information elements have
 -- to be included in the same component
 
@@ -985,10 +1140,12 @@ maxSignalInfoLength INTEGER  ::= 200
 maxNumberOfTeleservices 		INTEGER ::=  20
 maxNumberOfBearerServices 		INTEGER ::=  50
 maxNumberOfSupplServices 		INTEGER ::=  30
+
 maxNumberOfCUG			INTEGER ::=  10
 maxNumberOfBasicServices 		INTEGER ::=  70
 maxNumberOfForwardingFeatures		INTEGER ::=  13
 maxNumberOfCallBarringFeatures 		INTEGER ::=  13
+maxNumberOfHlrId			INTEGER ::=  50
 maxPacketDataVolume 		INTEGER ::= 100
 maxNumberOfChargingUnit 		INTEGER ::= 16777215
 maxCallDuration 			INTEGER ::= 16777215
@@ -996,9 +1153,11 @@ maxAddressLength 			INTEGER ::=  20
 
 maxNumberOfSentParameters 		INTEGER ::=  10
 -- this named value should correspond to the maximum of
+-- the maxNumberOfCUG and the maximum number of authentication
 -- set which may be returned by a HLR plus 1.
 END
 
+ExternalSignalInfo ::=  SEQUENCE{
 		protocolId    ProtocolId,
 		signalInfo  SignalInfo}
 
@@ -1006,14 +1165,17 @@ maxExternalInfoLength INTEGER  ::= 200
 
 Signal ::= OCTET STRING (SIZE (1..maxExternalInfoLength))
 
+ProtocolId    ::= ENUMERATED{
 		gsm-0408		(1),
 		gsm-0806		(2),
 		gsm-0808-bssmap	(3),
 		ETS300102-1	(4)}
 		
 
+
 MAP-DataTypes   DEFINITIONS ::=
 
+BEGIN
 
 -- exports all data types defined in this module
 
@@ -1021,10 +1183,12 @@ IMPORTS
 -- imports upper boundaries for data types
 
 maxSignalInfoLength, maxNumberOfTeleServices,
+maxNumberOfBearerServices, maxNumberOfSupplServices,
 maxNumberOfCUG, maxNumberOfBasicServices,
 maxNumberOfForwardingFeatures, maxNumberOfCallBarringFeatures,
 maxNumberOfHlrId, maxPacketDataVolume,
 maxNumberOfChargingUnit, maxCallDuration,
+maxAddressLength, maxNumberOfSentParameters
 FROM MAP-Constants;
 
 -- common data types
@@ -1032,6 +1196,7 @@ FROM MAP-Constants;
 TBCD-STRING	 ::= OCTET STRING
 		-- digits 0 through 9, two digits per octet,
 		-- each digit encoded 0000 to 1001,
+		-- 1111 used as filler when there is an odd number of digit.
 
 
 AddressString	 ::= OCTET STRING (SIZE (1..maxAddressLength))
@@ -1039,6 +1204,7 @@ AddressString	 ::= OCTET STRING (SIZE (1..maxAddressLength))
 
 IsdnAddressString	 ::= AddressString (SIZE (1..10))
 
+ExternalSignalInfo	 ::= SEQUENCE{
 			protocolId	ProtocolId,
 			signalInfo	SignalInfo}
 
@@ -1046,6 +1212,7 @@ SignalInfo	 ::= OCTET STRING (SIZE (1..maxSignalInfoLength))
 
 ProtocolId	 ::= ENUMERATED{
 		gsm-0408		(1),
+		gsm-0806		(2),
 		gsm-0808-bssmap	(3),
 		isup-Q763		(4)}
 
@@ -1055,6 +1222,7 @@ ProtocolId	 ::= ENUMERATED{
 IMSI	 ::= TBCD-STRING (SIZE (2..8))
 		-- MCC, MNC, MSIN concatenated in this order
 
+TMSI	 ::= OCTET STRING (SIZE (1..4))
 
 
 SubscriberId	 ::= CHOICE {
@@ -1062,6 +1230,7 @@ SubscriberId	 ::= CHOICE {
 		tmsi	[1] IMPLICIT TMSI}
 
 --
+IMEI	 ::= TBCD-STRING (SIZE (8))
 		-- Internal Structure
 		-- Type Approval Code : 6 digits
 		-- manufacturer place : 2 digits
@@ -1069,6 +1238,7 @@ SubscriberId	 ::= CHOICE {
 		-- unassigned : 1 digit
 
 LocAreaId	 ::= OCTET STRING (SIZE (2..5))
+		-- Octets coded according to
 		-- Recommendation GSM 04.08
 		-- Internal structure
 		-- Mobile Country Code	: 3 digits according to Rec E.212
@@ -1076,6 +1246,7 @@ LocAreaId	 ::= OCTET STRING (SIZE (2..5))
 		-- Mobile Network Code	: 2 digits according to Rec E.212
 		-- Location Area Code	: 2 octets according to GSM 04.08
 
+LocationInfo	 ::= CHOICE {
 		roamingNumber	[0] IMPLICIT IsdnAddressString,
 		mscNumber		[1] IMPLICIT IsdnAddressString}
 
@@ -1085,12 +1256,14 @@ HlrId	 ::= IMSI
 HlrList	 ::= SEQUENCE 
 		     SIZE(1.. maxNumberOfHlrId) OF HlrId
 
+
 LMsId	 ::= OCTET STRING (SIZE (4))
 
 
 GlobalCellId	 ::= OCTET STRING (SIZE (5..7))
 		-- Octets coded according to
 		-- Recommendation GSM 04.08
+		-- Internal structure
 		-- Mobile Country Code	: 3 digits according to Rec E.212
 		--		: 1 filler (1111)
 		-- Mobile Network Code	: 2 digits according to Rec E.212
@@ -1098,7 +1271,9 @@ GlobalCellId	 ::= OCTET STRING (SIZE (5..7))
 		-- to GSM 04.08
 		-- Cell identity	: 2 octets (CI) according to GSM 04.08
 
+
 -- data types for subscriber management
+
 --
 Category	 ::= OCTET STRING (SIZE (1))
 		-- internal structure defined in CCITT Rec Q.763
@@ -1106,6 +1281,7 @@ Category	 ::= OCTET STRING (SIZE (1))
 EquipStatus	 ::= ENUMERATED {
 		white-listed	(0),
 		black-listed	(1),
+		grey-listed	(2)}
 
 
 BearerServiceCode	 ::= OCTET STRING (SIZE (1))
@@ -1113,6 +1289,7 @@ BearerServiceCode	 ::= OCTET STRING (SIZE (1))
 		-- BIT 8 Transparency indicator (if applicable)
 		--     0 transparent
 		--     1 non transparent
+
 		-- BIT 7654  Bearer service group
 		--    0001 3.1 kHz ex PLMN
 		--    0010 Circuit data asynchronous
@@ -1120,6 +1297,7 @@ BearerServiceCode	 ::= OCTET STRING (SIZE (1))
 		--    0100 PAD access c.d.a
 		--    0101 Packet data synchrounous
 		--    0110 Alternate speech/c.d.a
+		--    0111 Alternate speech c.d.s
 		--    1000 Speech followed by data c.d.a
 		--    1001 Speech followed by data c.d.s
 		--    1111 12.6 kb/s unrestricted digital
@@ -1127,6 +1305,7 @@ BearerServiceCode	 ::= OCTET STRING (SIZE (1))
 		-- BIT 321  Rate (when applicable)
 		--    000 Any
 		--    001 300-300 b/s
+		--    010 1200-1200 b/s
 		--    011 1200-75 b/s
 		--    100 2400-2400 b/s
 		--    101 4800-4800 b/s
@@ -1134,6 +1313,7 @@ BearerServiceCode	 ::= OCTET STRING (SIZE (1))
 
 
 		-- Bits 321 = 000 can be used to refer to all
+		-- the bearer services of the corresponding group.
 		-- Value "00000000" can be used to refer to all the defined
 		-- bearer services.
 		-- For the codes referring to a group or all bearer services
@@ -1141,15 +1321,58 @@ BearerServiceCode	 ::= OCTET STRING (SIZE (1))
 
 
 BearerServiceList	 ::= SEQUENCE
+		     SIZE(1 .. maxNumberOfBearerServices)
 		     OF BearerServiceCode
 
 
 BearerServiceCode
 
 7564321		Meaning			
+0000000		All bearer services
+
+0001000		3.1 Khz group
+0001001		3.1 Khz ex PLMN
+0001010		alternate/speech
+0001011		speech followed by 3.1 Khz
+
+0010000		Data c.d.a
+0010001		Data c.d.a 300 b/s
+0010010		Data c.d.a 1200 b/s
+0010011		Data c.d.a 1200-75 b/s
+0010100		Data c.d.a 2400 b/s
+0010101		Data c.d.a 4800 b/s
+0010110		Data c.d.a 9600 b/s
+
+0011000		Data c.d.s
+0011010		Data c.d.s 1200 b/s
+0011100		Data c.d.s 2400 b/s
+0011101		Data c.d.s 4800 b/s
+0011110		Data c.d.s 9600 b/s
+
+0100000		PAD access c.d.a
+0100001		PAD access c.d.a 300 b/s
+0100010		PAD access c.d.a 1200 b/s
+0100011		PAD access c.d.a 1200-75 b/s
+0100100		PAD access c.d.a 2400 b/s
+0100101		PAD access c.d.a 4800 b/s
+0100110		PAD access c.d.a 9600 b/s
+
+0101000		Data p.d.s
+0101100		Data p.d.s 2400 b/s
+0101101		Data p.d.s 4800 b/s
+0101110		Data p.d.s 9600 b/s
+
+0110000		Alternate speech/data c.d.a
+0111000		Alternate speech/data c.d.s
+
+1000000		Speech followed by data c.d.a
+1001000		Speech followed by data c.d.s
+
+1111000		12 kb/s Unrestricted Digital
 
 TeleServiceCode
 
+Contents		Meaning			
 00000000		All teleservices
 
 00010000		Speech transmission
@@ -1176,6 +1399,7 @@ TeleServiceCode
 01100001		Facsimile Group 3 and alternate speech
 01100010		Automatic Facsimile Group 3
 
+
 TeleserviceCode	 ::= OCTET STRING (SIZE (1))
 		-- Internal structure according to table 6.4/2
 		-- Bit 8-5 encode the teleservice group
@@ -1183,6 +1407,7 @@ TeleserviceCode	 ::= OCTET STRING (SIZE (1))
 		-- Bit 4-1 = 0000 can be used to refer to all the
 		-- teleservices of the corresponding group.
 		-- Value "00000000" can be used to refer to all the defined
+		-- teleservices
 
 TeleserviceList	 ::= SEQUENCE
 		     SIZE(1 .. maxNumberOfTeleservices)
@@ -1190,6 +1415,7 @@ TeleserviceList	 ::= SEQUENCE
 
 
 BasicServiceCode	 ::= CHOICE {
+		bearerService	[2] IMPLICIT BearerServiceCode,
 		teleservice		[3] IMPLICIT TeleserviceCode}
 
 BasicServiceList	 ::= SEQUENCE
@@ -1197,12 +1423,14 @@ BasicServiceList	 ::= SEQUENCE
 		     OF BasicServiceCode
 
 --
+SubscriberStatus	 ::= ENUMERATED{
 		serviceGranted	(0),
 		operatorOGCallBarring	(1)}
 
 
 SS-Code
 
+Contents		Meaning			
 00010001		Calling number identification presentation
 00010010		Calling number identification restriction
 00010011		Called number identification presentation
@@ -1234,6 +1462,7 @@ SS-Code
 10011010		Barring of all incoming calls
 10011011		Barring of all IC calls when outside HPLMN
 
+-- Data types for supplementary services
 
 SS-Code	 ::= OCTET STRING (SIZE(1))
 		-- Internal structure according to
@@ -1241,6 +1470,7 @@ SS-Code	 ::= OCTET STRING (SIZE(1))
 		-- Bit 8-5
 		-- 0001 Number Identification services
 		-- 0010 Forwarding services
+		-- 0011 Call offering services
 		-- 0100 Call completion services
 		-- 0101 Multi-party services
 		-- 0110 Community of interest services
@@ -1248,6 +1478,7 @@ SS-Code	 ::= OCTET STRING (SIZE(1))
 		-- 1000 Additional information transfer services
 		-- 1001 Call restriction services
 		-- Bit 4-1 = 0000 can be use to refer to
+		-- a group of supplementary services
 		-- eg, "00100000" can be used to refer to all
 		-- forwarding services
 		-- "00101000" can be used to refer to all
@@ -1255,6 +1486,7 @@ SS-Code	 ::= OCTET STRING (SIZE(1))
 		-- "00000000" can be used to refer to all
 		-- supplementary services
 
+SS-CodeList	 ::= SEQUENCE
 		     SIZE(1 .. maxNumberOfSupplServices)
 		     OF SS-Code
 
@@ -1262,6 +1494,7 @@ SS-Code	 ::= OCTET STRING (SIZE(1))
 SS-Status	 ::= OCTET STRING (SIZE (1))
 		-- Bit 8-4 Unused
 		-- Bit 3   Provision indicator
+		--     0 : Not provisioned
 		--     1 : Provisioned
 		-- Bit 2   Registration indicator (if applicable)
 		--     0 : Not Registered
@@ -1269,6 +1502,7 @@ SS-Status	 ::= OCTET STRING (SIZE (1))
 		-- Bit 1   Activation indicator (If applicable)
 		--     0 : Not Active
 		--     1 : Active
+
 SS-Information	 ::= CHOICE{
 		forwardingInfo	[0] IMPLICIT ForwardingInfo,
 		callBarringInfo	[1] IMPLICIT CallBarringInfo,
@@ -1276,6 +1510,7 @@ SS-Information	 ::= CHOICE{
 		ss-Data		[3] IMPLICIT SS-Data}
 
 SS-InfoList	 ::= SEQUENCE
+		     SIZE(1 .. maxNumberOfSupplServices)
 		     OF SS-Information
 
 
@@ -1285,12 +1520,14 @@ SS-Data	 ::= SEQUENCE{
 	ss-Status		[4] IMPLICIT SS-Status OPTIONAL,
 	ss-SubscriptionOption	SS-SubscriptionOption OPTIONAL}
 
+
 SS-DataList	 ::= SEQUENCE
 		     SIZE(1 .. maxNumberOfSupplServices)
 		     OF SS-Data
 
 
 SS-Request	 ::= ENUMERATED{
+		registration (0),
 		erasure (1),
 		activation (2),
 		deactivation(3),
@@ -1298,11 +1535,13 @@ SS-Request	 ::= ENUMERATED{
 		invoke (5)}
 
 
+SS-SubscriptionOption	 ::= CHOICE{
 	perCallBasis			[5] IMPLICIT BOOLEAN,
 	notificationToHeldRetrievedParty	[6] IMPLICIT BOOLEAN,
 	userToUserServiceIndicator	[7] IMPLICIT UserToUserServiceIndicator,
 	maximumConfereesNumber	[8] IMPLICIT MaximumConfereesNumber,
 	huntGroupAccessSelectionOrder	[9] IMPLICIT HuntGroupAccessSelectionOrder}
+
 
 
 ForwardingOptions	 ::= OCTET STRING (SIZE(1))
@@ -1312,6 +1551,7 @@ ForwardingOptions	 ::= OCTET STRING (SIZE(1))
 		--          10  notification without calling number identity
 		-- Bit 6-5  Notification to calling party
 		--          00 No notification
+		--          01 Notification with forwarded-to number
 		--          10 Notification without forwarded-to number
 
 
@@ -1319,6 +1559,7 @@ UserToUserServiceIndicator	 ::= OCTET STRING (SIZE(1))
 		-- Bit 8   : service 1
 		-- Bit 7   : service 2
 		-- Bit 6   : service 3
+		-- Bit 5-1 : Reserved
 		-- Bit 8 to 6 coded "1" if the service
 		-- is available to the subscriber
 
@@ -1326,7 +1567,9 @@ UserToUserServiceIndicator	 ::= OCTET STRING (SIZE(1))
 MaximumConfereesNumber	 ::= INTEGER (1..10)
 
 
+
 HuntGroupAccessSelectionOrder ::= ENUMERATED{
+		random	(0),
 		sequential	(1)}
 
 
@@ -1334,6 +1577,7 @@ NoReplyConditionTime	 ::= INTEGER (5..30)
 
 
 
+NumberOfConferees	 ::= INTEGER (1..10)
 
 
 CUG-Facilities	 ::=  OCTET STRING (SIZE (1))
@@ -1341,6 +1585,7 @@ CUG-Facilities	 ::=  OCTET STRING (SIZE (1))
 		-- Bit 2-1
 		--   00 CUG only facilities
 		--   01 CUG with outgoing access
+		--   10 CUG with incoming access
 		--   11 CUG with both outgoing and incoming access
 
 CUG-Interlock	 ::= OCTET STRING (SIZE (4))
@@ -1348,6 +1593,7 @@ CUG-Interlock	 ::= OCTET STRING (SIZE (4))
 
 CUG-Index	 ::=  OCTET STRING (SIZE (1))
 		-- Internal structure defined in Rec CCITT Q.763
+
 CUG-Options	 ::=  OCTET STRING (SIZE (1))
 		-- BIT 8-4 00000 (Unused)
 		-- BIT 3 preferential CUG indicator
@@ -1355,6 +1601,7 @@ CUG-Options	 ::=  OCTET STRING (SIZE (1))
 		-- 1 preferential CUG
 		-- BIT 2 barring of incoming calls within the CUG
 		-- 0 no barring
+		-- 1 barring
 		-- BIT 1 barring of outgoing calls within the CUG
 		-- 0 no barring
 		-- 1 barring
@@ -1362,13 +1609,16 @@ CUG-Options	 ::=  OCTET STRING (SIZE (1))
 CUG-Feature	 ::= SEQUENCE {
 	cug-interlock		CUG-Interlock,
 	cug-Index		CUG-Index,
+	cug-Options		CUG-Options,
 	ss-Status		SS-Status}
 
 
 CUG-FeatureList ::= 	SEQUENCE SIZE (
 		1..maxNumberOfCUG) OF CUG-Feature
 
+
 CUG-Information	 ::= SEQUENCE{
+	cug-Facilities	CUG-Facilities,
 			CHOICE{
 	cug-Feature			[0] IMPLICIT CUG-Feature,
 	cug-FeatureList		[1] IMPLICIT CUG-FeatureList}}
@@ -1376,6 +1626,7 @@ CUG-Information	 ::= SEQUENCE{
 		-- for the preferred CUG.
 
 --
+ForwardingInfo	 ::= SEQUENCE{
 	ss-Code		SS-Code OPTIONAL,
 	forwardingFeatureList	ForwardingFeatureList}
 
@@ -1383,12 +1634,14 @@ ForwardingData	 ::= SEQUENCE{
 	forwardedToNumber	[5] IMPLICIT IsdnAddressString,
 	forwardingOptions	[6] IMPLICIT ForwardingOptions OPTIONAL}
 
+
 ForwardingFeature	 ::=  SEQUENCE {
 	basicService	BasicServiceCode OPTIONAL,
 	ss-Status		[4] IMPLICIT SS-Status,
 	forwardedToNumber	[5] IMPLICIT IsdnAddressString OPTIONAL,
 	forwardingOptions	[6] IMPLICIT ForwardingOptions OPTIONAL,
 	noReplyConditionTime	[7] IMPLICIT NoReplyConditionTime  OPTIONAL}
+
 ForwardingFeatureList	 ::= SEQUENCE SIZE (1.. maxNumberOfForwardingFeatures) 
 	OF ForwardingFeature
 
@@ -1396,17 +1649,21 @@ CallBarringInfo	 ::= SEQUENCE {
 	ss-Code		SS-Code,
 	callBarringFeatureList	CallBarringFeatureList}
 
+CallBarringFeature	 ::= SEQUENCE{
 	basicServiceCode	BasicServiceCode OPTIONAL,
 	ss-Status		[4] IMPLICIT SS-Status }
 
 CallBarringFeatureList	 ::= SEQUENCE SIZE (1.. maxNumberOfCallBarringFeatures) 
 OF CallBarringFeature
+
 SubscriberData	 ::= SEQUENCE{
 	msIsdn			[1] IMPLICIT IsdnAddressString OPTIONAL,
 	category			[2] IMPLICIT Category OPTIONAL,
 	subscriberStatus		[3] IMPLICIT SubscriberStatus OPTIONAL,
 	bearerServiceList		[4] IMPLICIT BearerServiceList OPTIONAL,
 	teleserviceList		[6] IMPLICIT TeleserviceList OPTIONAL, 	
+	provisonedSupplServices		[7] IMPLICIT SS-InfoList OPTIONAL}
+
 
 SS-Notification	 ::= OCTET STRING (SIZE (1))
 		-- 1 bit per defined indication
@@ -1415,6 +1672,7 @@ SS-Notification	 ::= OCTET STRING (SIZE (1))
 Password	 ::= CHOICE {
 		PrintableString (SIZE(4..8)),
 		NumericString (FROM (
+		"0"|"1"|"2"|"3"|"4"|
 		"5"|"6"|"7"|"8"|"9")|
 		SIZE(4))}
 		-- only the second form is used for GSM systems.
@@ -1422,6 +1680,7 @@ Password	 ::= CHOICE {
 
 GuidanceInfo	 ::=   ENUMERATED{
 		guidance0 (0),
+		guidance1 (1),
 		guidance2 (2),
 		guidance3 (3),
 		guidance4 (4)}
@@ -1429,17 +1688,20 @@ GuidanceInfo	 ::=   ENUMERATED{
 		-- the identifiers used in this description represent
 		-- the information which has to be delivered to the subscriber
 		-- according to table 6.4/4.
+		-- How this information is really delivered to the subscriber
 		-- (display, announcement, ...) is not part of this specification.
 
 SS-UserData	 ::= IA5String (SIZE (1.. maxSignalInfoLength))
 
 
 number		Information to be provided	
+
 guidance0		enter password
 guidance1		enter new password
 guidance2		enter new password again
 guidance3		bad password try again
 guidance4		bad password format try again
+
 
 -- Data types for call parameters
 
@@ -1448,6 +1710,7 @@ CallReference	 ::= OCTET STRING (SIZE (1..3))
 CallType	 ::= ENUMERATED{
 		incomingCall	(0),
 		forwardedCallPortion	(1),
+		reroutedCallPortion	(2),
 		outgoingCall		(3),
 		ss-Request		(4)}
 
@@ -1455,6 +1718,7 @@ SS-ChargingData	 ::= SEQUENCE {
 	ss-Code	[1] IMPLICIT SS-Code,
 	ss-Request	[2] IMPLICIT SS-Request,
 	charge	[3] IMPLICIT Charge OPTIONAL}
+
 SS-ChargingInfo	 ::= SEQUENCE
 		     SIZE(1..maxNumberOfSupplServices)
 		     OF SS-ChargingData
@@ -1462,6 +1726,7 @@ SS-ChargingInfo	 ::= SEQUENCE
 CallDuration	 ::= INTEGER (0..maxCallDuration)
 
 CallDateTime	 ::= GeneralizedTime (SIZE (14 .. 24))
+		-- local time and time differential
 		-- to UTC time
 
 PacketDataVolume	 ::= INTEGER (1..maxPacketDataVolume)
@@ -1469,6 +1734,7 @@ PacketDataVolume	 ::= INTEGER (1..maxPacketDataVolume)
 Charge	 ::= INTEGER (1.. maxNumberOfChargingUnit)
 
 ChargingUnit	 ::= ENUMERATED {
+		specialDrawingRights (0)}
 
 CallStatus	 ::= ENUMERATED
 		{undetermined 			(0),
@@ -1476,6 +1742,7 @@ CallStatus	 ::= ENUMERATED
 		successfulAbnormalTermination		(2),
 		forwarded				(4),
 		forwardedWithAbnormalTermination		(5),
+		rerouted				(6),
 		reroutedWithAbnormalTermination 		(7),
 		unsuccessfulNoRadioContact 		(8),
 		unsuccessfulNoResponse		(9),
@@ -1483,6 +1750,7 @@ CallStatus	 ::= ENUMERATED
 		unsuccessfulSystemFailed 		(11),
 		unsuccessfulSusbcriptionViolation 		(12),
 		unsuccessfulUnsupportedFacility 		(13)}
+
 NumberOfForwarding	 ::= INTEGER (1..5)
 
 
@@ -1491,6 +1759,7 @@ NumberOfForwarding	 ::= INTEGER (1..5)
 ChannelType	 ::= OCTET STRING (SIZE (1..10))
 		-- Concatenation of
 		-- Speech data indicator
+		-- Channel rate
 		-- Speech encoding algorithm/data rate
 		-- + transparency indicator
 		-- as defined in Recommendation GSM 08.08
@@ -1498,10 +1767,12 @@ ChannelType	 ::= OCTET STRING (SIZE (1..10))
 
 ClassmarkInformation	 ::= OCTET STRING (SIZE (1..2))
 		-- classmark information element type 1 or 2
+		-- contents as defined in Recommendation 08.08
 
 
 HandoverPriority	 ::= OCTET STRING (SIZE (1))
 		-- internal structure defined in Recommendation GSM 08.08
+
 
 
 
@@ -1512,6 +1783,7 @@ HandoverType	 ::= ENUMERATED
 
 -- Data types for security procedures
 
+AuthenticationSet	 ::= SEQUENCE {
 	rand	Rand,
 	sres	Sres,
 	kc	Kc}
@@ -1519,6 +1791,7 @@ HandoverType	 ::= ENUMERATED
 
 Rand	 ::= OCTET STRING (SIZE (16))
 
+Sres	 ::= OCTET STRING (SIZE (4))
 
 Kc	 ::= OCTET STRING (SIZE (8))
 
@@ -1526,6 +1799,7 @@ Ki	 ::= OCTET STRING (SIZE (16))
 
 CKSN	 ::= OCTET STRING (SIZE (1))
 		-- bits 8-4 unused
+		-- bits 3-1 coded as specified in recommendation GSM 04.08
 
 
 CipheringMode	 ::= ENUMERATED{
@@ -1533,7 +1807,9 @@ CipheringMode	 ::= ENUMERATED{
 		version1-GSM (2)}
 
 
+
 -- Data types for short message services
+
 SM-RP-DA	 ::= CHOICE{
 	imsi		[0] IMPLICIT IMSI,
 	lMsId		[1] IMPLICIT LMsId,
@@ -1541,6 +1817,7 @@ SM-RP-DA	 ::= CHOICE{
 	serviceCentreAddress	[4] IMPLICIT AddressString}
 
 
+SM-RP-OA	 ::= CHOICE{
 	msIsdn		[2] IMPLICIT IsdnAddressString,
 	serviceCentreAddress	[4] IMPLICIT AddressString}
 
@@ -1548,6 +1825,7 @@ SM-RP-DA	 ::= CHOICE{
 SM-RP-UI	 ::= OCTET STRING (SIZE (1..maxSignalInfoLength))
 
 Figure 6.4/9 
+ASN.1 Specification of MAP data types: short messages
 
 -- fault recovery, call tracing
 
@@ -1555,6 +1833,7 @@ TraceReference	 ::= OCTET STRING (SIZE (1..2))
 
 TraceType	 ::= INTEGER{
 		allEvents (0),
+		onlyCalls (1),
 		eventSet1 (2),
 		eventSet254 (255)}
 		(0..255)
@@ -1562,12 +1841,15 @@ TraceType	 ::= INTEGER{
 		-- sets of events pre-defined by each operator.
 
 NetworkResource	 ::= ENUMERATED
+		{pLMN		(0),
 		hLR		(1),
 		vLR 		(2),
 		previous-VLR 	(3),
 		controlling-MSC 	(4),
 		vMSC 		(5),
 		eIR 		(6),
+		radioSubSystem	(7)}
+
 
 -- other data types
 
@@ -1576,6 +1858,7 @@ RequestParameter	 ::= ENUMERATED{
 		request-AuthenticationSet 	(1),
 		request-SubscriberData 		(2),
 		request-CUG-Information 	(3),
+		request-Ki 			(4)}
 
 RequestParameters	 ::= SEQUENCE SIZE (1..2) OF RequestParameter
 
@@ -1583,12 +1866,14 @@ SentParameter	 ::= CHOICE{
 	imsi		[0] IMPLICIT IMSI,
 	authenticationSet	[1] IMPLICIT AuthenticationSet,
 	susbcriberData	[2] IMPLICIT SubscriberData,
+	cug-information	[3] IMPLICIT CUG-Information,
 	ki		[4] IMPLICIT Ki}
 	
 
 SentParameters	 ::= SEQUENCE
 		     SIZE(1..maxNumberOfSentParameters)
 		     OF SentParameter
+
 
 CmServiceType	 ::= ENUMERATED{
 		mobileOriginatingCall			(1),
@@ -1597,6 +1882,7 @@ CmServiceType	 ::= ENUMERATED{
 		ss-request 				(8),
 		mobileOriginatingCallRe-establishment	(9),
 		mobileTerminatingCall 			(10)}
+
 --
 AccessConnectionStatus	 ::= OCTET STRING (SIZE (1))
 		-- Bit 8-4 Reserved
@@ -1604,18 +1890,21 @@ AccessConnectionStatus	 ::= OCTET STRING (SIZE (1))
 		--     0 No RR- connection
 		--     1 RR-connection established
 		-- Bit 2
+		--     0 Ciphering mode off
 		--     1 Ciphering mode on
 		-- Bit 1
 		--     0 MM-connection existing and authenticated
 		--     1 MM-connection existing and not authenticated
 
 END -- End of data types specifications
+
 -	Undetermined
 -	Successful with normal termination
 -	Successful with abnormal termination
 -	Spare
 -	Forwarded
 -	Forwarded with abnormal termination
+-	Rerouted
 -	Rerouted with abnormal termination
 -	Unsuccessful due to no radio contact
 -	Unsuccessful due to no response
@@ -1629,6 +1918,7 @@ BEGIN
 
 IMPORTS
 maxSignalInfoLength FROM MAP-Constants;
+   
 MAPAbortInformation	 ::= SEQUENCE{
 		abortCause ENUMERATED{
 			unspecifiedReason (0),
@@ -1636,6 +1926,7 @@ MAPAbortInformation	 ::= SEQUENCE{
 			userResourceLimitation (2),
 			resourceUnavailableLongTermProblem (3),
 			resourceUnavailableTemporaryProblem (4),
+			radioChannelRelease (5),
 			networkPathRelease (6),
 			callRelease (7),
 			associatedProcedureFailed (8),
@@ -1643,6 +1934,7 @@ MAPAbortInformation	 ::= SEQUENCE{
 		additionalInformation OCTET STRING (SIZE(
 			1..MaxSignalInfoLength))}
 		--
+		-- The internal structure of the OCTET STRING
 		-- is up to the operator
 		
 END
@@ -1652,6 +1944,7 @@ MAP-Protocol DEFINITIONS ::=
 BEGIN
 IMPORTS
 
+-- Imports operation types
 
 -- Location management
 UpdateLocationArea, UpdateLocation, CancelLocation,
@@ -1659,6 +1952,7 @@ DetachIMSI, AttachIMSI, DeregisterMobileSubscriber,
 
 -- Data management
 SendParameters, InsertSubscriberData, DeleteSubscriberData,
+
 -- Supplementary Services Handling
 RegisterSS, EraseSS, ActivateSS,
 DeactivateSS, InterrogateSS, InvokeSS, ForwardSsNotification,
@@ -1666,6 +1960,7 @@ RegisterPassword, GetPassword, ProcessUnstructuredSsData,
 
 -- Call set-up
 SendInfoForIncomingCall, SendInfoForOutgoingCall, SendRoutingInformation, ProvideRoamingNumber,
+CompleteCall, ConnectToFollowingAddress, ProcessCallWaiting
 
 -- Paging
  Page, SearchForMobileSubscriber,
@@ -1673,6 +1968,8 @@ SendInfoForIncomingCall, SendInfoForOutgoingCall, SendRoutingInformation, Provid
 -- Handover
 PerformHandover, SendEndSignal,
 PerformSubsequentHandover, AllocateHandoverNumber, SendHandoverReport,
+ProcessAccessSignalling, ForwardAccessSignalling, NoteInternalHandover,
+
 
 -- Charging
 RegisterChargingInformation,
@@ -1681,6 +1978,7 @@ RegisterChargingInformation,
 Reset, ForwardCheckSsIndication,
 
 -- Authentication and security
+Authenticate, ProvideIMSI,
 ForwardNewTMSI, SetCipheringMode,
 
 
@@ -1688,6 +1986,7 @@ ForwardNewTMSI, SetCipheringMode,
 CheckIMEI,
 
 -- Short messages
+SendRoutingForShortMsg, ForwardShortMessage, SetMessageWaitingData,
 NoteMSPresent, AlertServiceCentre,
 
 -- Tracing
@@ -1695,6 +1994,7 @@ ActivateTraceMode, DeactivateTraceMode, TraceSubscriberActivity,
 
 -- Others
 ProcessAccessRequest
+BeginSubscriberActivity
 FROM MAP-Operations
 
 -- imports error types
@@ -1702,6 +2002,7 @@ FROM MAP-Operations
 UnknownSubscriber, UnknownBaseStation,UnknownMSC,
 UnknownLocArea, UnidentifiedSubscriber,
 UnallocatedRoamingNumber, UnknownEquipment, RoamingNotAllowed,
+IllegalMS, BearerServiceNotProvisioned,
 TeleserviceNotProvisioned, InsufficientBearerCapabilities,
 CallBarred, ForwardingViolation, CUG-Reject,
 IllegalSS-Operation, SS-ErrorStatus, SS-NotAvailable,
@@ -1709,12 +2010,15 @@ SS-SubscriptionViolation, SS-Incompatibility, FacilityNotSupported, InvalidTarge
 NoHandoverNumberAvailable,
 SubsequentHandoverFailure, AbsentSubscriber,
 BusySubscriber, NoSubscriberReply, RadioCongestion,
+ImpossibleCallCompletion, SM-DeliveryFailure, MessageWaitingListFull, SystemFailure, DataMissing,
 UnexpectedDataValue, PasswordRegistrationFailure,
 NegativePasswordCheck, NoRoamingNumberAvailable,
 TracingBufferFull
 FROM MAP-Errors;
 
+
 -- allocation of local value to operations
+
 updateLocationArea UpdateLocationArea ::= 1
 
 updateLocation UpdateLocation ::= 2
@@ -1722,6 +2026,7 @@ updateLocation UpdateLocation ::= 2
 cancelLocation CancelLocation ::= 3
 
 provideRoamingNumber ProvideRoamingNumber ::= 4
+
 detachIMSI DetachIMSI ::= 5
 
 attachIMSI AttachIMSI ::= 6
@@ -1729,6 +2034,7 @@ attachIMSI AttachIMSI ::= 6
 insertSubscriberData InsertSubscriberData ::= 7
 
 deleteSubscriberData DeleteSubscriberData ::= 8
+
 sendParameters SendParameters ::= 9
 
 registerSS RegisterSS ::= 10
@@ -1736,6 +2042,7 @@ registerSS RegisterSS ::= 10
 eraseSS EraseSS ::= 11
 
 activateSS ActivateSS ::= 12
+
 deactivateSS DeactivateSS ::= 13
 
 interrogateSS InterrogateSS ::= 14
@@ -1743,6 +2050,7 @@ interrogateSS InterrogateSS ::= 14
 invokeSS InvokeSS ::= 15
 
 forwardSsNotification ForwardSsNotification ::= 16
+
 registerPassword RegisterPassword ::= 17
 
 getPassword GetPassword ::= 18
@@ -1750,6 +2058,7 @@ getPassword GetPassword ::= 18
 processUnstructuredSsData ::= 19
 
 sendInfoForIncomingCall SendInfoForIncomingCall ::= 20
+
 sendInfoForOutgoingCall SendInfoForOutgoingCall ::= 21
 
 sendRoutingInformation SendRoutingInformation ::= 22
@@ -1757,6 +2066,7 @@ sendRoutingInformation SendRoutingInformation ::= 22
 completeCall CompleteCall ::= 23
 
 connectToFollowingAddress ConnectToFollowingAddress ::= 24
+
 processCallWaiting ProcessCallWaiting ::= 25
 
 
@@ -1765,6 +2075,7 @@ page Page ::= 26
 searchForMobileSubscriber SearchForMobileSubscriber ::= 27
 
 performHandover PerformHandover ::= 28
+
 sendEndSignal SendEndSignal ::= 29
 
 performSubsequentHandover PerformSubsequentHandover ::= 30
@@ -1772,6 +2083,7 @@ performSubsequentHandover PerformSubsequentHandover ::= 30
 allocateHandoverNumber AllocateHandoverNumber ::= 31
 
 sendHandoverReport SendHandoverReport ::= 32
+
 processAccessSignalling ProcessAccessSignalling ::= 33
 
 forwardAccessSignalling ForwardAccessSignalling ::= 34
@@ -1779,6 +2091,7 @@ forwardAccessSignalling ForwardAccessSignalling ::= 34
 noteInternalHandover NoteInternalHandover ::= 35
 
 registerChargingInformation RegisterChargingInformation ::= 36
+
 reset Reset ::= 37
 
 forwardCheckSsIndication ForwardCheckSsIndication ::= 38
@@ -1786,6 +2099,7 @@ forwardCheckSsIndication ForwardCheckSsIndication ::= 38
 authenticate Authenticate ::= 39
 
 provideIMSi ProvideIMSI ::= 40
+
 forwardNewTMSI ForwardNewTMSI ::= 41
 
 setCipheringMode SetCipheringMode ::= 42
@@ -1793,6 +2107,7 @@ setCipheringMode SetCipheringMode ::= 42
 checkIMEI CheckIMEI ::= 43
 
 sendRoutingInfoForSM SendRoutingInfoForSM ::= 45
+
 forwardShortMessage ForwardShortMessage ::= 46
 
 setMessageWaitingData SetMessageWaitingData ::= 47
@@ -1800,13 +2115,16 @@ setMessageWaitingData SetMessageWaitingData ::= 47
 noteMSPresent NoteMsPresent ::= 48
 
 alertServiceCentre AlertServiceCentre ::= 49
+
 activateTraceMode ActivateTraceMode ::= 50
 
 deactivateTraceMode DeactivateTraceMode ::= 51
 
 traceSubscriberActivity TraceSubscriberActivity ::= 52
 
+
 processAccessRequest ProcessAccessRequest ::= 53
+
 beginSubscriberActivity BeginSubscriberActivity ::= 54
 
 --
@@ -1814,6 +2132,7 @@ beginSubscriberActivity BeginSubscriberActivity ::= 54
 
 unknownSubscriber UnknownSubscriber ::= 1
 
+unknownBaseStation UnknownBaseStation ::= 2
 
 unknownMSC UnknownMSC ::= 3
 
@@ -1821,6 +2140,7 @@ unknownLocArea UnknownLocArea ::= 4
 
 unidentifiedSubscriber UnidentifiedSubscriber ::= 5
 
+unallocatedRoamingNumber UnallocatedRoamingNumber ::= 6
 
 unknownEquipment UnknownEquipment ::= 7
 
@@ -1828,6 +2148,7 @@ roamingNotAllowed RoamingNotAllowed ::= 8
 
 illegalMS IllegalMS ::= 9
 
+bearerServiceNotProvisioned BearerServiceNotProvisioned ::= 10
 
 teleServiceNotProvisioned TeleServiceNotProvisioned ::= 11
 
@@ -1835,6 +2156,7 @@ insufficientBearerCapabilities InsufficientBearerCapabilities ::= 12
 
 callBarred CallBarred ::= 13
 
+forwardingViolation ForwardingViolation ::= 14
 
 cug-Reject CUG-Reject ::= 15
 
@@ -1842,6 +2164,7 @@ illegalSS-Operation IllegalSS-Operation ::= 16
 
 ss-ErrorStatus SS-ErrorStatus ::= 17
 
+ss-NotAvailable SS-NotAvailable ::= 18
 
 ss-SubscriptionViolation SS-SubscriptionViolation ::= 19
 
@@ -1849,7 +2172,9 @@ ss-Incompatibility SS-Incompatibility ::= 20
 
 facilityNotSupported FacilityNotSupported ::= 21
 
+invalidTargetBaseStation InvalidTargetBaseStation  ::= 23
 
+noRadioResourceAvailable NoRadioResourceAvailable ::= 24
 
 noHandoverNumberAvailable NoHandoverNumberAvailable ::= 25
 
@@ -1857,6 +2182,7 @@ subsequentHandoverFailure SubsequentHandoverFailure ::= 26
 
 absentSubscriber AbsentSubscriber ::= 27
 
+busySubscriber BusySubscriber ::= 28
 
 noSubscriberReply NoSubscriberReply ::= 29
 
@@ -1864,6 +2190,7 @@ radioCongestion RadioCongestion ::= 30
 
 impossibleCallCompletion ImpossibleCallCompletion ::= 31
 
+sm-DeliveryFailure SM-DeliveryFailure ::= 32
 
 MessageWaitingListFull ::= 33
 
@@ -1871,6 +2198,7 @@ systemFailure SystemFailure ::= 34
 
 dataMissing DataMissing ::= 35
 
+unexpectedDataValue UnexpectedDataValue ::= 36
 
 passwordRegistrationFailure PasswordRegistrationFailure :: 37
 
@@ -1878,6 +2206,7 @@ negativePasswordCheck NegativePasswordCheck ::= 38
 
 noRoamingNumberAvailable NoRoamingNumberAvailable ::= 39
 
+tracingBufferFull TracingBufferFull ::= 40
 
 
 END
