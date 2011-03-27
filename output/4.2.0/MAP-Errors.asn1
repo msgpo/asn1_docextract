@@ -1,0 +1,249 @@
+
+-- MODULE 'MAP-Errors' START
+MAP-Errors {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-Errors (10) version2 (2)}
+
+DEFINITIONS
+
+::=
+
+BEGIN
+
+EXPORTS
+
+	-- generic errors
+	SystemFailure,
+	DataMissing,
+	UnexpectedDataValue,
+	FacilityNotSupported,
+
+	-- identification and numbering errors
+	UnknownSubscriber,
+	NumberChanged,
+	UnknownBaseStation,
+	UnknownMSC,
+--<B--	UnknownLocArea,--B>--
+	UnidentifiedSubscriber,
+--<B--	UnallocatedRoamingNumber,--B>--
+	UnknownEquipment,
+
+	-- subscription errors
+	RoamingNotAllowed,
+	IllegalSubscriber,
+	IllegalEquipment,
+	BearerServiceNotProvisioned,
+	TeleserviceNotProvisioned,
+
+	-- handover errors
+	InvalidTargetBaseStation,
+	NoRadioResourceAvailable,
+	NoHandoverNumberAvailable,
+	SubsequentHandoverFailure,
+
+	-- operation and maintenance errors
+	TracingBufferFull,
+
+	-- call handling errors
+	NoRoamingNumberAvailable,
+	AbsentSubscriber,
+--<B--	BusySubscriber,--B>--
+--<B--	NoSubscriberReply,--B>--
+--<B--	RadioCongestion,--B>--
+--<B--	ImpossibleCallCompletion,--B>--
+	CallBarred,
+	ForwardingViolation,
+	CUG-Reject,
+
+	-- supplementary service errors
+	IllegalSS-Operation,
+	SS-ErrorStatus,
+	SS-NotAvailable,
+	SS-SubscriptionViolation,
+	SS-Incompatibility,
+	SS-PartialAcceptance,
+	SS-NotDelivered,
+	PW-RegistrationFailure,
+	NegativePW-Check,
+	NumberOfPW-AttemptsViolation,
+
+	-- short message service errors
+	SM-DeliveryFailure,
+	MessageWaitingListFull
+;
+
+IMPORTS
+	ERROR
+FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
+
+	SS-Status,
+	SS-SubscriptionOption--<B--,--B>--
+--<B--	SS-List--B>--
+FROM MAP-SS-DataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-SS-DataTypes (14) version2 (2)}
+
+	RoamingNotAllowedCause,
+--<B--	BusySubscriberCause,--B>--
+	CallBarringCause,
+	CUG-RejectCause,
+	SS-IncompatibilityCause,
+	PW-RegistrationFailureCause,
+	SM-DeliveryFailureCause
+FROM MAP-ER-DataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-ER-DataTypes (17) version2 (2)}
+
+	NetworkResource
+FROM MAP-CommonDataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+;
+
+
+-- generic errors
+
+SystemFailure ::= ERROR
+	PARAMETER
+		networkResource	NetworkResource
+		-- optional
+
+DataMissing ::= ERROR
+
+UnexpectedDataValue ::= ERROR
+
+FacilityNotSupported ::= ERROR
+
+
+-- identification and numbering errors
+
+UnknownSubscriber ::= ERROR
+
+NumberChanged ::= ERROR
+
+UnknownBaseStation ::= ERROR
+
+UnknownMSC ::= ERROR
+
+--<B--UnknownLocArea ::= ERROR--B>--
+
+UnidentifiedSubscriber ::= ERROR
+
+--<B--UnallocatedRoamingNumber ::= ERROR--B>--
+
+UnknownEquipment ::= ERROR
+
+
+-- subscription errors
+
+RoamingNotAllowed ::= ERROR
+	PARAMETER
+		roamingNotAllowedCause	RoamingNotAllowedCause
+		-- optional
+		-- OA! roamingNotAllowedCause must be absent in version 1
+		-- OP>1 roamingNotAllowedCause must be present in version greater 1
+
+IllegalSubscriber ::= ERROR
+
+IllegalEquipment ::= ERROR
+
+BearerServiceNotProvisioned ::= ERROR
+
+TeleserviceNotProvisioned ::= ERROR
+
+
+-- handover errors
+
+InvalidTargetBaseStation ::= ERROR
+
+NoRadioResourceAvailable ::= ERROR
+
+NoHandoverNumberAvailable ::= ERROR
+
+SubsequentHandoverFailure ::= ERROR
+
+
+-- operation and maintenance errors
+
+TracingBufferFull ::= ERROR
+
+
+-- call handling errors
+
+NoRoamingNumberAvailable ::= ERROR
+
+AbsentSubscriber ::= ERROR
+	PARAMETER
+		mwd-Set	BOOLEAN
+		-- optional
+		-- OA>1 mwd-Set must be absent in version greater 1
+
+--<B--BusySubscriber ::= ERROR--B>--
+--<B--	PARAMETER--B>--
+--<B--		busySubscriberCause	BusySubscriberCause--B>--
+--<B--		-- optional----B>--
+
+--<B--NoSubscriberReply ::= ERROR--B>--
+
+--<B--RadioCongestion ::= ERROR--B>--
+
+--<B--ImpossibleCallCompletion ::= ERROR--B>--
+--<B--	PARAMETER--B>--
+--<B--		ss-List	SS-List--B>--
+--<B--		-- optional----B>--
+
+CallBarred ::= ERROR
+	PARAMETER
+		callBarringCause	CallBarringCause
+		-- optional
+
+ForwardingViolation ::= ERROR
+
+CUG-Reject ::= ERROR
+	PARAMETER
+		cug-RejectCause	CUG-RejectCause
+		-- optional
+
+
+-- supplementary service errors
+
+IllegalSS-Operation ::= ERROR
+
+SS-ErrorStatus ::= ERROR
+	PARAMETER
+		ss-Status	SS-Status
+		-- optional
+
+SS-NotAvailable ::= ERROR
+
+SS-SubscriptionViolation ::= ERROR
+	PARAMETER
+		ss-SubscriptionOption	SS-SubscriptionOption
+		-- optional
+
+SS-Incompatibility ::= ERROR
+	PARAMETER
+		ss-IncompatibilityCause	SS-IncompatibilityCause
+		-- optional
+
+SS-PartialAcceptance ::= ERROR
+
+SS-NotDelivered ::= ERROR
+
+PW-RegistrationFailure ::= ERROR
+	PARAMETER
+		pw-RegistrationFailureCause	PW-RegistrationFailureCause
+
+NegativePW-Check ::= ERROR
+
+NumberOfPW-AttemptsViolation ::= ERROR
+
+
+-- short message service errors
+
+SM-DeliveryFailure ::= ERROR
+	PARAMETER
+		sm-DeliveryFailureCause	SM-DeliveryFailureCause
+
+MessageWaitingListFull ::= ERROR
+

@@ -1,0 +1,170 @@
+
+-- MODULE 'MAP-ShortMessageServiceOperations' START
+MAP-ShortMessageServiceOperations {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-ShortMessageServiceOperations (9) version2 (2)}
+
+DEFINITIONS
+
+::=
+
+BEGIN
+
+EXPORTS
+	SendRoutingInfoForSM,
+	ForwardSM,
+	ReportSM-DeliveryStatus,
+	NoteSubscriberPresent,
+	AlertServiceCentre,
+	InformServiceCentre,
+--<B--	SendInfoForMT-SMS,--B>--
+--<B--	SendInfoForMO-SMS,--B>--
+	ReadyForSM
+;
+
+IMPORTS
+	OPERATION
+FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
+
+	SystemFailure,
+	DataMissing,
+	UnexpectedDataValue,
+	FacilityNotSupported,
+	UnknownSubscriber,
+	UnidentifiedSubscriber,
+	IllegalSubscriber,
+	IllegalEquipment,
+	TeleserviceNotProvisioned,
+	AbsentSubscriber,
+	CallBarred,
+	SM-DeliveryFailure,
+	MessageWaitingListFull
+FROM MAP-Errors {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-Errors (10) version2 (2)}
+
+	RoutingInfoForSM-Arg,
+	RoutingInfoForSM-Res,
+	ForwardSM-Arg,
+--<B--	SM-RP-DA,--B>--
+	ReportSM-DeliveryStatusArg,
+	AlertServiceCentreArg,
+	InformServiceCentreArg,
+	ReadyForSM-Arg
+FROM MAP-SM-DataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-SM-DataTypes (16) version2 (2)}
+
+--<B--	AddressString,--B>--
+	ISDN-AddressString,
+	IMSI
+FROM MAP-CommonDataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+;
+
+
+SendRoutingInfoForSM ::= OPERATION				--Timer m--
+	ARGUMENT
+		routingInfoForSM-Arg	RoutingInfoForSM-Arg
+	RESULT
+		routingInfoForSM-Res	RoutingInfoForSM-Res
+	ERRORS {
+		SystemFailure,
+		DataMissing,
+		UnexpectedDataValue,
+		FacilityNotSupported,
+		UnknownSubscriber,
+		TeleserviceNotProvisioned,
+		AbsentSubscriber,
+		CallBarred}
+
+ForwardSM ::= OPERATION					--Timer m--
+	ARGUMENT
+		forwardSM-Arg	ForwardSM-Arg
+	RESULT zzzz-Empty	NULL
+	ERRORS {
+		SystemFailure,
+		DataMissing,
+		-- NU1 DataMissing must not be used in version 1
+		UnexpectedDataValue,
+		FacilityNotSupported,
+		UnidentifiedSubscriber,
+		IllegalSubscriber,
+		IllegalEquipment,
+		-- NU1 IllegalEquipment must not be used in version 1
+		AbsentSubscriber,
+		SM-DeliveryFailure}
+
+ReportSM-DeliveryStatus ::= OPERATION			--Timer s--
+	ARGUMENT
+		reportSM-DeliveryStatusArg	ReportSM-DeliveryStatusArg
+	RESULT
+		storedMSISDN	ISDN-AddressString
+		-- optional
+		-- OA1 storedMSISDN must be absent in version 1
+		-- OP>1 storedMSISDN must be present in version greater 1
+	ERRORS {
+		DataMissing,
+		-- NU1 DataMissing must not be used in version 1
+		UnexpectedDataValue,
+		UnknownSubscriber,
+		MessageWaitingListFull}
+
+NoteSubscriberPresent ::= OPERATION				--Timer s--
+	ARGUMENT
+		imsi		IMSI
+
+AlertServiceCentre ::= OPERATION				--Timer s--
+	ARGUMENT
+		alertServiceCentreArg	AlertServiceCentreArg
+	RESULT zzzz-Empty	NULL
+		-- OA1 RESULT must be absent in version 1
+		-- OU>1 RESULT must be used in version greater 1
+	ERRORS {
+		SystemFailure,
+		-- NU1 SystemFailure must not be used in version 1
+		DataMissing,
+		-- NU1 DataMissing must not be used in version 1
+		UnexpectedDataValue}
+		-- NU1 UnexpectedDataValue must not be used in version 1
+
+InformServiceCentre ::= OPERATION				--Timer s--
+	ARGUMENT
+		informServiceCentreArg	InformServiceCentreArg
+
+--<B--SendInfoForMT-SMS ::= OPERATION				--Timer s----B>--
+--<B--	ARGUMENT--B>--
+--<B--		sm-RP-DA	SM-RP-DA--B>--
+--<B--	RESULT--B>--
+--<B--		msisdn	ISDN-AddressString--B>--
+--<B--	ERRORS {--B>--
+--<B--		SystemFailure,--B>--
+--<B--		DataMissing,--B>--
+--<B--		UnexpectedDataValue,--B>--
+--<B--		UnknownSubscriber,--B>--
+--<B--		UnidentifiedSubscriber,--B>--
+--<B--		IllegalSubscriber,--B>--
+--<B--		IllegalEquipment,--B>--
+--<B--		AbsentSubscriber}--B>--
+
+--<B--SendInfoForMO-SMS ::= OPERATION				--Timer s----B>--
+--<B--	ARGUMENT--B>--
+--<B--		serviceCentreAddress	AddressString--B>--
+--<B--	RESULT--B>--
+--<B--		msisdn	ISDN-AddressString--B>--
+--<B--	ERRORS {--B>--
+--<B--		DataMissing,--B>--
+--<B--		UnexpectedDataValue,--B>--
+--<B--		TeleserviceNotProvisioned,--B>--
+--<B--		CallBarred}--B>--
+
+ReadyForSM ::= OPERATION				--Timer m--
+	ARGUMENT
+		readyForSM-Arg	ReadyForSM-Arg
+	RESULT zzzz-Empty	NULL
+	ERRORS {
+		DataMissing,
+		UnexpectedDataValue,
+		UnknownSubscriber}
+

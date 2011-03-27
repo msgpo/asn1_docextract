@@ -1,0 +1,50 @@
+
+-- MODULE 'MobileDomainDefinitions' START
+MobileDomainDefinitions {
+   ccitt (0) identified-organization (4) etsi (0) mobileDomainId (0)
+   mobileDomainDefinitions (0) version1 (1)}
+
+DEFINITIONS
+
+::=
+
+BEGIN
+
+-- Mobile Domain
+
+mobileDomain  OBJECT IDENTIFIER ::=
+	{ccitt (0) identified-organization (4) etsi (0) mobileDomainId (0)}
+
+
+-- Mobile Subdomains
+
+gsm-Network  OBJECT IDENTIFIER ::=
+	{mobileDomain gsm-NetworkId (1)}
+
+gsm-Access  OBJECT IDENTIFIER ::=
+	{mobileDomain gsm-AccessId (2)}
+
+gsm-OperationAndMaintenance  OBJECT IDENTIFIER ::=
+	{mobileDomain gsm-Operation-MaintenanceId (3)}
+
+gsm-Messaging  OBJECT IDENTIFIER ::=
+	{mobileDomain gsm-MessagingId (4)}
+
+
+-- Common Component Ids for structuring Mobile Subdomains
+
+CommonComponentId ::= INTEGER (0..9)
+
+ac-Id  CommonComponentId ::= 0
+
+as-Id  CommonComponentId ::= 1
+
+ase-Id  CommonComponentId ::= 2
+
+moduleId  CommonComponentId ::= 3
+
+er-Id  CommonComponentId ::= 4
+
+
+END
+-- MODULE END

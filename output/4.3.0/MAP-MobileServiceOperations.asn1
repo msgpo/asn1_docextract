@@ -1,0 +1,439 @@
+
+-- MODULE 'MAP-MobileServiceOperations' START
+MAP-MobileServiceOperations {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-MobileServiceOperations (5) version2 (2)}
+
+DEFINITIONS
+
+::=
+
+BEGIN
+
+EXPORTS
+
+	-- location registration operations
+--<B--	UpdateLocationArea,--B>--
+	UpdateLocation,
+	CancelLocation,
+	PurgeMS,
+	SendIdentification,
+--<B--	DetachIMSI,--B>--
+--<B--	AttachIMSI,--B>--
+
+	-- paging management operations
+--<B--	Page,--B>--
+--<B--	SearchForMS,--B>--
+
+	-- access management operations
+--<B--	ProcessAccessRequest,--B>--
+
+	-- handover operations
+	PerformHandover,
+	SendEndSignal,
+	ProcessAccessSignalling,
+	ForwardAccessSignalling,
+	PerformSubsequentHandover,
+--<B--	AllocateHandoverNumber,--B>--
+--<B--	SendHandoverReport,--B>--
+
+	-- authentication management operations
+--<B--	Authenticate,--B>--
+	SendAuthenticationInfo,
+
+	-- security management operations
+--<B--	SetCipheringMode,--B>--
+
+	-- IMEI management operations
+	CheckIMEI,
+--<B--	ObtainIMEI,--B>--
+
+	-- subscriber management operations
+	SendParameters,
+	InsertSubscriberData,
+	DeleteSubscriberData,
+
+	-- identity management operations
+--<B--	ProvideIMSI,--B>--
+--<B--	ForwardNewTMSI,--B>--
+
+	-- fault recovery operations
+	Reset,
+	ForwardCheckSS-Indication,
+	RestoreData
+;
+
+IMPORTS
+	OPERATION
+FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
+
+	SystemFailure,
+	DataMissing,
+	UnexpectedDataValue,
+	UnknownSubscriber,
+	UnknownBaseStation,
+	UnknownMSC,
+--<B--	UnknownLocArea,--B>--
+	UnidentifiedSubscriber,
+	UnknownEquipment,
+	RoamingNotAllowed,
+--<B--	IllegalSubscriber,--B>--
+--<B--	IllegalEquipment,--B>--
+	InvalidTargetBaseStation,
+	NoRadioResourceAvailable,
+	NoHandoverNumberAvailable,
+	SubsequentHandoverFailure--<B--,--B>--
+--<B--	AbsentSubscriber,--B>--
+--<B--	BusySubscriber--B>--
+FROM MAP-Errors {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-Errors (10) version2 (2)}
+
+--<B--	UpdateLocationAreaArg,--B>--
+	UpdateLocationArg,
+	UpdateLocationRes,
+	CancelLocationArg,
+	PurgeMS-Arg,
+	SendIdentificationRes,
+--<B--	PageArg,--B>--
+--<B--	SearchForMS-Arg,--B>--
+--<B--	ProcessAccessRequestArg,--B>--
+--<B--	ProcessAccessRequestRes,--B>--
+	PerformHO-Arg,
+	PerformHO-Res,
+	PerformSubsequentHO-Arg,
+--<B--	AuthenticateArg,--B>--
+	SendAuthenticationInfoArg,
+	SendAuthenticationInfoRes,
+--<B--	SRES,--B>--
+--<B--	SetCipheringModeArg,--B>--
+	CheckIMEI-Arg,
+	SendParametersArg,
+	SentParameterList,
+	InsertSubscriberDataArg,
+	InsertSubscriberDataRes,
+	DeleteSubscriberDataArg,
+	ResetArg,
+	RestoreDataArg,
+	RestoreDataRes
+FROM MAP-MS-DataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-MS-DataTypes (11) version2 (2)}
+
+--<B--	ISDN-AddressString,--B>--
+	ExternalSignalInfo,
+--<B--	IMSI,--B>--
+	TMSI,
+--<B--	SubscriberId,--B>--
+	IMEI--<B--,--B>--
+--<B--	LocAreaId--B>--
+FROM MAP-CommonDataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+;
+
+
+-- location registration operations
+
+--<B--UpdateLocationArea ::= OPERATION				--Timer m----B>--
+--<B--	ARGUMENT--B>--
+--<B--		updateLocationAreaArg	UpdateLocationAreaArg--B>--
+--<B--	RESULT zzzz-Empty	NULL--B>--
+--<B--	ERRORS {--B>--
+--<B--		SystemFailure,--B>--
+--<B--		DataMissing,--B>--
+--<B--		-- NU1 DataMissing must not be used in version 1----B>--
+--<B--		UnexpectedDataValue,--B>--
+--<B--		UnknownSubscriber,--B>--
+--<B--		UnknownLocArea,--B>--
+--<B--		RoamingNotAllowed,--B>--
+--<B--		IllegalSubscriber,--B>--
+--<B--		IllegalEquipment}--B>--
+--<B--		-- NU1 IllegalEquipment must not be used in version 1----B>--
+
+UpdateLocation ::= OPERATION				--Timer m--
+	ARGUMENT
+		updateLocationArg	UpdateLocationArg
+	RESULT
+		updateLocationRes	UpdateLocationRes
+	ERRORS {
+		SystemFailure,
+		DataMissing,
+		-- NU1 DataMissing must not be used in version 1
+		UnexpectedDataValue,
+		UnknownSubscriber,
+		RoamingNotAllowed}
+
+CancelLocation ::= OPERATION				--Timer m--
+	ARGUMENT
+		cancelLocationArg	CancelLocationArg
+	RESULT zzzz-Empty	NULL
+	ERRORS {
+		DataMissing,
+		-- NU1 DataMissing must not be used in version 1
+		UnexpectedDataValue,
+		UnidentifiedSubscriber}
+		-- NU>1 UnidentifiedSubscriber must not be used in version 1
+
+PurgeMS ::= OPERATION				--Timer m--
+	ARGUMENT
+		purgeMS-Arg	PurgeMS-Arg
+	RESULT zzzz-Empty	NULL
+
+SendIdentification::= OPERATION				--Timer s--
+	ARGUMENT
+		tmsi		TMSI
+	RESULT
+		sendIdentificationRes	SendIdentificationRes
+	ERRORS {
+		DataMissing,
+		UnidentifiedSubscriber}
+
+--<B--DetachIMSI ::= OPERATION				--Timer s----B>--
+--<B--	ARGUMENT--B>--
+--<B--		subscriberId		SubscriberId--B>--
+
+--<B--AttachIMSI ::= OPERATION				--Timer s----B>--
+--<B--	ARGUMENT--B>--
+--<B--		subscriberId		SubscriberId--B>--
+--<B--	RESULT zzzz-Empty	NULL--B>--
+--<B--	ERRORS {--B>--
+--<B--		SystemFailure,--B>--
+--<B--		DataMissing,--B>--
+--<B--		-- NU1 DataMissing must not be used in version 1----B>--
+--<B--		UnexpectedDataValue,--B>--
+--<B--		UnknownSubscriber,--B>--
+--<B--		UnidentifiedSubscriber,--B>--
+--<B--		RoamingNotAllowed,--B>--
+--<B--		IllegalSubscriber}--B>--
+
+
+-- paging management operations
+
+--<B--Page ::= OPERATION				--Timer m----B>--
+--<B--	ARGUMENT--B>--
+--<B--		pageArg	PageArg--B>--
+--<B--	ERRORS {--B>--
+--<B--		SystemFailure,--B>--
+--<B--		DataMissing,--B>--
+--<B--		-- NU1 DataMissing must not be used in version 1----B>--
+--<B--		UnexpectedDataValue,--B>--
+--<B--		UnknownLocArea,--B>--
+--<B--		AbsentSubscriber,--B>--
+--<B--		BusySubscriber}--B>--
+
+--<B--SearchForMS ::= OPERATION				--Timer m----B>--
+--<B--	ARGUMENT--B>--
+--<B--		searchForMS-Arg	SearchForMS-Arg--B>--
+--<B--	RESULT--B>--
+--<B--		currentLocAreaId	LocAreaId--B>--
+--<B--	ERRORS {--B>--
+--<B--		SystemFailure,--B>--
+--<B--		DataMissing,--B>--
+--<B--		-- NU1 DataMissing must not be used in version 1----B>--
+--<B--		UnexpectedDataValue,--B>--
+--<B--		AbsentSubscriber,--B>--
+--<B--		BusySubscriber}--B>--
+
+
+-- access management operations
+
+--<B--ProcessAccessRequest ::= OPERATION				--Timer m----B>--
+--<B--	ARGUMENT--B>--
+--<B--		proccessAccessRequestArg	ProcessAccessRequestArg--B>--
+--<B--	RESULT--B>--
+--<B--		processAccessRequestRes	ProcessAccessRequestRes--B>--
+--<B--	ERRORS {--B>--
+--<B--		SystemFailure,--B>--
+--<B--		DataMissing,--B>--
+--<B--		-- NU1 DataMissing must not be used in version 1----B>--
+--<B--		UnexpectedDataValue,--B>--
+--<B--		UnknownSubscriber,--B>--
+--<B--		-- NU>1 UnknownSubscriber must not be used in version greater 1----B>--
+--<B--		UnknownLocArea,--B>--
+--<B--		-- NU1 UnknownLocArea must not be used in version 1----B>--
+--<B--		UnidentifiedSubscriber,--B>--
+--<B--		RoamingNotAllowed,--B>--
+--<B--		-- NU1 RoamingNotAllowed must not be used in version 1----B>--
+--<B--		IllegalSubscriber,--B>--
+--<B--		IllegalEquipment}--B>--
+--<B--		-- NU1 IllegalEquipment must not be used in version 1----B>--
+
+
+-- handover operations
+
+PerformHandover ::= OPERATION				--Timer s--
+	ARGUMENT
+		performHO-Arg	PerformHO-Arg
+	RESULT
+		performHO-Res	PerformHO-Res
+	ERRORS {
+		SystemFailure,
+		DataMissing,
+		-- NU1 DataMissing must not be used in version 1
+		UnexpectedDataValue,
+		UnknownBaseStation,
+		InvalidTargetBaseStation,
+		NoRadioResourceAvailable,
+		NoHandoverNumberAvailable}
+
+SendEndSignal ::= OPERATION				--Timer l--
+	RESULT zzzz-Empty	NULL
+
+ProcessAccessSignalling ::= OPERATION			--Timer s--
+	ARGUMENT
+		bss-APDU	ExternalSignalInfo
+
+ForwardAccessSignalling ::= OPERATION			--Timer s--
+	ARGUMENT
+		bss-APDU	ExternalSignalInfo
+
+PerformSubsequentHandover ::= OPERATION			--Timer m--
+	ARGUMENT
+		performSubsequentHO-Arg	PerformSubsequentHO-Arg
+	RESULT
+		accessSignalInfo	ExternalSignalInfo
+	ERRORS {
+		UnexpectedDataValue,
+		DataMissing,
+		-- NU1 DataMissing must not be used in version 1
+		UnknownBaseStation,
+		UnknownMSC,
+		InvalidTargetBaseStation,
+		SubsequentHandoverFailure}
+
+--<B--AllocateHandoverNumber ::= OPERATION			--Timer s----B>--
+--<B--	ERRORS {--B>--
+--<B--		NoHandoverNumberAvailable}--B>--
+--<B--	LINKED {--B>--
+--<B--		SendHandoverReport}--B>--
+
+--<B--SendHandoverReport ::= OPERATION				--Timer l----B>--
+--<B--	ARGUMENT--B>--
+--<B--		handoverNumber	ISDN-AddressString--B>--
+--<B--	RESULT zzzz-Empty	NULL--B>--
+
+
+-- authentication management operations
+
+--<B--Authenticate ::= OPERATION				--Timer s----B>--
+--<B--	ARGUMENT--B>--
+--<B--		authenticateArg	AuthenticateArg--B>--
+--<B--	RESULT--B>--
+--<B--		sres		SRES--B>--
+
+SendAuthenticationInfo ::= OPERATION			--Timer m--
+	ARGUMENT
+		sendAuthenticationInfoArg	SendAuthenticationInfoArg
+	RESULT
+		sendAuthenticationInfoRes	SendAuthenticationInfoRes
+	ERRORS {
+		SystemFailure,
+		DataMissing,
+		UnexpectedDataValue,
+		UnknownSubscriber}
+
+
+-- security management operations
+
+--<B--SetCipheringMode ::= OPERATION				--Timer s----B>--
+--<B--	ARGUMENT--B>--
+--<B--		setCipheringModeArg	SetCipheringModeArg--B>--
+
+
+-- IMEI management operations
+
+CheckIMEI ::= OPERATION					--Timer m--
+	ARGUMENT
+		imei		IMEI
+		-- optional:
+		-- OP1 imei must be present in version 1
+	RESULT
+		checkIMEI-Arg	CheckIMEI-Arg
+	ERRORS {
+		SystemFailure,
+		DataMissing,
+		-- NU1 DataMissing must not be used in version 1
+		UnexpectedDataValue,
+		-- NU>1 UnexpectedDataValue must not be used in version greater 1
+		UnknownEquipment}
+
+--<B--ObtainIMEI ::= OPERATION				--Timer s----B>--
+--<B--	RESULT--B>--
+--<B--		imei	IMEI--B>--
+--<B--	ERRORS {--B>--
+--<B--		SystemFailure}--B>--
+
+
+-- subscriber management operations
+
+SendParameters ::= OPERATION				--Timer m--
+	ARGUMENT
+		sendParametersArg	SendParametersArg
+	RESULT
+		sentParameterList	SentParameterList
+		-- optional
+		-- nothing is returned, if no requested parameter is available or
+		-- exists
+	ERRORS {
+		UnexpectedDataValue,
+		UnknownSubscriber,
+		UnidentifiedSubscriber}
+
+InsertSubscriberData ::= OPERATION				--Timer m--
+	ARGUMENT
+		insertSubscriberDataArg	InsertSubscriberDataArg
+	RESULT
+		insertSubscriberDataRes	InsertSubscriberDataRes
+		-- optional
+		-- OA1 insertSubscriberDataRes must be absent in version 1
+	ERRORS {
+		DataMissing,
+		UnexpectedDataValue,
+		UnidentifiedSubscriber}
+
+DeleteSubscriberData ::= OPERATION				--Timer m--
+	ARGUMENT
+		deleteSubscriberDataArg	DeleteSubscriberDataArg
+	RESULT zzzz-Empty	NULL
+	ERRORS {
+		DataMissing,
+		UnexpectedDataValue,
+		UnidentifiedSubscriber}
+
+
+-- identity management operations
+
+--<B--ProvideIMSI ::= OPERATION				--Timer s----B>--
+--<B--	RESULT--B>--
+--<B--		imsi		IMSI--B>--
+--<B--	ERRORS {--B>--
+--<B--		DataMissing,--B>--
+--<B--		-- NU1 DataMissing must not be used in version 1----B>--
+--<B--		AbsentSubscriber}--B>--
+
+--<B--ForwardNewTMSI ::= OPERATION				--Timer s----B>--
+--<B--	ARGUMENT--B>--
+--<B--		tmsi		TMSI--B>--
+--<B--	RESULT zzzz-Empty	NULL--B>--
+
+
+-- fault recovery operations
+
+Reset ::= OPERATION					--Timer m--
+	ARGUMENT
+		resetArg	ResetArg
+
+ForwardCheckSS-Indication ::= OPERATION			--Timer s--
+
+RestoreData ::= OPERATION				--Timer m--
+	ARGUMENT
+		restoreDataArg	RestoreDataArg
+	RESULT
+		restoreDataRes	RestoreDataRes
+	ERRORS {
+		SystemFailure,
+		DataMissing,
+		UnexpectedDataValue,
+		UnknownSubscriber}
+

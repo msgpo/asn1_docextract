@@ -1,0 +1,92 @@
+
+-- MODULE 'MAP-OperationAndMaintenanceOperations' START
+MAP-OperationAndMaintenanceOperations {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-OperationAndMaintenanceOperations (6) version2 (2)}
+
+DEFINITIONS
+
+::=
+
+BEGIN
+
+EXPORTS
+	ActivateTraceMode,
+	DeactivateTraceMode,
+	TraceSubscriberActivity,
+	NoteInternalHandover,
+	SendIMSI
+;
+
+IMPORTS
+	OPERATION
+FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
+
+	SystemFailure,
+	DataMissing,
+	UnexpectedDataValue,
+	FacilityNotSupported,
+	UnknownSubscriber,
+	UnidentifiedSubscriber,
+	TracingBufferFull
+FROM MAP-Errors {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-Errors (10) version2 (2)}
+
+	ActivateTraceModeArg,
+	DeactivateTraceModeArg,
+	TraceSubscriberActivityArg,
+	NoteInternalHO-Arg
+FROM MAP-OM-DataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-OM-DataTypes (12) version2 (2)}
+
+	ISDN-AddressString,
+	IMSI
+FROM MAP-CommonDataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-ComonDataTypes (18) version2 (2)}
+;
+
+
+ActivateTraceMode ::= OPERATION				--Timer m--
+	ARGUMENT
+		activateTraceModeArg	ActivateTraceModeArg
+	RESULT zzzz-Empty	NULL
+	ERRORS {
+		SystemFailure,
+		DataMissing,
+		UnexpectedDataValue,
+		FacilityNotSupported,
+		UnidentifiedSubscriber,
+		TracingBufferFull}
+
+DeactivateTraceMode ::= OPERATION				--Timer m--
+	ARGUMENT
+		deactivateTraceModeArg	DeactivateTraceModeArg
+	RESULT zzzz-Empty	NULL
+	ERRORS {
+		SystemFailure,
+		DataMissing,
+		UnexpectedDataValue,
+		FacilityNotSupported,
+		UnidentifiedSubscriber}
+
+TraceSubscriberActivity ::= OPERATION			--Timer s--
+	ARGUMENT
+		traceSubscriberActivityArg	TraceSubscriberActivityArg
+
+NoteInternalHandover ::= OPERATION				--Timer s--
+	ARGUMENT
+		noteInternalHO-Arg	NoteInternalHO-Arg
+
+SendIMSI ::= OPERATION					--Timer m--
+	ARGUMENT
+		msisdn			ISDN-AddressString
+	RESULT
+		imsi			IMSI
+	ERRORS {
+		DataMissing,
+		UnexpectedDataValue,
+		UnknownSubscriber}
+

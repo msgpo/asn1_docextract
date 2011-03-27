@@ -31,6 +31,22 @@ static int g_debug = 0;
 #define DBG(x, args ...) do {						\
 		if (g_debug) fprintf(stderr, x, ## args); } while (0)
 
+static void new_outfile(const char *name)
+{
+	char *tmp = calloc(1, strlen(name) + strlen(".asn1") + 1);
+
+	strcpy(tmp, name);
+	strcat(tmp, ".asn1");
+
+	if (g_outfile != stdout)
+		fclose(g_outfile);
+	g_outfile = fopen(tmp, "w");
+	if (!g_outfile) {
+		perror("opening new outfile");
+		exit(1);
+	}
+}
+
 static void output_filter_text(struct word_handle *wh, uint32_t start_offs, uint32_t next_offs)
 {
 	uint8_t *cur;
@@ -103,6 +119,7 @@ restart:
 				/* start */
 				dump_start = start_offs + found_delta + 2;
 				DBG("Found START (0x%x): '%s'\n", dump_start, found);
+				new_outfile(mod_name_tok);
 				fprintf(g_outfile, "\n-- MODULE '%s' START\n", mod_name_tok);
 				free(mod_name_tmp);
 			} else {

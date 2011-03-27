@@ -1,0 +1,87 @@
+
+-- MODULE 'MAP-ER-DataTypes' START
+MAP-ER-DataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-ER-DataTypes (17) version2 (2)}
+
+DEFINITIONS
+
+IMPLICIT TAGS
+
+::=
+
+BEGIN
+
+EXPORTS
+	RoamingNotAllowedCause,
+--<B--	BusySubscriberCause,--B>--
+	CallBarringCause,
+	CUG-RejectCause,
+	SS-IncompatibilityCause,
+	PW-RegistrationFailureCause,
+	SM-DeliveryFailureCause
+;
+
+IMPORTS
+	SS-Status
+FROM MAP-SS-DataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-SS-DataTypes (14) version2 (2)}
+
+	BasicServiceCode
+FROM MAP-CommonDataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+
+	SS-Code
+FROM MAP-SS-Code {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-SS-Code (15) version2 (2)}
+;
+
+
+RoamingNotAllowedCause ::= ENUMERATED {
+	plmnRoamingNotAllowed  (0),
+	nationalRoamingNotAllowed  (1),
+	locationAreaNotAllowed  (2),
+	operatorDeterminedBarring  (3)}
+
+--<B--BusySubscriberCause ::= ENUMERATED {--B>--
+--<B--	networkDeterminedUserBusy  (0),--B>--
+--<B--	moreCallsAllowed  (1),--B>--
+--<B--	userDeterminedUserBusy  (2)}--B>--
+
+CallBarringCause ::= ENUMERATED {
+	barringServiceActive  (0),
+	operatorBarring  (1)}
+
+CUG-RejectCause ::= ENUMERATED {
+	incomingCallsBarredWithinCUG  (0),
+	subscriberNotMemberOfCUG  (1),
+	outgoingCallsBarredWithinCUG  (2),
+	indexIncompatibleWithRequestedBasicService  (3),
+	unknownCUG-Index  (4),
+	requestedBasicServiceViolatesCUG-Constraints  (5),
+	noCUG-Selected  (6),
+	calledPartySS-InteractionViolation  (7)}
+	-- NU1 calledPartySS-InteractionViolation must not be used in version 1
+
+SS-IncompatibilityCause ::= SEQUENCE {
+	ss-Code		[1] SS-Code	OPTIONAL,
+	basicService	BasicServiceCode	OPTIONAL,
+	ss-Status	[4] SS-Status	OPTIONAL}
+
+PW-RegistrationFailureCause ::= ENUMERATED {
+	undetermined  (0),
+	invalidFormat  (1),
+	newPasswordsMismatch  (2)}
+
+SM-DeliveryFailureCause ::= ENUMERATED {
+	memoryCapacityExceeded  (0),
+	equipmentProtocolError  (1),
+	equipmentNotSM-Equiped  (2),
+	unknownServiceCentre  (3),
+	sc-Congestion  (4),
+	invalidSME-Address  (5),
+	subscriberNotSC-Subscriber  (6)} 
+

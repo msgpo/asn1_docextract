@@ -1,0 +1,394 @@
+
+-- MODULE 'MAP-MS-DataTypes' START
+MAP-MS-DataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-MS-DataTypes (11) version2 (2)}
+
+DEFINITIONS
+
+IMPLICIT TAGS
+
+::=
+
+BEGIN
+
+EXPORTS
+
+	-- location registration types
+--<B--	UpdateLocationAreaArg,--B>--
+	UpdateLocationArg,
+	UpdateLocationRes,
+	CancelLocationArg,
+	PurgeMS-Arg,
+	SendIdentificationRes,
+--<B--	SRES,--B>--
+
+	-- page management types
+--<B--	PageArg,--B>--
+--<B--	SearchForMS-Arg,--B>--
+
+	-- access management types
+--<B--	ProcessAccessRequestArg,--B>--
+--<B--	ProcessAccessRequestRes,--B>--
+
+	-- handover types
+	PerformHO-Arg,
+	PerformHO-Res,
+	PerformSubsequentHO-Arg,
+
+	-- authentication management types
+--<B--	AuthenticateArg,--B>--
+	SendAuthenticationInfoArg,
+	SendAuthenticationInfoRes,
+
+	-- security management types
+--<B--	SetCipheringModeArg,--B>--
+	CheckIMEI-Arg,
+
+	-- subscriber management types
+	SendParametersArg,
+	SentParameterList,
+	InsertSubscriberDataArg,
+	InsertSubscriberDataRes,
+	DeleteSubscriberDataArg,
+
+	-- fault recovery types
+	ResetArg,
+	RestoreDataArg,
+	RestoreDataRes
+;
+
+IMPORTS
+	SS-List,
+	SS-InfoList
+FROM MAP-SS-DataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-SS-DataTypes (14) version2 (2)}
+
+	TBCD-STRING,
+	ISDN-AddressString,
+	ExternalSignalInfo,
+	IMSI,
+--<B--	TMSI,--B>--
+	SubscriberId,
+	IMEI,
+--<B--	LocAreaId,--B>--
+--<B--	LocAreaIdOrNone,--B>--
+	LocationInfo,
+	HLR-List,
+	LMSI,
+	GlobalCellId,
+	NetworkResource,
+	Category,
+	BearerServiceList,
+	TeleserviceList,
+	BasicServiceList
+FROM MAP-CommonDataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+;
+
+
+-- location registration types
+
+--<B--UpdateLocationAreaArg ::= SEQUENCE {--B>--
+--<B--	subscriberId	SubscriberId,--B>--
+--<B--	previousLocAreaId	LocAreaIdOrNone,--B>--
+--<B--	targetLocAreaId	LocAreaId,--B>--
+--<B--	cksn			CKSN			OPTIONAL}--B>--
+--<B--	-- OP1 cksn must be present in version 1----B>--
+
+UpdateLocationArg ::= SEQUENCE {
+	imsi		IMSI,
+	locationInfo	LocationInfo,
+	vlr-Number	ISDN-AddressString,
+	lmsi			[10] LMSI	OPTIONAL}
+
+UpdateLocationRes ::= CHOICE {
+	hlr-Number	ISDN-AddressString,
+	-- NU>1 hlr-Number must not be used in version greater 1
+	hlr-NumberWithRoamingRestrictions	HLR-NumberWithRoamingRestrictions}
+	-- NU1 hlr-NumberWithRoamingRestrictions must not be used in version 1
+
+HLR-NumberWithRoamingRestrictions ::= SEQUENCE {
+	hlr-Number	ISDN-AddressString,
+	roamingRestrictions	ZoneCodeList	OPTIONAL}
+
+ZoneCodeList ::= SEQUENCE SIZE (1..maxNumOfZoneCodes)
+				OF ZoneCode
+
+ZoneCode ::= TBCD-STRING (SIZE (3..8))
+	-- digits of MCC, MNC, VLRI, ZI are concatenated in this order.
+
+maxNumOfZoneCodes  INTEGER ::= 10
+
+CancelLocationArg ::= CHOICE {
+	imsi			IMSI,
+	imsi-WithLMSI	IMSI-WithLMSI}
+
+PurgeMS-Arg ::= SEQUENCE {
+	imsi			IMSI,
+	vlr-Number	ISDN-AddressString}
+
+IMSI-WithLMSI ::= SEQUENCE {
+		imsi		IMSI,
+		lmsi		LMSI}
+
+SendIdentificationRes ::= SEQUENCE {
+	imsi			IMSI,
+	authenticationSetList	AuthenticationSetList	OPTIONAL}
+
+AuthenticationSetList ::= SEQUENCE SIZE (1..5) OF
+				AuthenticationSet
+
+AuthenticationSet ::= SEQUENCE {
+	rand			RAND,
+	sres			SRES,
+	kc			Kc}
+
+RAND ::= OCTET STRING (SIZE (16))
+
+SRES ::= OCTET STRING (SIZE (4))
+
+Kc ::= OCTET STRING (SIZE (8))
+
+
+-- page management types
+
+--<B--PageArg ::= SEQUENCE {--B>--
+--<B--	imsi			[0] IMSI,--B>--
+--<B--	tmsi			[1] TMSI		OPTIONAL,--B>--
+--<B--	locAreaId	[2] LocAreaId}--B>--
+
+--<B--SearchForMS-Arg ::= SEQUENCE {--B>--
+--<B--	imsi			IMSI,--B>--
+--<B--	storedLocAreaId	LocAreaIdOrNone}--B>--
+
+
+-- access management types
+
+--<B--ProcessAccessRequestArg ::= SEQUENCE {--B>--
+--<B--	subscriberIdOrIMEI	SubscriberIdOrIMEI,--B>--
+--<B--	cm-ServiceType	CM-ServiceType,--B>--
+--<B--	accessConnectionStatus	AccessConnectionStatus,--B>--
+--<B--	cksn			CKSN,--B>--
+--<B--	targetLocArea	LocAreaId	OPTIONAL}--B>--
+	-- OA1 targetLocAreas must be absent in version 1
+	-- OP>1 targetLocArea must be present in version greater 1
+
+--<B--SubscriberIdOrIMEI ::= CHOICE {--B>--
+--<B--	subscriberID	SubscriberId,--B>--
+--<B--	imei			[2] IMEI}--B>--
+	-- NU1 imei must not be used in version 1
+
+--<B--CM-ServiceType ::= ENUMERATED {--B>--
+--<B--	mobileOriginatingCallorPacketMode  (1),--B>--
+--<B--	emergencyCallEstablishment  (2),--B>--
+--<B--	shortMessageService  (4),--B>--
+--<B--	ss-Activation  (8),--B>--
+--<B--	mobileOriginatingCallReestablishment  (9),--B>--
+--<B--	mobileTerminatingCall  (10)}--B>--
+
+--<B--AccessConnectionStatus ::= OCTET STRING (SIZE (1))--B>--
+
+	-- bits 87654: 00000 (unused)
+
+	-- bit 3:
+	--	0  no RR-connection
+	--	1  RR-connection established
+
+	-- bit 2:
+	--	0  ciphering mode off
+	--	1  ciphering mode on
+
+	-- bit 1:
+	--	0  MM-connection existing and authenticated
+	--	1  MM-connection existing and not authenticated
+
+--<B--ProcessAccessRequestRes ::= SEQUENCE {--B>--
+--<B--	imsi-OrIMEI	IMSI-OrIMEI,--B>--
+--<B--	msisdn		ISDN-AddressString	OPTIONAL}--B>--
+
+--<B--IMSI-OrIMEI ::= CHOICE {--B>--
+--<B--	imsi			IMSI,--B>--
+--<B--	imei			[0] IMEI}--B>--
+	-- NU1 imei must not be used in version 1
+
+-- handover types
+
+PerformHO-Arg ::= SEQUENCE {
+	targetCellId	GlobalCellId,
+	servingCellId	GlobalCellId,
+	channelType	ChannelType,
+	classmarkInfo	ClassmarkInfo,
+	handoverPriority	[11] HandoverPriority	OPTIONAL,
+	handoverReason	[13] HandoverReason	OPTIONAL,
+	-- OA1 handoverReason must be absent in version 1
+	kc			[12] Kc		OPTIONAL}
+
+ChannelType ::= OCTET STRING (SIZE (1..10))
+	-- concatenation of
+	-- speech data indicator
+	-- channel rate
+	-- speech encoding algorithm/ data rate 
+	-- and transparency indicator
+	-- as defined in GSM 08.08
+
+ClassmarkInfo ::= OCTET STRING (SIZE (1..2))
+	-- classmark information element type 1 or 2 contents as defined in
+	-- GSM 08.08
+
+HandoverPriority ::= OCTET STRING (SIZE (1))
+	-- The internal structure is defined in GSM 08.08.
+
+HandoverReason ::= OCTET STRING (SIZE (1..2))
+	-- the internal structure is defined in GSM 08.08
+
+PerformHO-Res ::= SEQUENCE {
+	handoverNumber	ISDN-AddressString,
+	accessSignalInfo	ExternalSignalInfo}
+
+PerformSubsequentHO-Arg ::= SEQUENCE {
+	targetCellId	GlobalCellId,
+	servingCellId	GlobalCellId,
+	targetMSC-Number	ISDN-AddressString,
+	classmarkInfo	[10] ClassmarkInfo	OPTIONAL}
+
+
+-- authentication management types
+
+--<B--AuthenticateArg ::= SEQUENCE {--B>--
+--<B--	rand			RAND,--B>--
+--<B--	cksn			CKSN}--B>--
+
+--<B--CKSN ::= OCTET STRING (SIZE (1))--B>--
+
+	-- bits 87654: 00000 (unused)
+
+	-- bits 321 coded as specified in GSM 04.08
+
+SendAuthenticationInfoArg ::= IMSI
+
+SendAuthenticationInfoRes ::= AuthenticationSetList
+
+Ki ::= OCTET STRING (SIZE (16))
+
+
+-- security management types
+
+--<B--SetCipheringModeArg ::= SEQUENCE {--B>--
+--<B--	cipheringMode	CipheringMode,--B>--
+--<B--	kc			Kc			OPTIONAL}--B>--
+
+--<B--CipheringMode ::= ENUMERATED {--B>--
+--<B--	noEncryption  (1),--B>--
+--<B--	version1-GSM  (2)}--B>--
+
+CheckIMEI-Arg ::= CHOICE {
+	equipmentStatus	EquipmentStatus,
+	imei-withEquipmentStatus	IMEI-withEquipmentStatus}
+	-- NU1 imei-withEquipmentStatus must not be used in version 1
+
+IMEI-withEquipmentStatus ::= SEQUENCE {
+	imei		IMEI,
+	equipmentStatus	EquipmentStatus}
+
+EquipmentStatus ::= ENUMERATED {
+	whiteListed  (0),
+	blackListed  (1),
+	greyListed  (2)}
+
+
+-- subscriber management types
+
+SendParametersArg ::= SEQUENCE {
+	subscriberId	SubscriberId,
+	requestParameterList	RequestParameterList}
+
+RequestParameterList ::= SEQUENCE SIZE (1..2) OF
+				RequestParameter
+
+RequestParameter ::= ENUMERATED {
+	requestIMSI  (0),
+	requestAuthenticationSet  (1),
+	requestSubscriberData  (2),
+	requestKi  (4)}
+
+SentParameterList ::= SEQUENCE SIZE (1..maxNumOfSentParameter) OF
+				SentParameter
+
+SentParameter ::= CHOICE {
+	imsi			[0] IMSI,
+	authenticationSet	[1] AuthenticationSet,
+	subscriberData	[2] SubscriberData,
+	ki			[4] Ki}
+
+maxNumOfSentParameter  INTEGER ::= 6
+	-- This NamedValue corresponds to the maximum number of authentication set which may
+	-- be returned by a HLR plus 1.
+
+InsertSubscriberDataArg ::= SEQUENCE {
+	imsi			[0] IMSI		OPTIONAL,
+	COMPONENTS OF	SubscriberData}
+
+SubscriberData ::= SEQUENCE {
+	msisdn		[1] ISDN-AddressString	OPTIONAL,
+	category		[2] Category	OPTIONAL,
+	subscriberStatus	[3] SubscriberStatus	OPTIONAL,
+	bearerServiceList	[4] BearerServiceList	OPTIONAL,
+	teleserviceList	[6] TeleserviceList	OPTIONAL,
+	provisionedSS	[7] SS-InfoList	OPTIONAL,
+	odb-Data		[8] ODB-Data	OPTIONAL}
+	-- OA1 odb-Data must be absent in version 1
+
+SubscriberStatus ::= ENUMERATED {
+	serviceGranted  (0),
+	operatorDeterminedBarring  (1)}
+
+ODB-Data ::= SEQUENCE {
+	odb-GeneralData	ODB-GeneralData,
+	odb-HPLMN-Data	ODB-HPLMN-Data	OPTIONAL}
+
+ODB-GeneralData ::= BIT STRING {
+	allOG-CallsBarred  (0),
+	internationalOGCallsBarred  (1),
+	internationalOGCallsNotToHPLMN-CountryBarred  (2),
+	premiumRateInformationOGCallsBarred  (3),
+	premiumRateEntertainementOGCallsBarred  (4),
+	ss-AccessBarred  (5)} (SIZE (6))
+
+ODB-HPLMN-Data ::= BIT STRING {
+	plmn-SpecificBarringType1  (0),
+	plmn-SpecificBarringType2  (1),
+	plmn-SpecificBarringType3  (2),
+	plmn-SpecificBarringType4  (3)} (SIZE (4))
+
+InsertSubscriberDataRes ::= SEQUENCE {
+	teleserviceList	[1] TeleserviceList	OPTIONAL,
+	bearerServiceList	[2] BearerServiceList	OPTIONAL,
+	ss-List		[3] SS-List	OPTIONAL,
+	odb-GeneralData	[4] ODB-GeneralData	OPTIONAL}
+
+DeleteSubscriberDataArg ::= SEQUENCE {
+	imsi			[0] IMSI,
+	basicServiceList	[1] BasicServiceList	OPTIONAL,
+	ss-List		[2] SS-List	OPTIONAL}
+
+
+-- fault recovery types
+
+ResetArg ::= SEQUENCE {
+	networkResource	NetworkResource	OPTIONAL,
+	-- OP1 networkResource must be present in version 1
+	-- OA>1 networkResource must be absent in version greater 1
+	hlr-Number	ISDN-AddressString,
+	hlr-List		HLR-List		OPTIONAL}
+
+RestoreDataArg ::= SEQUENCE {
+	imsi		IMSI,
+	lmsi			LMSI			OPTIONAL}
+
+RestoreDataRes ::= SEQUENCE {
+	COMPONENTS OF	HLR-NumberWithRoamingRestrictions,
+	msNotReachable	NULL			OPTIONAL}
+

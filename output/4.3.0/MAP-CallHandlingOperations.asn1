@@ -1,0 +1,163 @@
+
+-- MODULE 'MAP-CallHandlingOperations' START
+MAP-CallHandlingOperations {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-CallHandlingOperations (7) version2 (2)}
+
+DEFINITIONS
+
+::=
+
+BEGIN
+
+EXPORTS
+--<B--	SendInfoForIncomingCall,--B>--
+--<B--	ConnectToFollowingAddress,--B>--
+--<B--	ProcessCallWaiting,--B>--
+--<B--	SendInfoForOutgoingCall,--B>--
+	SendRoutingInfo,
+	ProvideRoamingNumber--<B--,--B>--
+--<B--	CompleteCall--B>--
+;
+
+IMPORTS
+	OPERATION
+FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
+
+	SystemFailure,
+	DataMissing,
+	UnexpectedDataValue,
+	FacilityNotSupported,
+	UnknownSubscriber,
+	NumberChanged,
+--<B--	UnidentifiedSubscriber,--B>--
+--<B--	UnallocatedRoamingNumber,--B>--
+	BearerServiceNotProvisioned,
+	TeleserviceNotProvisioned,
+	NoRoamingNumberAvailable,
+	AbsentSubscriber,
+--<B--	BusySubscriber,--B>--
+--<B--	NoSubscriberReply,--B>--
+--<B--	RadioCongestion,--B>--
+--<B--	ImpossibleCallCompletion,--B>--
+	CallBarred,
+	ForwardingViolation,
+	CUG-Reject
+FROM MAP-Errors {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-Errors (10) version2 (2)}
+
+--<B--	InfoForIC-Arg,--B>--
+--<B--	ConnectToFollowingAddressArg,--B>--
+--<B--	ProcessCallWaitingArg,--B>--
+--<B--	InfoForOC-Arg,--B>--
+	SendRoutingInfoArg,
+	SendRoutingInfoRes,
+	ProvideRoamingNumberArg--<B--,--B>--
+--<B--	CompleteCallArg--B>--
+FROM MAP-CH-DataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-CH-DataTypes (13) version2 (2)}
+
+	ISDN-AddressString
+FROM MAP-CommonDataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
+   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+;
+
+
+--<B--SendInfoForIncomingCall ::= OPERATION			--Timer m----B>--
+--<B--	ARGUMENT--B>--
+--<B--		infoForIC-Arg	InfoForIC-Arg--B>--
+--<B--	ERRORS {--B>--
+--<B--		SystemFailure,--B>--
+--<B--		DataMissing,--B>--
+--<B--		UnexpectedDataValue,--B>--
+--<B--		UnknownSubscriber,--B>--
+--<B--		UnidentifiedSubscriber,--B>--
+--<B--		UnallocatedRoamingNumber,--B>--
+--<B--		AbsentSubscriber,--B>--
+--<B--		ForwardingViolation,--B>--
+--<B--		ImpossibleCallCompletion}--B>--
+--<B--	LINKED {--B>--
+--<B--		CompleteCall,--B>--
+--<B--		ProcessCallWaiting,--B>--
+--<B--		ConnectToFollowingAddress}--B>--
+
+--<B--ConnectToFollowingAddress ::= OPERATION			--Timer s----B>--
+--<B--	ARGUMENT--B>--
+--<B--		connectToFollowingAddressArg	ConnectToFollowingAddressArg--B>--
+
+--<B--ProcessCallWaiting ::= OPERATION				--Timer s----B>--
+--<B--	ARGUMENT--B>--
+--<B--		processCallWaitingArg	ProcessCallWaitingArg--B>--
+--<B--		-- optional----B>--
+--<B--		-- OA1 processCallWaitingArg must be absent in version 1----B>--
+--<B--	ERRORS {--B>--
+--<B--		DataMissing,--B>--
+--<B--		-- NU1 DataMissing must not be used in version 1----B>--
+--<B--		UnexpectedDataValue,--B>--
+--<B--		-- NU1 UnexpectedDataValue must not be used in version 1----B>--
+--<B--		BusySubscriber,--B>--
+--<B--		-- NU1 BusySubscriber must not be used in version 1----B>--
+--<B--		NoSubscriberReply}--B>--
+--<B--		-- NU1 NoSubscriberReply must not be used in version 1----B>--
+
+--<B--SendInfoForOutgoingCall ::= OPERATION			--Timer ml----B>--
+--<B--	ARGUMENT--B>--
+--<B--		infoForOC-Arg	InfoForOC-Arg--B>--
+--<B--	ERRORS {--B>--
+--<B--		SystemFailure,--B>--
+--<B--		DataMissing,--B>--
+--<B--		UnexpectedDataValue,--B>--
+--<B--		UnknownSubscriber,--B>--
+--<B--		BearerServiceNotProvisioned,--B>--
+--<B--		TeleserviceNotProvisioned,--B>--
+--<B--		CallBarred,--B>--
+--<B--		CUG-Reject}--B>--
+--<B--	LINKED {--B>--
+--<B--		CompleteCall}--B>--
+
+SendRoutingInfo ::= OPERATION				--Timer m--
+	ARGUMENT
+		sendRoutingInfoArg	SendRoutingInfoArg
+	RESULT
+		sendRoutingInfoRes	SendRoutingInfoRes
+	ERRORS {
+		SystemFailure,
+		DataMissing,
+		UnexpectedDataValue,
+		FacilityNotSupported,
+		UnknownSubscriber,
+		NumberChanged,
+		-- NU1 NumberChanged must not be used in version 1
+	BearerServiceNotProvisioned,
+		TeleserviceNotProvisioned,
+		AbsentSubscriber,
+		CallBarred,
+		CUG-Reject,
+		ForwardingViolation}
+
+ProvideRoamingNumber ::= OPERATION				--Timer m--
+	ARGUMENT
+		provideRoamingNumberArg	ProvideRoamingNumberArg
+	RESULT
+		roamingNumber	ISDN-AddressString
+	ERRORS {
+		SystemFailure,
+		DataMissing,
+		UnexpectedDataValue,
+		FacilityNotSupported,
+		AbsentSubscriber,
+		NoRoamingNumberAvailable}
+
+--<B--CompleteCall ::= OPERATION				--Timer ml----B>--
+--<B--	ARGUMENT--B>--
+--<B--		completeCallArg	CompleteCallArg--B>--
+--<B--	ERRORS {--B>--
+--<B--		DataMissing,--B>--
+--<B--		UnexpectedDataValue,--B>--
+--<B--		BusySubscriber,--B>--
+--<B--		NoSubscriberReply,--B>--
+--<B--		RadioCongestion}--B>--
+
