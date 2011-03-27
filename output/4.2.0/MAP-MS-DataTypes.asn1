@@ -392,3 +392,6 @@ RestoreDataRes ::= SEQUENCE {
 	COMPONENTS OF	HLR-NumberWithRoamingRestrictions,
 	msNotReachable	NULL			OPTIONAL}
 
+
+END
+-- MODULE END

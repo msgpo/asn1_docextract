@@ -85,3 +85,6 @@ SM-DeliveryFailureCause ::= ENUMERATED {
 	invalidSME-Address  (5),
 	subscriberNotSC-Subscriber  (6)} 
 
+
+END
+-- MODULE END

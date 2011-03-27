@@ -69,3 +69,6 @@ HandoverType ::= ENUMERATED {
 	interBSS  (0),
 	intraBSS  (1)}
 
+
+END
+-- MODULE END

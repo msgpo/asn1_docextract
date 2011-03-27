@@ -1,8 +1,8 @@
 
 -- MODULE 'MAP-Protocol' START
 MAP-Protocol {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-Protocol (4) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-Protocol (4) version2 (2)}
 
 DEFINITIONS
 
@@ -42,8 +42,9 @@ IMPORTS
 	ForwardCheckSS-Indication,
 	RestoreData
 FROM MAP-MobileServiceOperations {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-MobileServiceOperations (5) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-MobileServiceOperations (5)
+   version2 (2)}
 
 	ActivateTraceMode,
 	DeactivateTraceMode,
@@ -51,8 +52,9 @@ FROM MAP-MobileServiceOperations {
 	NoteInternalHandover,
 	SendIMSI
 FROM MAP-OperationAndMaintenanceOperations {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-OperationAndMaintenanceOperations (6) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-OperationAndMaintenanceOperations (6)
+   version2 (2)}
 
 --<B--	SendInfoForIncomingCall,--B>--
 --<B--	ConnectToFollowingAddress,--B>--
@@ -62,8 +64,9 @@ FROM MAP-OperationAndMaintenanceOperations {
 	ProvideRoamingNumber--<B--,--B>--
 --<B--	CompleteCall--B>--
 FROM MAP-CallHandlingOperations {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-CallHandlingOperaations (7) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-CallHandlingOperaations (7)
+   version2 (2)}
 
 	RegisterSS,
 	EraseSS,
@@ -80,8 +83,9 @@ FROM MAP-CallHandlingOperations {
 	GetPassword,
 	BeginSubscriberActivity
 FROM MAP-SupplementaryServiceOperations {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-SupplementaryServiceOperations (8) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-SupplementaryServiceOperations (8)
+   version2 (2)}
 
 	SendRoutingInfoForSM,
 	ForwardSM,
@@ -93,8 +97,9 @@ FROM MAP-SupplementaryServiceOperations {
 --<B--	SendInfoForMO-SMS,--B>--
 	ReadyForSM
 FROM MAP-ShortMessageServiceOperations {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-ShortMessageServieOperations (9) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-ShortMessageServieOperations (9)
+   version2 (2)}
 
 	SystemFailure,
 	DataMissing,
@@ -132,7 +137,6 @@ FROM MAP-ShortMessageServiceOperations {
 	SS-NotAvailable,
 	SS-SubscriptionViolation,
 	SS-Incompatibility,
-	SS-PartialAcceptance,
 	SS-NotDelivered,
 	PW-RegistrationFailure,
 	NegativePW-Check,
@@ -140,8 +144,8 @@ FROM MAP-ShortMessageServiceOperations {
 	SM-DeliveryFailure,
 	MessageWaitingListFull
 FROM MAP-Errors {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-Errors (10) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-Errors (10) version2 (2)}
 ;
 
 
@@ -300,8 +304,6 @@ ss-ErrorStatus  SS-ErrorStatus ::= localValue 17
 ss-NotAvailable  SS-NotAvailable ::= localValue 18
 ss-SubscriptionViolation  SS-SubscriptionViolation ::= localValue 19
 ss-Incompatibility  SS-Incompatibility ::= localValue 20
-ss-PartialAcceptance  SS-PartialAcceptance ::= localValue 41
--- NU1 ss-PartialAcceptance must not be used in version 1
 ss-NotDelivered  SS-NotDelivered ::= localValue 42
 -- NU1 ss-NotDelivered must not be used in version 1
 pw-RegistrationFailure  PW-RegistrationFailure ::= localValue 37
@@ -315,3 +317,6 @@ numberOfPW-AttemptsViolation  NumberOfPW-AttemptsViolation ::= localValue 43
 sm-DeliveryFailure  SM-DeliveryFailure ::= localValue 32
 messageWaitingListFull  MessageWaitingListFull ::= localValue 33
 
+
+END
+-- MODULE END

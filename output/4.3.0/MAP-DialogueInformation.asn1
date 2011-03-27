@@ -1,8 +1,8 @@
 
 -- MODULE 'MAP-DialogueInformation' START
 MAP-DialogueInformation {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-DialogueInformation (3) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-DialogueInformation (3) version2 (2)}
 
 DEFINITIONS
 
@@ -21,8 +21,8 @@ FROM MobileDomainDefinitions {
 
 	AddressString
 FROM MAP-CommonDataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-CommonDataTypes (18) version2 (2)}
 ;
 
 
@@ -83,9 +83,12 @@ ProcedureCancellationReason ::= ENUMERATED {
 
 MAP-ProviderAbortInfo ::= SEQUENCE {
 	map-ProviderAbortReason	MAP-ProviderAbortReason,
-	plmn-specificInfo	EXTERNAL		OPTIONAL}
+	plmn-specificInfo	EXTERNAL	OPTIONAL}
 
 MAP-ProviderAbortReason ::= ENUMERATED {
 	abnormalDialogue  (0),
 	invalidPDU  (1)}
 
+
+END
+-- MODULE END

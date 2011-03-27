@@ -315,3 +315,6 @@ numberOfPW-AttemptsViolation  NumberOfPW-AttemptsViolation ::= localValue 43
 sm-DeliveryFailure  SM-DeliveryFailure ::= localValue 32
 messageWaitingListFull  MessageWaitingListFull ::= localValue 33
 
+
+END
+-- MODULE END

@@ -247,3 +247,6 @@ SM-DeliveryFailure ::= ERROR
 
 MessageWaitingListFull ::= ERROR
 
+
+END
+-- MODULE END

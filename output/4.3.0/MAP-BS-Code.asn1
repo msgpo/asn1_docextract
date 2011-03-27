@@ -1,8 +1,8 @@
 
 -- MODULE 'MAP-BS-Code' START
 MAP-BS-Code {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-BS-Code (20) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-BS-Code (20) version2 (2)}
 
 DEFINITIONS
 
@@ -11,22 +11,23 @@ DEFINITIONS
 BEGIN
 
 BearerServiceCode ::= OCTET STRING (SIZE (1))
-	-- This type is used to represent the code identifying a single bearer service,
-	-- a group of bearer services, or all bearer services. The services are
-	-- defined in GSM 02.02.
+	-- This type is used to represent the code identifying a single
+	-- bearer service, a group of bearer services, or all bearer
+	-- services. The services are defined in GSM 02.02.
 	-- The internal structure is defined as follows:
 
 	-- v1: bit 8: Transparency indicator (If applicable)
-	--	0  transparent (postfix T) or if not applicable (no postfix T or NT)
-	--	1  non transparent (postfix NT)
+	--	0	transparent (postfix T) or if not applicable
+	--		(no postfix T or NT)
+	--	1	non transparent (postfix NT)
 
-	-- v2:
+	-- v2: bit 8: 0 (unused)
 	-- plmn-specific bearer services:
 	-- bits 87654321: defined by the HPLMN operator
 	-- rest of bearer services:
-	-- bit 8: 0 (unused)
 
-	-- bits 7654321: group (bits 7654), and rate, if applicable (bits 321)
+	-- bits 7654321: group (bits 7654), and rate, if applicable
+	-- (bits 321)
 	-- symbolic constants are assigned only for v2
 
 allBearerServices	BearerServiceCode ::= '00000000'B
@@ -43,7 +44,7 @@ allDataCDS-Services	BearerServiceCode ::= '00011000'B
 dataCDS-1200bps	BearerServiceCode ::= '00011010'B
 dataCDS-2400bps	BearerServiceCode ::= '00011100'B
 dataCDS-4800bps	BearerServiceCode ::= '00011101'B
-dataCDS-9600bps		BearerServiceCode ::= '00011110'B
+dataCDS-9600bps	BearerServiceCode ::= '00011110'B
 
 allPadAccessCA-Services	BearerServiceCode ::= '00100000'B
 padAccessCA-300bps	BearerServiceCode ::= '00100001'B
@@ -68,6 +69,27 @@ allSpeechFollowedByDataCDS	BearerServiceCode ::= '01001000'B
 
 allUnrestrictedDigital-12-kbps	BearerServiceCode ::= '01111000'B
 
+--  NU1 The following non-hierarchical Compound Bearer Service
+-- Groups are defined in TS GSM 02.30:
+allDataCircuitAsynchronous	BearerServiceCode ::= '01010000'B
+	-- covers 'allDataCDA-Services', 'allAlternateSpeech-DataCDA' and
+	-- 'allSpeechFollowedByDataCDA'
+allAsynchronousServices	BearerServiceCode ::= '01100000'B
+	-- covers 'allDataCDA-Services', 'allAlternateSpeech-DataCDA',
+	-- 'allSpeechFollowedByDataCDA' and 'allPadAccessCDA-Services'
+allDataCircuitSynchronous	BearerServiceCode ::= '01011000'B
+	-- covers 'allDataCDS-Services', 'allAlternateSpeech-DataCDS' and
+	-- 'allSpeechFollowedByDataCDS'
+allSynchronousServices	BearerServiceCode ::= '01101000'B
+	-- covers 'allDataCDS-Services', 'allAlternateSpeech-DataCDS',
+	-- 'allSpeechFollowedByDataCDS' and 'allDataPDS-Services'
+-- NU1 
+-- NU1 Compound Bearer Service Group Codes are only used in call
+-- NU1 independent supplementary service operations, ie they
+-- NU1 are not used in InsertSubscriberData or in
+-- NU1 DeleteSubscriberData messages. Compound Bearer Service Group
+-- NU1 Codes must not be used in version 1.
+
 allPLMN-specificBS	BearerServiceCode ::= '11010000'B
 -- NU1 *plmn-specific* must not be used in version 1
 plmn-specificBS-1	BearerServiceCode ::= '11010001'B
@@ -86,3 +108,6 @@ plmn-specificBS-D	BearerServiceCode ::= '11011101'B
 plmn-specificBS-E	BearerServiceCode ::= '11011110'B
 plmn-specificBS-F	BearerServiceCode ::= '11011111'B
 
+
+END
+-- MODULE END

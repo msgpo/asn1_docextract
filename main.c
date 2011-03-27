@@ -144,7 +144,7 @@ restart:
 		found = strstr(tmp, ".#");
 		if (found) {
 			found_delta = found - tmp;
-			if (strlen(found) > 2 && !strncmp(found, ".#END", 5)) {
+			if (!strncmp(wh->base_addr + start_offs + found_delta, ".#END", 5)) {
 				/* end */
 				dump_end = start_offs + found_delta;
 				DBG("Found END (0x%x): '%s'\n", dump_end, found);

@@ -1,8 +1,8 @@
 
 -- MODULE 'MAP-Errors' START
 MAP-Errors {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-Errors (10) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-Errors (10) version2 (2)}
 
 DEFINITIONS
 
@@ -61,7 +61,6 @@ EXPORTS
 	SS-NotAvailable,
 	SS-SubscriptionViolation,
 	SS-Incompatibility,
-	SS-PartialAcceptance,
 	SS-NotDelivered,
 	PW-RegistrationFailure,
 	NegativePW-Check,
@@ -74,14 +73,15 @@ EXPORTS
 
 IMPORTS
 	ERROR
-FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
+FROM TCAPMessages {
+   ccitt recommendation q 773 modules(2) messages (1)}
 
 	SS-Status,
 	SS-SubscriptionOption--<B--,--B>--
 --<B--	SS-List--B>--
 FROM MAP-SS-DataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-SS-DataTypes (14) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-SS-DataTypes (14) version2 (2)}
 
 	RoamingNotAllowedCause,
 --<B--	BusySubscriberCause,--B>--
@@ -91,13 +91,13 @@ FROM MAP-SS-DataTypes {
 	PW-RegistrationFailureCause,
 	SM-DeliveryFailureCause
 FROM MAP-ER-DataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-ER-DataTypes (17) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-ER-DataTypes (17) version2 (2)}
 
 	NetworkResource
 FROM MAP-CommonDataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) 
+   gsmNetworkId(1) moduleId (3) map-CommonDataTypes (18) version2 (2)}
 ;
 
 
@@ -226,8 +226,6 @@ SS-Incompatibility ::= ERROR
 		ss-IncompatibilityCause	SS-IncompatibilityCause
 		-- optional
 
-SS-PartialAcceptance ::= ERROR
-
 SS-NotDelivered ::= ERROR
 
 PW-RegistrationFailure ::= ERROR
@@ -247,3 +245,6 @@ SM-DeliveryFailure ::= ERROR
 
 MessageWaitingListFull ::= ERROR
 
+
+END
+-- MODULE END

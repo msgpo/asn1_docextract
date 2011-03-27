@@ -1,8 +1,8 @@
 
 -- MODULE 'MAP-ER-DataTypes' START
 MAP-ER-DataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-ER-DataTypes (17) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-ER-DataTypes (17) version2 (2)}
 
 DEFINITIONS
 
@@ -25,18 +25,18 @@ EXPORTS
 IMPORTS
 	SS-Status
 FROM MAP-SS-DataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-SS-DataTypes (14) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-SS-DataTypes (14) version2 (2)}
 
 	BasicServiceCode
 FROM MAP-CommonDataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-CommonDataTypes (18) version2 (2)}
 
 	SS-Code
 FROM MAP-SS-Code {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-SS-Code (15) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) 
+   gsmNetworkId(1) moduleId (3) map-SS-Code (15) version2 (2)}
 ;
 
 
@@ -64,7 +64,8 @@ CUG-RejectCause ::= ENUMERATED {
 	requestedBasicServiceViolatesCUG-Constraints  (5),
 	noCUG-Selected  (6),
 	calledPartySS-InteractionViolation  (7)}
-	-- NU1 calledPartySS-InteractionViolation must not be used in version 1
+	-- NU1 calledPartySS-InteractionViolation must not be used in
+	-- version 1
 
 SS-IncompatibilityCause ::= SEQUENCE {
 	ss-Code		[1] SS-Code	OPTIONAL,
@@ -85,3 +86,6 @@ SM-DeliveryFailureCause ::= ENUMERATED {
 	invalidSME-Address  (5),
 	subscriberNotSC-Subscriber  (6)} 
 
+
+END
+-- MODULE END

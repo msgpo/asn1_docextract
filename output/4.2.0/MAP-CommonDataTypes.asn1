@@ -248,3 +248,6 @@ BasicServiceGroupList ::= SEQUENCE SIZE (1..maxNumOfBasicServiceGroups) OF
 
 maxNumOfBasicServiceGroups  INTEGER ::= 13
 
+
+END
+-- MODULE END

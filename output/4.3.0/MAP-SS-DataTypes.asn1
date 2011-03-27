@@ -1,8 +1,8 @@
 
 -- MODULE 'MAP-SS-DataTypes' START
 MAP-SS-DataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-SS-DataTypes (14) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-SS-DataTypes (14) version2 (2)}
 
 DEFINITIONS
 
@@ -32,7 +32,6 @@ EXPORTS
 	Password,
 	GuidanceInfo,
 	BeginSubscriberActivityArg,
-
 	SS-List,
 	SS-InfoList,
 --<B--	SS-DataList,--B>--
@@ -50,13 +49,13 @@ IMPORTS
 	BasicServiceGroupList,
 	maxNumOfBasicServiceGroups
 FROM MAP-CommonDataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-CommonDataTypes (18) version2 (2)}
 
 	SS-Code
 FROM MAP-SS-Code {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-SS-Code (15) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-SS-Code (15) version2 (2)}
 ;
 
 
@@ -85,7 +84,7 @@ ForwardingFeatureList ::= SEQUENCE SIZE (1..maxNumOfBasicServiceGroups) OF
 
 ForwardingFeature ::= SEQUENCE {
 	basicService	BasicServiceCode	OPTIONAL,
-	ss-Status		[4] SS-Status	OPTIONAL,
+	ss-Status	[4] SS-Status	OPTIONAL,
 	-- OP1 ss-Status must be present in version 1
 	forwardedToNumber	[5] ISDN-AddressString	OPTIONAL,
 	forwardedToSubaddress	[8] ISDN-SubaddressString	OPTIONAL,
@@ -209,12 +208,8 @@ SS-Data ::= SEQUENCE {
 	-- OA1 basicServiceGroupList must be absent in version 1
 
 SS-SubscriptionOption ::= CHOICE {
-	presentationMode	[0] PresentationMode,
+	restrictionPerCall	[5] BOOLEAN,
 	overrideCategory	[1] OverrideCategory}
-
-PresentationMode ::= ENUMERATED {
-	presentationPermanent  (0),
-	presentationPerCall  (1)}
 
 OverrideCategory ::= ENUMERATED {
 	overrideEnabled  (0),
@@ -241,8 +236,8 @@ ProcessSS-RequestArg ::= SEQUENCE {
 SS-FeatureAccessCode ::= OCTET STRING (SIZE (1..2))
 
 EquipmentType ::= SEQUENCE {
-	displayDeviceExists	NULL			OPTIONAL,
-	imei			IMEI}
+	displayDeviceExists	NULL		OPTIONAL,
+	imei		IMEI}
 
 SS-SpecificInfo ::= CHOICE {
 	ss-unstructuredInfo	[1] SS-UnstructuredInfo,
@@ -257,7 +252,7 @@ SS-DigitString ::= IA5String
 ToneOrDisplay ::= CHOICE {
 	nonRegisteredDisplay	[0] SS-DisplayString,
 	preRegisteredDisplay	[1] SS-StringReference,
-	tone			[2] Tone}
+	tone		[2] Tone}
 
 SS-DisplayString ::= PrintableString (SIZE (1..32))
 
@@ -291,11 +286,12 @@ GuidanceInfo ::= ENUMERATED {
 	enterPW  (0),
 	enterNewPW  (1),
 	enterNewPW-Again  (2)}
-	-- How this information is really delivered to the subscriber (display,
-	-- announcement, ...) is not part of this specification.
+	-- How this information is really delivered to the subscriber
+	-- (display, announcement, ...) is not part of this
+	-- specification.
 
 BeginSubscriberActivityArg ::= SEQUENCE {
-	imsi			IMSI,
+	imsi		IMSI,
 	originatingEntityNumber	ISDN-AddressString}
 
 SS-List ::= SEQUENCE SIZE (1..maxNumOfSS) OF
@@ -316,3 +312,6 @@ ForwardingData ::= SEQUENCE {
 	-- OA1 forwardedToSubaddress must be absent in version 1
 	forwardingOptions	[6] ForwardingOptions	OPTIONAL}
 
+
+END
+-- MODULE END

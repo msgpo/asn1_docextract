@@ -58,3 +58,6 @@ plmn-specificTS-D	TeleserviceCode ::= '11011101'B
 plmn-specificTS-E	TeleserviceCode ::= '11011110'B
 plmn-specificTS-F	TeleserviceCode ::= '11011111'B
 
+
+END
+-- MODULE END

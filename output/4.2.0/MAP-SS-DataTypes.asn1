@@ -316,3 +316,6 @@ ForwardingData ::= SEQUENCE {
 	-- OA1 forwardedToSubaddress must be absent in version 1
 	forwardingOptions	[6] ForwardingOptions	OPTIONAL}
 
+
+END
+-- MODULE END

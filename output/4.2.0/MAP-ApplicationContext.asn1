@@ -108,3 +108,6 @@ mwdMngtContext-v1  OBJECT IDENTIFIER ::=
 shortMsgMT-RelayContext-v2  OBJECT IDENTIFIER ::=
 	{map-ac shortMsgMT-Relay (25) version2(2)}
 
+
+END
+-- MODULE END

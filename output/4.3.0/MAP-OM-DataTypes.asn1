@@ -1,8 +1,8 @@
 
 -- MODULE 'MAP-OM-DataTypes' START
 MAP-OM-DataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-OM-DataTypes (12) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-OM-DataTypes (12) version2 (2)}
 
 DEFINITIONS
 
@@ -25,34 +25,34 @@ IMPORTS
 	IMSI,
 	GlobalCellId
 FROM MAP-CommonDataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-CommonDataTypes (18) version2 (2)}
+
+	IMSI-OrIMEI
+FROM MAP-MS-DataTypes {
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-MS-DataTypes (11) version2 (2)}
 ;
 
 
 ActivateTraceModeArg ::= SEQUENCE {
-	imsi			[0] IMSI		OPTIONAL,
+	imsi		[0] IMSI	OPTIONAL,
 	traceReference	[1] TraceReference,
 	traceType	[2] TraceType,
 	omc-Id		[3] AddressString	OPTIONAL}
 
 TraceReference ::= OCTET STRING (SIZE (1..2))
 
-TraceType ::= INTEGER {
-	allEvents  (0),
-	onlyCalls  (1),
-	eventSet1  (2),
-	eventSet254  (255)}
+TraceType ::= INTEGER
 	(0..255)
-	-- Identifiers eventSet1 to eventSet254  correspond to sets of events
-	-- predefined by each operator.
+	-- Trace types are more fully defined in TS GSM 12.02.
 
 DeactivateTraceModeArg ::= SEQUENCE {
-	imsi			[0] IMSI		OPTIONAL,
+	imsi		[0] IMSI	OPTIONAL,
 	traceReference	[1] TraceReference}
 
 TraceSubscriberActivityArg ::= SEQUENCE {
-	imsi			[0] IMSI		OPTIONAL,
+	imsi-OrIMEI	[0] IMSI-OrIMEI	OPTIONAL,
 	traceReference	[1] TraceReference,
 	traceType	[2] TraceType,
 	omc-Id		[3] AddressString	OPTIONAL,
@@ -69,3 +69,6 @@ HandoverType ::= ENUMERATED {
 	interBSS  (0),
 	intraBSS  (1)}
 
+
+END
+-- MODULE END

@@ -287,3 +287,6 @@ BeginSubscriberActivity ::= OPERATION			--Timer m--
 	ARGUMENT
 		beginSubscriberActivityArg	BeginSubscriberActivityArg
 
+
+END
+-- MODULE END

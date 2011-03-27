@@ -1,8 +1,9 @@
 
 -- MODULE 'MAP-CallHandlingOperations' START
 MAP-CallHandlingOperations {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-CallHandlingOperations (7) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-CallHandlingOperations (7)
+   version2 (2)}
 
 DEFINITIONS
 
@@ -22,7 +23,8 @@ EXPORTS
 
 IMPORTS
 	OPERATION
-FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
+FROM TCAPMessages {
+   ccitt recommendation q 773 modules(2) messages (1)}
 
 	SystemFailure,
 	DataMissing,
@@ -44,8 +46,8 @@ FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
 	ForwardingViolation,
 	CUG-Reject
 FROM MAP-Errors {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-Errors (10) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-Errors (10) version2 (2)}
 
 --<B--	InfoForIC-Arg,--B>--
 --<B--	ConnectToFollowingAddressArg,--B>--
@@ -56,17 +58,17 @@ FROM MAP-Errors {
 	ProvideRoamingNumberArg--<B--,--B>--
 --<B--	CompleteCallArg--B>--
 FROM MAP-CH-DataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-CH-DataTypes (13) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-CH-DataTypes (13) version2 (2)}
 
 	ISDN-AddressString
 FROM MAP-CommonDataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-CommonDataTypes (18) version2 (2)}
 ;
 
 
---<B--SendInfoForIncomingCall ::= OPERATION			--Timer m----B>--
+--<B--SendInfoForIncomingCall ::= OPERATION		--Timer m----B>--
 --<B--	ARGUMENT--B>--
 --<B--		infoForIC-Arg	InfoForIC-Arg--B>--
 --<B--	ERRORS {--B>--
@@ -84,11 +86,11 @@ FROM MAP-CommonDataTypes {
 --<B--		ProcessCallWaiting,--B>--
 --<B--		ConnectToFollowingAddress}--B>--
 
---<B--ConnectToFollowingAddress ::= OPERATION			--Timer s----B>--
+--<B--ConnectToFollowingAddress ::= OPERATION		--Timer s----B>--
 --<B--	ARGUMENT--B>--
 --<B--		connectToFollowingAddressArg	ConnectToFollowingAddressArg--B>--
 
---<B--ProcessCallWaiting ::= OPERATION				--Timer s----B>--
+--<B--ProcessCallWaiting ::= OPERATION			--Timer s----B>--
 --<B--	ARGUMENT--B>--
 --<B--		processCallWaitingArg	ProcessCallWaitingArg--B>--
 --<B--		-- optional----B>--
@@ -103,7 +105,7 @@ FROM MAP-CommonDataTypes {
 --<B--		NoSubscriberReply}--B>--
 --<B--		-- NU1 NoSubscriberReply must not be used in version 1----B>--
 
---<B--SendInfoForOutgoingCall ::= OPERATION			--Timer ml----B>--
+--<B--SendInfoForOutgoingCall ::= OPERATION	--Timer ml----B>--
 --<B--	ARGUMENT--B>--
 --<B--		infoForOC-Arg	InfoForOC-Arg--B>--
 --<B--	ERRORS {--B>--
@@ -138,7 +140,7 @@ SendRoutingInfo ::= OPERATION				--Timer m--
 		CUG-Reject,
 		ForwardingViolation}
 
-ProvideRoamingNumber ::= OPERATION				--Timer m--
+ProvideRoamingNumber ::= OPERATION			--Timer m--
 	ARGUMENT
 		provideRoamingNumberArg	ProvideRoamingNumberArg
 	RESULT
@@ -151,7 +153,7 @@ ProvideRoamingNumber ::= OPERATION				--Timer m--
 		AbsentSubscriber,
 		NoRoamingNumberAvailable}
 
---<B--CompleteCall ::= OPERATION				--Timer ml----B>--
+--<B--CompleteCall ::= OPERATION			--Timer ml----B>--
 --<B--	ARGUMENT--B>--
 --<B--		completeCallArg	CompleteCallArg--B>--
 --<B--	ERRORS {--B>--
@@ -161,3 +163,6 @@ ProvideRoamingNumber ::= OPERATION				--Timer m--
 --<B--		NoSubscriberReply,--B>--
 --<B--		RadioCongestion}--B>--
 
+
+END
+-- MODULE END

@@ -1,8 +1,8 @@
 
 -- MODULE 'MAP-SM-DataTypes' START
 MAP-SM-DataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-SM-DataTypes (16) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-SM-DataTypes (16) version2 (2)}
 
 DEFINITIONS
 
@@ -33,13 +33,13 @@ IMPORTS
 	TeleserviceCode, (CR202)
 	LMSI
 FROM MAP-CommonDataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-CommonDataTypes (18) version2 (2)}
 
 	TeleserviceCode
 FROM MAP-TS-Code {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-TS-Code (19) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-TS-Code (19) version2 (2)}
 ;
 
 
@@ -52,7 +52,7 @@ RoutingInfoForSM-Arg ::= SEQUENCE {
 
 
 RoutingInfoForSM-Res::= SEQUENCE {
-	imsi			IMSI,
+	imsi		IMSI,
 	locationInfoWithLMSI	LocationInfoWithLMSI,
 	mwd-Set		[2] BOOLEAN	OPTIONAL}
 	-- OA>1 mwd-Set must be absent in version greater 1
@@ -60,18 +60,18 @@ RoutingInfoForSM-Res::= SEQUENCE {
 
 LocationInfoWithLMSI ::= SEQUENCE {
 		locationInfo	LocationInfo,
-		lmsi		LMSI			OPTIONAL}
+		lmsi	LMSI		OPTIONAL}
 
 ForwardSM-Arg ::= SEQUENCE {
-	sm-RP-DA		SM-RP-DA,
-	sm-RP-OA		SM-RP-OA,
-	sm-RP-UI		SignalInfo,
-	moreMessagesToSend	NULL			OPTIONAL}
+	sm-RP-DA	SM-RP-DA,
+	sm-RP-OA	SM-RP-OA,
+	sm-RP-UI	SignalInfo,
+	moreMessagesToSend	NULL		OPTIONAL}
 	-- OA1 moreMessagesToSend must be absent in version 1
 
 SM-RP-DA ::= CHOICE {
-	imsi			[0] IMSI,
-	lmsi			[1] LMSI,
+	imsi		[0] IMSI,
+	lmsi		[1] LMSI,
 	roamingNumber	[3] ISDN-AddressString,
 	serviceCentreAddressDA	[4] AddressString,
 	noSM-SP-DA	[5] NULL}
@@ -100,8 +100,8 @@ AlertServiceCentreArg ::= SEQUENCE {
 	serviceCentreAddress	AddressString}
 
 InformServiceCentreArg ::= SEQUENCE {
-	storedMSISDN		ISDN-AddressString	OPTIONAL,
-	mw-Status		MW-Status	OPTIONAL}
+	storedMSISDN	ISDN-AddressString	OPTIONAL,
+	mw-Status	MW-Status	OPTIONAL}
 
 MW-Status ::= BIT STRING {
 	sc-AddressNotIncluded  (0),
@@ -116,3 +116,6 @@ AlertReason ::= ENUMERATED {
 	ms-Present  (0),
 	memoryAvailable  (1)}
 
+
+END
+-- MODULE END

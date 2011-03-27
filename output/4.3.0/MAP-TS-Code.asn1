@@ -1,8 +1,8 @@
 
 -- MODULE 'MAP-TS-Code' START
 MAP-TS-Code {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-TS-Code (19) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-TS-Code (19) version2 (2)}
 
 DEFINITIONS
 
@@ -11,12 +11,13 @@ DEFINITIONS
 BEGIN
 
 TeleserviceCode ::= OCTET STRING (SIZE (1))
-	-- This type is used to represent the code identifying a single teleservice, a
-	-- group of teleservices, or all teleservices. The services are defined in
-	-- GSM 02.03.
+	-- This type is used to represent the code identifying a single
+	-- teleservice, a group of teleservices, or all teleservices. The
+	-- services are defined in GSM 02.03.
 	-- The internal structure is defined as follows:
 
-	-- bits 87654321: group (bits 8765) and specific service (bits 4321)
+	-- bits 87654321: group (bits 8765) and specific service
+	-- (bits 4321)
 
 allTeleservices	TeleserviceCode ::= '00000000'B
 
@@ -28,10 +29,9 @@ allShortMessageServices	TeleserviceCode ::= '00100000'B
 shortMessageMT-PP	TeleserviceCode ::= '00100001'B
 shortMessageMO-PP	TeleserviceCode ::= '00100010'B 
 
-
 allTeletextTransmissionServices	TeleserviceCode ::= '01010000'B
-teletex			TeleserviceCode ::= '01010001'B
-teletexISDN		TeleserviceCode ::= '01010010'B
+teletex		TeleserviceCode ::= '01010001'B
+teletexISDN	TeleserviceCode ::= '01010010'B
 -- NU1 teletexISDN must not be used in version 1
 
 allFacsimileTransmissionServices	TeleserviceCode ::= '01100000'B
@@ -39,6 +39,21 @@ facsimileGroup3AndAlterSpeech	TeleserviceCode ::= '01100001'B
 automaticFacsimileGroup3	TeleserviceCode ::= '01100010'B
 facsimileGroup4	TeleserviceCode ::= '01100011'B
 -- NU1 facsimileGroup4 must not be used in version 1
+
+-- NU1 The following non-hierarchical Compound Teleservice Groups
+-- are defined in TS GSM 02.30:
+allDataTeleservices	TeleserviceCode ::= '01110000'B
+	-- covers Teleservice Groups 'allFacsimileTransmissionServices'
+	-- and 'allShortMessageServices'
+allTeleservices-ExeptSMS	TeleserviceCode ::= '10000000'B
+	-- covers Teleservice Groups 'allSpeechTransmissionServices' and
+	-- 'allFacsimileTransmissionServices'
+-- 
+-- NU1 Compound Teleservice Group Codes are only used in call
+-- NU1 independent supplementary service operations, ie they
+-- NU1 are not used in InsertSubscriberData or in
+-- NU1 DeleteSubscriberData messages. Compound Teleservice Group
+-- NU1 Codes must not be used in version 1.
 
 allPLMN-specificTS	TeleserviceCode ::= '11010000'B
 -- NU1 *plmn-specific* must not be used in version 1
@@ -58,3 +73,6 @@ plmn-specificTS-D	TeleserviceCode ::= '11011101'B
 plmn-specificTS-E	TeleserviceCode ::= '11011110'B
 plmn-specificTS-F	TeleserviceCode ::= '11011111'B
 
+
+END
+-- MODULE END

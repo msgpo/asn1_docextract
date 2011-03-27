@@ -1,8 +1,9 @@
 
 -- MODULE 'MAP-SupplementaryServiceOperations' START
 MAP-SupplementaryServiceOperations {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-SupplementaryServiceOperations (8) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-SupplementaryServiceOperations (8)
+   version2 (2)}
 
 DEFINITIONS
 
@@ -29,7 +30,8 @@ EXPORTS
 
 IMPORTS
 	OPERATION
-FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
+FROM TCAPMessages {
+   ccitt recommendation q 773 modules(2) messages (1)}
 
 	SystemFailure,
 	DataMissing,
@@ -45,14 +47,13 @@ FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
 	SS-NotAvailable,
 	SS-SubscriptionViolation,
 	SS-Incompatibility,
-	SS-PartialAcceptance,
 	SS-NotDelivered,
 	PW-RegistrationFailure,
 	NegativePW-Check,
 	NumberOfPW-AttemptsViolation
 FROM MAP-Errors {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-Errors (10) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-Errors (10) version2 (2)}
 
 	RegisterSS-Arg,
 	SS-Info,
@@ -69,13 +70,13 @@ FROM MAP-Errors {
 	GuidanceInfo,
 	BeginSubscriberActivityArg
 FROM MAP-SS-DataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-SS-DataTypes (14) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-SS-DataTypes (14) version2 (2)}
 
 	SS-Code
 FROM MAP-SS-Code {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-SS-Code (15) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-SS-Code (15) version2 (2)}
 ;
 
 
@@ -101,11 +102,9 @@ RegisterSS ::= OPERATION				--Timer m--
 		SS-ErrorStatus,
 		SS-NotAvailable,
 		SS-SubscriptionViolation,
-		SS-Incompatibility,
-		SS-PartialAcceptance}
-		-- NU1 SS-PartialAcceptance must not be used in version 1
+		SS-Incompatibility,}
 
-EraseSS ::= OPERATION					--Timer m--
+EraseSS ::= OPERATION				--Timer m--
 	ARGUMENT
 		ss-ForBS	SS-ForBS-Code
 	RESULT
@@ -148,8 +147,6 @@ ActivateSS ::= OPERATION				--Timer m--
 		SS-NotAvailable,
 		SS-SubscriptionViolation,
 		SS-Incompatibility,
-		SS-PartialAcceptance,
-		-- NU1 SS-PartialAcceptance must not be used in version 1
 		NegativePW-Check,
 		NumberOfPW-AttemptsViolation}
 
@@ -196,7 +193,7 @@ InterrogateSS ::= OPERATION				--Timer m--
 		SS-NotAvailable}
 		-- NU>1 SS-NotAvailable must not be used in version greater 1
 
---<B--InvokeSS ::= OPERATION					--Timer m----B>--
+--<B--InvokeSS ::= OPERATION				--Timer m----B>--
 --<B--	ARGUMENT--B>--
 --<B--		ss-ForBS	SS-ForBS-Code--B>--
 --<B--	RESULT zzzz-Empty	NULL--B>--
@@ -210,7 +207,7 @@ InterrogateSS ::= OPERATION				--Timer m--
 --<B--		SS-ErrorStatus,--B>--
 --<B--		SS-NotAvailable}--B>--
 
-ProcessUnstructuredSS-Data ::= OPERATION		--Timer m--
+ProcessUnstructuredSS-Data ::= OPERATION	--Timer m--
 	ARGUMENT
 		ss-UserData	SS-UserData
 	RESULT
@@ -222,7 +219,7 @@ ProcessUnstructuredSS-Data ::= OPERATION		--Timer m--
 		-- NU1 DataMissing must not be used in version 1
 		UnexpectedDataValue}
 
-ProcessSS-Request ::= OPERATION				--Timer ml--
+ProcessSS-Request ::= OPERATION			--Timer ml--
 	ARGUMENT
 		processSS-RequestArg	ProcessSS-RequestArg
 	RESULT
@@ -234,19 +231,19 @@ ProcessSS-Request ::= OPERATION				--Timer ml--
 		UnknownSubscriber,
 		CallBarred}
 
-SS-GetDigits ::= OPERATION				--Timer ml--
+SS-GetDigits ::= OPERATION			--Timer ml--
 	ARGUMENT
 		ss-GetDigitsArg	SS-GetDigitsArg
 	RESULT
 		ss-DigitString	SS-DigitString
 
-SS-GetString ::= OPERATION				--Timer ml--
+SS-GetString ::= OPERATION			--Timer ml--
 	ARGUMENT
 		ss-GetStringArg	SS-GetStringArg
 	RESULT
 		ss-GetStringRes	SS-GetStringRes
 
-UnstructuredNotifySS ::= OPERATION				--Timer ml--
+UnstructuredNotifySS ::= OPERATION		--Timer ml--
 	ARGUMENT
 		toneOrDisplay	ToneOrDisplay
 	ERRORS {
@@ -283,7 +280,10 @@ GetPassword ::= OPERATION				--Timer m--
 	RESULT
 		currentPassword	Password
 
-BeginSubscriberActivity ::= OPERATION			--Timer m--
+BeginSubscriberActivity ::= OPERATION		--Timer m--
 	ARGUMENT
 		beginSubscriberActivityArg	BeginSubscriberActivityArg
 
+
+END
+-- MODULE END

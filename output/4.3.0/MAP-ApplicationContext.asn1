@@ -1,8 +1,8 @@
 
 -- MODULE 'MAP-ApplicationContext' START
 MAP-ApplicationContext {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-ApplicationContext (2) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-ApplicationContext (2) version2 (2)}
 
 DEFINITIONS
 
@@ -108,3 +108,6 @@ mwdMngtContext-v1  OBJECT IDENTIFIER ::=
 shortMsgMT-RelayContext-v2  OBJECT IDENTIFIER ::=
 	{map-ac shortMsgMT-Relay (25) version2(2)}
 
+
+END
+-- MODULE END

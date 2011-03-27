@@ -122,3 +122,6 @@ plmn-specificSS-D	SS-Code ::= '11111101'B
 plmn-specificSS-E	SS-Code ::= '11111110'B
 plmn-specificSS-F	SS-Code ::= '11111111'B
 
+
+END
+-- MODULE END

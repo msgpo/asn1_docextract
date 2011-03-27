@@ -1,8 +1,9 @@
 
 -- MODULE 'MAP-MobileServiceOperations' START
 MAP-MobileServiceOperations {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-MobileServiceOperations (5) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-MobileServiceOperations (5)
+   version2 (2)}
 
 DEFINITIONS
 
@@ -65,7 +66,8 @@ EXPORTS
 
 IMPORTS
 	OPERATION
-FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
+FROM TCAPMessages {
+   ccitt recommendation q 773 modules(2) messages (1)}
 
 	SystemFailure,
 	DataMissing,
@@ -86,8 +88,8 @@ FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
 --<B--	AbsentSubscriber,--B>--
 --<B--	BusySubscriber--B>--
 FROM MAP-Errors {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-Errors (10) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-Errors (10) version2 (2)}
 
 --<B--	UpdateLocationAreaArg,--B>--
 	UpdateLocationArg,
@@ -117,8 +119,8 @@ FROM MAP-Errors {
 	RestoreDataArg,
 	RestoreDataRes
 FROM MAP-MS-DataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-MS-DataTypes (11) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-MS-DataTypes (11) version2 (2)}
 
 --<B--	ISDN-AddressString,--B>--
 	ExternalSignalInfo,
@@ -128,14 +130,14 @@ FROM MAP-MS-DataTypes {
 	IMEI--<B--,--B>--
 --<B--	LocAreaId--B>--
 FROM MAP-CommonDataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-CommonDataTypes (18) version2 (2)}
 ;
 
 
 -- location registration operations
 
---<B--UpdateLocationArea ::= OPERATION				--Timer m----B>--
+--<B--UpdateLocationArea ::= OPERATION			--Timer m----B>--
 --<B--	ARGUMENT--B>--
 --<B--		updateLocationAreaArg	UpdateLocationAreaArg--B>--
 --<B--	RESULT zzzz-Empty	NULL--B>--
@@ -182,7 +184,7 @@ PurgeMS ::= OPERATION				--Timer m--
 
 SendIdentification::= OPERATION				--Timer s--
 	ARGUMENT
-		tmsi		TMSI
+		tmsi	TMSI
 	RESULT
 		sendIdentificationRes	SendIdentificationRes
 	ERRORS {
@@ -191,11 +193,11 @@ SendIdentification::= OPERATION				--Timer s--
 
 --<B--DetachIMSI ::= OPERATION				--Timer s----B>--
 --<B--	ARGUMENT--B>--
---<B--		subscriberId		SubscriberId--B>--
+--<B--		subscriberId	SubscriberId--B>--
 
 --<B--AttachIMSI ::= OPERATION				--Timer s----B>--
 --<B--	ARGUMENT--B>--
---<B--		subscriberId		SubscriberId--B>--
+--<B--		subscriberId	SubscriberId--B>--
 --<B--	RESULT zzzz-Empty	NULL--B>--
 --<B--	ERRORS {--B>--
 --<B--		SystemFailure,--B>--
@@ -238,7 +240,7 @@ SendIdentification::= OPERATION				--Timer s--
 
 -- access management operations
 
---<B--ProcessAccessRequest ::= OPERATION				--Timer m----B>--
+--<B--ProcessAccessRequest ::= OPERATION			--Timer m----B>--
 --<B--	ARGUMENT--B>--
 --<B--		proccessAccessRequestArg	ProcessAccessRequestArg--B>--
 --<B--	RESULT--B>--
@@ -280,15 +282,15 @@ PerformHandover ::= OPERATION				--Timer s--
 SendEndSignal ::= OPERATION				--Timer l--
 	RESULT zzzz-Empty	NULL
 
-ProcessAccessSignalling ::= OPERATION			--Timer s--
+ProcessAccessSignalling ::= OPERATION		--Timer s--
 	ARGUMENT
 		bss-APDU	ExternalSignalInfo
 
-ForwardAccessSignalling ::= OPERATION			--Timer s--
+ForwardAccessSignalling ::= OPERATION		--Timer s--
 	ARGUMENT
 		bss-APDU	ExternalSignalInfo
 
-PerformSubsequentHandover ::= OPERATION			--Timer m--
+PerformSubsequentHandover ::= OPERATION		--Timer m--
 	ARGUMENT
 		performSubsequentHO-Arg	PerformSubsequentHO-Arg
 	RESULT
@@ -302,13 +304,13 @@ PerformSubsequentHandover ::= OPERATION			--Timer m--
 		InvalidTargetBaseStation,
 		SubsequentHandoverFailure}
 
---<B--AllocateHandoverNumber ::= OPERATION			--Timer s----B>--
+--<B--AllocateHandoverNumber ::= OPERATION		--Timer s----B>--
 --<B--	ERRORS {--B>--
 --<B--		NoHandoverNumberAvailable}--B>--
 --<B--	LINKED {--B>--
 --<B--		SendHandoverReport}--B>--
 
---<B--SendHandoverReport ::= OPERATION				--Timer l----B>--
+--<B--SendHandoverReport ::= OPERATION			--Timer l----B>--
 --<B--	ARGUMENT--B>--
 --<B--		handoverNumber	ISDN-AddressString--B>--
 --<B--	RESULT zzzz-Empty	NULL--B>--
@@ -320,9 +322,9 @@ PerformSubsequentHandover ::= OPERATION			--Timer m--
 --<B--	ARGUMENT--B>--
 --<B--		authenticateArg	AuthenticateArg--B>--
 --<B--	RESULT--B>--
---<B--		sres		SRES--B>--
+--<B--		sres	SRES--B>--
 
-SendAuthenticationInfo ::= OPERATION			--Timer m--
+SendAuthenticationInfo ::= OPERATION		--Timer m--
 	ARGUMENT
 		sendAuthenticationInfoArg	SendAuthenticationInfoArg
 	RESULT
@@ -343,9 +345,9 @@ SendAuthenticationInfo ::= OPERATION			--Timer m--
 
 -- IMEI management operations
 
-CheckIMEI ::= OPERATION					--Timer m--
+CheckIMEI ::= OPERATION				--Timer m--
 	ARGUMENT
-		imei		IMEI
+		imei	IMEI
 		-- optional:
 		-- OP1 imei must be present in version 1
 	RESULT
@@ -373,14 +375,13 @@ SendParameters ::= OPERATION				--Timer m--
 	RESULT
 		sentParameterList	SentParameterList
 		-- optional
-		-- nothing is returned, if no requested parameter is available or
-		-- exists
+		-- nothing is returned, if no requested parameter is available 		-- or exists
 	ERRORS {
 		UnexpectedDataValue,
 		UnknownSubscriber,
 		UnidentifiedSubscriber}
 
-InsertSubscriberData ::= OPERATION				--Timer m--
+InsertSubscriberData ::= OPERATION			--Timer m--
 	ARGUMENT
 		insertSubscriberDataArg	InsertSubscriberDataArg
 	RESULT
@@ -392,7 +393,7 @@ InsertSubscriberData ::= OPERATION				--Timer m--
 		UnexpectedDataValue,
 		UnidentifiedSubscriber}
 
-DeleteSubscriberData ::= OPERATION				--Timer m--
+DeleteSubscriberData ::= OPERATION			--Timer m--
 	ARGUMENT
 		deleteSubscriberDataArg	DeleteSubscriberDataArg
 	RESULT zzzz-Empty	NULL
@@ -420,11 +421,11 @@ DeleteSubscriberData ::= OPERATION				--Timer m--
 
 -- fault recovery operations
 
-Reset ::= OPERATION					--Timer m--
+Reset ::= OPERATION				--Timer m--
 	ARGUMENT
 		resetArg	ResetArg
 
-ForwardCheckSS-Indication ::= OPERATION			--Timer s--
+ForwardCheckSS-Indication ::= OPERATION		--Timer s--
 
 RestoreData ::= OPERATION				--Timer m--
 	ARGUMENT
@@ -437,3 +438,6 @@ RestoreData ::= OPERATION				--Timer m--
 		UnexpectedDataValue,
 		UnknownSubscriber}
 
+
+END
+-- MODULE END

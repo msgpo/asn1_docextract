@@ -1,8 +1,9 @@
 
 -- MODULE 'MAP-ShortMessageServiceOperations' START
 MAP-ShortMessageServiceOperations {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-ShortMessageServiceOperations (9) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-ShortMessageServiceOperations (9)
+   version2 (2)}
 
 DEFINITIONS
 
@@ -24,7 +25,8 @@ EXPORTS
 
 IMPORTS
 	OPERATION
-FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
+FROM TCAPMessages {
+   ccitt recommendation q 773 modules(2) messages (1)}
 
 	SystemFailure,
 	DataMissing,
@@ -40,8 +42,8 @@ FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
 	SM-DeliveryFailure,
 	MessageWaitingListFull
 FROM MAP-Errors {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-Errors (10) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-Errors (10) version2 (2)}
 
 	RoutingInfoForSM-Arg,
 	RoutingInfoForSM-Res,
@@ -52,19 +54,19 @@ FROM MAP-Errors {
 	InformServiceCentreArg,
 	ReadyForSM-Arg
 FROM MAP-SM-DataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-SM-DataTypes (16) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-SM-DataTypes (16) version2 (2)}
 
 --<B--	AddressString,--B>--
 	ISDN-AddressString,
 	IMSI
 FROM MAP-CommonDataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-CommonDataTypes (18) version2 (2)}
 ;
 
 
-SendRoutingInfoForSM ::= OPERATION				--Timer m--
+SendRoutingInfoForSM ::= OPERATION			--Timer m--
 	ARGUMENT
 		routingInfoForSM-Arg	RoutingInfoForSM-Arg
 	RESULT
@@ -79,7 +81,7 @@ SendRoutingInfoForSM ::= OPERATION				--Timer m--
 		AbsentSubscriber,
 		CallBarred}
 
-ForwardSM ::= OPERATION					--Timer m--
+ForwardSM ::= OPERATION				--Timer ml--
 	ARGUMENT
 		forwardSM-Arg	ForwardSM-Arg
 	RESULT zzzz-Empty	NULL
@@ -96,7 +98,7 @@ ForwardSM ::= OPERATION					--Timer m--
 		AbsentSubscriber,
 		SM-DeliveryFailure}
 
-ReportSM-DeliveryStatus ::= OPERATION			--Timer s--
+ReportSM-DeliveryStatus ::= OPERATION		--Timer s--
 	ARGUMENT
 		reportSM-DeliveryStatusArg	ReportSM-DeliveryStatusArg
 	RESULT
@@ -111,11 +113,11 @@ ReportSM-DeliveryStatus ::= OPERATION			--Timer s--
 		UnknownSubscriber,
 		MessageWaitingListFull}
 
-NoteSubscriberPresent ::= OPERATION				--Timer s--
+NoteSubscriberPresent ::= OPERATION			--Timer s--
 	ARGUMENT
-		imsi		IMSI
+		imsi	IMSI
 
-AlertServiceCentre ::= OPERATION				--Timer s--
+AlertServiceCentre ::= OPERATION			--Timer s--
 	ARGUMENT
 		alertServiceCentreArg	AlertServiceCentreArg
 	RESULT zzzz-Empty	NULL
@@ -129,7 +131,7 @@ AlertServiceCentre ::= OPERATION				--Timer s--
 		UnexpectedDataValue}
 		-- NU1 UnexpectedDataValue must not be used in version 1
 
-InformServiceCentre ::= OPERATION				--Timer s--
+InformServiceCentre ::= OPERATION			--Timer s--
 	ARGUMENT
 		informServiceCentreArg	InformServiceCentreArg
 
@@ -168,3 +170,6 @@ ReadyForSM ::= OPERATION				--Timer m--
 		UnexpectedDataValue,
 		UnknownSubscriber}
 
+
+END
+-- MODULE END

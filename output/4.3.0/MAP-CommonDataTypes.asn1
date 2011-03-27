@@ -1,8 +1,8 @@
 
 -- MODULE 'MAP-CommonDataTypes' START
 MAP-CommonDataTypes {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-CommonDataTypes (18) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-CommonDataTypes (18) version2 (2)}
 
 DEFINITIONS
 
@@ -49,37 +49,38 @@ EXPORTS
 IMPORTS
 	TeleserviceCode
 FROM MAP-TS-Code {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-TS-Code (19) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0) 
+   gsmNetworkId(1) moduleId (3) map-TS-Code (19) version2 (2)}
 
 	BearerServiceCode
 FROM MAP-BS-Code {
-   ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
-   moduleId (3) map-BS-Code (20) version2 (2)}
+   ccitt identified-organization (4) etsi (0) mobileDomainId (0)
+   gsmNetworkId(1) moduleId (3) map-BS-Code (20) version2 (2)}
 ;
 
 
 -- general data types
 
 TBCD-STRING ::= OCTET STRING
-	-- This type (Telephony Binary Coded Decimal String) is used to represent
-	-- several digits from 0 through 9, *, #, a, b , c, two digits per octet,
-	-- each digit encoded 0000 to 1001 (0 to 9), 1010 (*), 1011 (#), 1100 (a),
-	-- 1101 (b) or 1110 (c); 1111 used as filler when there is an odd number
-	-- of digits.
+	-- This type (Telephony Binary Coded Decimal String) is used to
+	-- represent several digits from 0 through 9, *, #, a, b , c, two
+	-- digits per octet, each digit encoded 0000 to 1001 (0 to 9),
+	-- 1010 (*), 1011 (#), 1100 (a), 1101 (b) or 1110 (c); 1111 used
+	-- as filler when there is an odd number of digits.
 
 	-- bits 8765 of octet n encoding digit 2n  
 	-- bits 4321 of octet n encoding digit 2(n-1) +1 
 
 AddressString ::= OCTET STRING (SIZE (1..maxAddressLength))
-	-- This type is used to represent a number for addressing purposes. It is
-	-- composed of
-	--	  a)	one  octet for nature of address, and numbering plan indicator.
-	--	  b)	digits of an address encoded as TBCD-String.
+	-- This type is used to represent a number for addressing
+	-- purposes. It is composed of
+	--	a)	one  octet for nature of address, and numbering plan
+	--		indicator.
+	--	b)	digits of an address encoded as TBCD-String.
 
-	-- a)	The first octet includes a one bit extension indicator, a 3 bits nature of
-	-- 	address indicator and a 4 bits numbering plan indicator, encoded as
-	-- 	follows:
+	-- a)	The first octet includes a one bit extension indicator, a
+	--		3 bits nature of address indicator and a 4 bits numbering
+	--		 plan indicator, encoded as follows:
 
 	-- bit 8: 1  (no extension)
 
@@ -106,10 +107,10 @@ AddressString ::= OCTET STRING (SIZE (1..maxAddressLength))
 	--	1001  private numbering plan
 	--	1111  reserved for extension
 
-	-- 	all other values are reserved.
+	--	all other values are reserved.
 
-	-- b)	The following octets representing digits of an address encoded as a
-	--	TBCD-STRING.
+	-- b)	The following octets representing digits of an address
+	--		encoded as a TBCD-STRING.
 
 maxAddressLength  INTEGER ::= 20
 
@@ -126,31 +127,33 @@ maxISDN-SubaddressLength  INTEGER ::= 21
 ExternalSignalInfo ::= SEQUENCE {
 	protocolId	ProtocolId,
 	signalInfo	SignalInfo}
-	-- This data type is defined to allow the Mobile Application Part protocol to
-	-- carry information elements defined in other Recommendations/Technical
-	-- Specifications without any direct reference to their internal
-	-- structure.
+	-- This data type is defined to allow the Mobile Application Part
+	-- protocol to carry information elements defined in other
+	-- Recommendations/Technical Specifications without any direct
+	-- reference to their internal structure.
 
-	-- The data type represents any set of information elements (including tag
-	-- and length octets) imported from another signalling protocol. For the
-	-- user-network protocol, the set of elements may consist of a complete
-	-- layer 3 message. The protocol to which the information elements belong is
-	-- indicated by the protocolId element, while the signalling information is
-	-- contained in the signalInfo element.
+	-- The data type represents any set of information elements
+	-- (including tag and length octets) imported from another
+	-- signalling protocol. For the user-network protocol, the set of
+	-- elements may consist of a complete layer 3 message. The
+	-- protocol to which the information elements belong is
+	-- indicated by the protocolId element, while the signalling
+	-- information is contained in the signalInfo element.
 
 SignalInfo ::= OCTET STRING (SIZE (1..maxSignalInfoLength))
 
 maxSignalInfoLength  INTEGER ::= 200
-	-- This NamedValue represents the theoretical maximum number of octets
-	-- which are available to carry a single data type, without requiring
-	-- segmentation to cope with the network layer service. However, the actual
-	-- maximum size available for a data type may be lower, especially when
-	-- other information elements have to be included in the same component.
+	-- This NamedValue represents the theoretical maximum number of
+	-- octets which are available to carry a single data type,
+	-- without requiring segmentation to cope with the network layer
+	-- service. However, the actual maximum size available for a data
+	-- type may be lower, especially when other information elements
+	-- have to be included in the same component.
 
 ProtocolId ::= ENUMERATED {
 	gsm-0408  (1),
-	gsm-0806-DTAP  (2),
-	gsm-0808-BSSMAP  (3),
+	gsm-DTAP  (2),
+	gsm-BSSMAP  (3),
 	isup-Q763  (4)}
 
 
@@ -162,8 +165,8 @@ IMSI ::= TBCD-STRING (SIZE (3..8))
 TMSI ::= OCTET STRING (SIZE (1..4))
 
 SubscriberId ::= CHOICE {
-	imsi			[0] IMSI,
-	tmsi			[1] TMSI}
+	imsi		[0] IMSI,
+	tmsi		[1] TMSI}
 
 IMEI ::= TBCD-STRING (SIZE (8))
 	-- The internal Structure is defined as follows:
@@ -248,3 +251,6 @@ BasicServiceGroupList ::= SEQUENCE SIZE (1..maxNumOfBasicServiceGroups) OF
 
 maxNumOfBasicServiceGroups  INTEGER ::= 13
 
+
+END
+-- MODULE END

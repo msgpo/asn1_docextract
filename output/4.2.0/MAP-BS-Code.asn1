@@ -86,3 +86,6 @@ plmn-specificBS-D	BearerServiceCode ::= '11011101'B
 plmn-specificBS-E	BearerServiceCode ::= '11011110'B
 plmn-specificBS-F	BearerServiceCode ::= '11011111'B
 
+
+END
+-- MODULE END
