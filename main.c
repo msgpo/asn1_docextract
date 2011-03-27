@@ -25,6 +25,11 @@ enum extract_mode {
 
 static enum extract_mode g_mode = MODE_3;
 static int g_type4_out_enable = 0;
+static FILE *g_outfile;
+static int g_debug = 0;
+
+#define DBG(x, args ...) do {						\
+		if (g_debug) fprintf(stderr, x, ## args); } while (0)
 
 static void output_filter_text(struct word_handle *wh, uint32_t start_offs, uint32_t next_offs)
 {
@@ -44,12 +49,12 @@ static void output_filter_text(struct word_handle *wh, uint32_t start_offs, uint
 		case '\r':
 			break;
 		case 0x0b: /* line feed */
-			fputc('\n', stdout);
+			fputc('\n', g_outfile);
 			break;
 		case 0x09: /* tab */
 		case '\n':
 		default:
-			fputc(*cur, stdout);
+			fputc(*cur, g_outfile);
 		}
 	}
 }
@@ -58,13 +63,13 @@ static void output_filter_text(struct word_handle *wh, uint32_t start_offs, uint
 static void handle_par_fmt_desc(struct word_handle *wh, struct word_par_fmt *pfmt,
 				uint32_t start_offs, uint32_t next_offs)
 {
-	fprintf(stderr, "Paragraph format (0x%08x-0x%08x):\n", start_offs, next_offs);
+	DBG("Paragraph format (0x%08x-0x%08x):\n", start_offs, next_offs);
 	if (!pfmt)
 		return;
-	fprintf(stderr, "\tFormat length: %u\n", pfmt->length);
-	fprintf(stderr, "\tFormat code: 0x%02x\n", pfmt->fmt_code);
-	fprintf(stderr, "\tAlignment: %d\n", pfmt->par_align);
-	fprintf(stderr, "\tStd Par Fmt: 0x%02x\n", pfmt->std_par_fmt);
+	DBG("\tFormat length: %u\n", pfmt->length);
+	DBG("\tFormat code: 0x%02x\n", pfmt->fmt_code);
+	DBG("\tAlignment: %d\n", pfmt->par_align);
+	DBG("\tStd Par Fmt: 0x%02x\n", pfmt->std_par_fmt);
 
 	switch (g_mode) {
 	case MODE_3:
@@ -97,13 +102,13 @@ restart:
 			if (mod_name_tok && strlen(mod_name_tok) > 1) {
 				/* start */
 				dump_start = start_offs + found_delta + 2;
-				fprintf(stderr, "Found START (0x%x): '%s'\n", dump_start, found);
-				printf("\n--- MODULE '%s' START ---\n", mod_name_tok);
+				DBG("Found START (0x%x): '%s'\n", dump_start, found);
+				fprintf(g_outfile, "\n-- MODULE '%s' START\n", mod_name_tok);
 				free(mod_name_tmp);
 			} else {
 				/* continuation */
 				dump_start = start_offs + found_delta + 2;
-				fprintf(stderr, "Found CONT: (0x%x): '%s'\n", dump_start, found);
+				DBG("Found CONT: (0x%x): '%s'\n", dump_start, found);
 			}
 			g_type4_out_enable = 1;
 		}
@@ -125,18 +130,18 @@ restart:
 			if (strlen(found) > 2 && !strncmp(found, ".#END", 5)) {
 				/* end */
 				dump_end = start_offs + found_delta;
-				fprintf(stderr, "Found END (0x%x): '%s'\n", dump_end, found);
+				DBG("Found END (0x%x): '%s'\n", dump_end, found);
 				found_end = 1;
 			} else {
 				/* interrupt */
 				dump_end = start_offs + found_delta;
-				fprintf(stderr, "Found INT (0x%x): '%s'\n", dump_end, found);
+				DBG("Found INT (0x%x): '%s'\n", dump_end, found);
 			}
 			g_type4_out_enable = 0;
 		}
 		output_filter_text(wh, dump_start, dump_end);
 		if (found_end)
-			printf("\n--- MODULE END ---\n");
+			fprintf(g_outfile, "\nEND\n-- MODULE END\n");
 	}
 
 	free(tmp);
@@ -178,12 +183,12 @@ static void handle_fmt_block(struct word_handle *wh, uint16_t block_nr,
 	uint32_t last_fmt_start = offset;
 	int i;
 	
-	fprintf(stderr, "Format block %u\n", block_nr);
-	fprintf(stderr, "Offset of first Paragraph: %u (0x%x)\n", offset, offset);
-	fprintf(stderr, "Number of format table entries: %u\n", num_fmts);
+	DBG("Format block %u\n", block_nr);
+	DBG("Offset of first Paragraph: %u (0x%x)\n", offset, offset);
+	DBG("Number of format table entries: %u\n", num_fmts);
 
 	for (i = 0; i < num_fmts; i++) {
-		fprintf(stderr, "Format tbl entry Text Ptr: %u (0x%x), Fmt: %u\n",
+		DBG("Format tbl entry Text Ptr: %u (0x%x), Fmt: %u\n",
 			fmt_tbl[i].ptr_text, fmt_tbl[i].ptr_text, fmt_tbl[i].offset_fmt);
 		if (fmt_tbl[i].offset_fmt != 0xffff)
 			pfmt = block_base + 4 + fmt_tbl[i].offset_fmt;
@@ -213,9 +218,9 @@ static void process(struct word_handle *wh)
 	struct word_file_hdr *wfh = (struct word_file_hdr *) wh->base_addr;
 	uint32_t char_fmt_ptr;
 
-	fprintf(stderr, "Word file size: %u\n", wh->file_size);
-	fprintf(stderr, "End of text PTR: %u (0x%x)\n", wfh->ptr_end_of_text, wfh->ptr_end_of_text);
-	fprintf(stderr, "Paragraph fmt Block PTR: %u, offset = %u\n", wfh->bptr_fmt_para,
+	DBG("Word file size: %u\n", wh->file_size);
+	DBG("End of text PTR: %u (0x%x)\n", wfh->ptr_end_of_text, wfh->ptr_end_of_text);
+	DBG("Paragraph fmt Block PTR: %u, offset = %u\n", wfh->bptr_fmt_para,
 		word_bptr2offset(wfh->bptr_fmt_para));
 
 	char_fmt_ptr = wfh->ptr_end_of_text;
@@ -226,12 +231,19 @@ static void process(struct word_handle *wh)
 	handle_fmt_block(wh, char_fmt_ptr/WORD_BLOCK_SIZE, FMT_CHARACTER);
 }
 
+static void usage(char **argv)
+{
+	fprintf(stderr, "Usage: %s [-3 | -4] [-d] file.doc\n", argv[0]);
+}
+
 int main(int argc, char **argv)
 {
 	struct word_handle *wh;
 	int opt;
 
-	while ((opt = getopt(argc, argv, "34")) != -1) {
+	g_outfile = stdout;
+
+	while ((opt = getopt(argc, argv, "34do:")) != -1) {
 		switch (opt) {
 		case '3':
 			g_mode = MODE_3;
@@ -239,18 +251,28 @@ int main(int argc, char **argv)
 		case '4':
 			g_mode = MODE_4;
 			break;
+		case 'd':
+			g_debug = 1;
+			break;
+		case 'o':
+			g_outfile = fopen(optarg, "w");
+			if (!g_outfile) {
+				perror("open outfile");
+				exit(1);
+			}
+			break;
 		default:
-			fprintf(stderr, "Usage: %s [-3 | -4]\n", argv[0]);
+			usage(argv);
 			exit(2);
 		}
 	}
 
 	if (optind >= argc) {
-		fprintf(stderr, "You need to specify the file name of the DOC file\n");
+		usage(argv);
 		exit(2);
 	}
 
-	fprintf(stderr, "Opening file name '%s'\n", argv[optind]);
+	DBG("Opening file name '%s'\n", argv[optind]);
 
 	wh = word_file_open(argv[optind]);
 	if (!wh)
