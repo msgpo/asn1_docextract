@@ -1870,7 +1870,7 @@ systemFailure SystemFailure ::= 34
 dataMissing DataMissing ::= 35
 
 
-passwordRegistrationFailure PasswordRegistrationFailure :: 37
+passwordRegistrationFailure PasswordRegistrationFailure ::= 37
 
 negativePasswordCheck NegativePasswordCheck ::= 38
 
