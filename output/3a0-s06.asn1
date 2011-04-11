@@ -46,6 +46,7 @@ Authenticate, ProvideIMSI, ForwardNewTMSI, SetCipheringMode,
 SendRoutingInfoForSM, ForwardShortMessage, SetMessageWaitingData, NoteMSPresent, AlertServiceCentre,
 
 -- Access request
+ProcessAccessRequest;
 
 
 IMPORTS
@@ -1144,37 +1145,37 @@ BearerServiceList	 ::= SEQUENCE
 		     OF BearerServiceCode
 
 
-BearerServiceCode
+-- BearerServiceCode
 
-7564321		Meaning			
+-- 7564321		Meaning			
 
-TeleServiceCode
+-- TeleServiceCode
 
-00000000		All teleservices
+-- 00000000		All teleservices
 
-00010000		Speech transmission
-00010001		Telephony
-00010010		Emergency calls
+-- 00010000		Speech transmission
+-- 00010001		Telephony
+-- 00010010		Emergency calls
 
-00100000		Short messages services
-00100001		Short message MT/PP
-00100010		Short message MO/PP
+-- 00100000		Short messages services
+-- 00100001		Short message MT/PP
+-- 00100010		Short message MO/PP
 
-00110000		Data MHS
-00110001		Advanced MHS access
+-- 00110000		Data MHS
+-- 00110001		Advanced MHS access
 
-01000000		Videotex access services
-01000001		Videotex access profile 1
-01000010		Videotex access profile 2
-01000011		Videotex access profile 3
+-- 01000000		Videotex access services
+-- 01000001		Videotex access profile 1
+-- 01000010		Videotex access profile 2
+-- 01000011		Videotex access profile 3
 
-01010000		Teletex service
-01010001		Teletex CS
-01010010		Teletex PS
+-- 01010000		Teletex service
+-- 01010001		Teletex CS
+-- 01010010		Teletex PS
 
-01100000		Facsimile 
-01100001		Facsimile Group 3 and alternate speech
-01100010		Automatic Facsimile Group 3
+-- 01100000		Facsimile 
+-- 01100001		Facsimile Group 3 and alternate speech
+-- 01100010		Automatic Facsimile Group 3
 
 TeleserviceCode	 ::= OCTET STRING (SIZE (1))
 		-- Internal structure according to table 6.4/2
@@ -1201,38 +1202,37 @@ BasicServiceList	 ::= SEQUENCE
 		operatorOGCallBarring	(1)}
 
 
-SS-Code
+-- SS-Code
 
-00010001		Calling number identification presentation
-00010010		Calling number identification restriction
-00010011		Called number identification presentation
-00010100		Called number identification restriction
-00010101		Malicious call identification
-00100001		Call forwarding unconditional
-00101000		All conditional forwarding services
-00101001		Call forwarding on mobile subscriber busy
-00101010		Call forwarding on no reply
-00101011		Call forwarding on subscriber not reachable
-00110001		Call transfer
-00110010		Mobile access hunting
-01000001		Call waiting
-01000010		Call hold
-01000011		Completion of calls to busy subscribers
-01010001		Three party service
-01010010		Conference calling
-01100001		Closed user group
-01110001		Advice of charge
-01110010		Freephone service
-01110011		Reverse charging
-10000001		User to user signalling
-10010001		Barring of outgoing calls
-10010010		Barring of all outgoing calls 
-10010011		Barring of all outgoing international calls
-10010100		Barring of all OG international non-HPLMN
-		directed calls
-10011001		Barring of incoming calls
-10011010		Barring of all incoming calls
-10011011		Barring of all IC calls when outside HPLMN
+-- 00010001		Calling number identification presentation
+-- 00010010		Calling number identification restriction
+-- 00010011		Called number identification presentation
+-- 00010100		Called number identification restriction
+-- 00010101		Malicious call identification
+-- 00100001		Call forwarding unconditional
+-- 00101000		All conditional forwarding services
+-- 00101001		Call forwarding on mobile subscriber busy
+-- 00101010		Call forwarding on no reply
+-- 00101011		Call forwarding on subscriber not reachable
+-- 00110001		Call transfer
+-- 00110010		Mobile access hunting
+-- 01000001		Call waiting
+-- 01000010		Call hold
+-- 01000011		Completion of calls to busy subscribers
+-- 01010001		Three party service
+-- 01010010		Conference calling
+-- 01100001		Closed user group
+-- 01110001		Advice of charge
+-- 01110010		Freephone service
+-- 01110011		Reverse charging
+-- 10000001		User to user signalling
+-- 10010001		Barring of outgoing calls
+-- 10010010		Barring of all outgoing calls 
+-- 10010011		Barring of all outgoing international calls
+-- 10010100		Barring of all OG international non-HPLMN directed calls
+-- 10011001		Barring of incoming calls
+-- 10011010		Barring of all incoming calls
+-- 10011011		Barring of all IC calls when outside HPLMN
 
 
 SS-Code	 ::= OCTET STRING (SIZE(1))
@@ -1434,12 +1434,12 @@ GuidanceInfo	 ::=   ENUMERATED{
 SS-UserData	 ::= IA5String (SIZE (1.. maxSignalInfoLength))
 
 
-number		Information to be provided	
-guidance0		enter password
-guidance1		enter new password
-guidance2		enter new password again
-guidance3		bad password try again
-guidance4		bad password format try again
+-- number		Information to be provided	
+-- guidance0		enter password
+-- guidance1		enter new password
+-- guidance2		enter new password again
+-- guidance3		bad password try again
+-- guidance4		bad password format try again
 
 -- Data types for call parameters
 
@@ -1547,8 +1547,6 @@ SM-RP-DA	 ::= CHOICE{
 
 SM-RP-UI	 ::= OCTET STRING (SIZE (1..maxSignalInfoLength))
 
-Figure 6.4/9 
-
 -- fault recovery, call tracing
 
 TraceReference	 ::= OCTET STRING (SIZE (1..2))
@@ -1610,19 +1608,19 @@ AccessConnectionStatus	 ::= OCTET STRING (SIZE (1))
 		--     1 MM-connection existing and not authenticated
 
 END -- End of data types specifications
--	Undetermined
--	Successful with normal termination
--	Successful with abnormal termination
--	Spare
--	Forwarded
--	Forwarded with abnormal termination
--	Rerouted with abnormal termination
--	Unsuccessful due to no radio contact
--	Unsuccessful due to no response
--	Unsuccessful due to busy subscriber
--	Unsuccessful due to system failure
--	Unsuccessful due to subscription violation
--	Unsuccessful due to not supported facility
+--	Undetermined
+--	Successful with normal termination
+--	Successful with abnormal termination
+--	Spare
+--	Forwarded
+--	Forwarded with abnormal termination
+--	Rerouted with abnormal termination
+--	Unsuccessful due to no radio contact
+--	Unsuccessful due to no response
+--	Unsuccessful due to busy subscriber
+--	Unsuccessful due to system failure
+--	Unsuccessful due to subscription violation
+--	Unsuccessful due to not supported facility
 MAP-AbortInformation  DEFINITIONS ::=
 
 BEGIN
