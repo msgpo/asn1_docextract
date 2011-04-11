@@ -11,33 +11,33 @@ DEFINITIONS
 BEGIN
 
 IMPORTS
---<B--	UpdateLocationArea,--B>--
+	UpdateLocationArea,
 	UpdateLocation,
 	CancelLocation,
 	PurgeMS,
 	SendIdentification,
---<B--	DetachIMSI,--B>--
---<B--	AttachIMSI,--B>--
---<B--	Page,--B>--
---<B--	SearchForMS,--B>--
---<B--	ProcessAccessRequest,--B>--
+	DetachIMSI,
+	AttachIMSI,
+	Page,
+	SearchForMS,
+	ProcessAccessRequest,
 	PerformHandover,
 	SendEndSignal,
 	ProcessAccessSignalling,
 	ForwardAccessSignalling,
 	PerformSubsequentHandover,
---<B--	AllocateHandoverNumber,--B>--
---<B--	SendHandoverReport,--B>--
---<B--	Authenticate,--B>--
+	AllocateHandoverNumber,
+	SendHandoverReport,
+	Authenticate,
 	SendAuthenticationInfo,
---<B--	SetCipheringMode,--B>--
+	SetCipheringMode,
 	CheckIMEI,
---<B--	ObtainIMEI,--B>--
+	ObtainIMEI,
 	SendParameters,
 	InsertSubscriberData,
 	DeleteSubscriberData,
---<B--	ProvideIMSI,--B>--
---<B--	ForwardNewTMSI,--B>--
+	ProvideIMSI,
+	ForwardNewTMSI,
 	Reset,
 	ForwardCheckSS-Indication,
 	RestoreData
@@ -54,13 +54,13 @@ FROM MAP-OperationAndMaintenanceOperations {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-OperationAndMaintenanceOperations (6) version2 (2)}
 
---<B--	SendInfoForIncomingCall,--B>--
---<B--	ConnectToFollowingAddress,--B>--
---<B--	ProcessCallWaiting,--B>--
---<B--	SendInfoForOutgoingCall,--B>--
+	SendInfoForIncomingCall,
+	ConnectToFollowingAddress,
+	ProcessCallWaiting,
+	SendInfoForOutgoingCall,
 	SendRoutingInfo,
-	ProvideRoamingNumber--<B--,--B>--
---<B--	CompleteCall--B>--
+	ProvideRoamingNumber,
+	CompleteCall
 FROM MAP-CallHandlingOperations {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-CallHandlingOperaations (7) version2 (2)}
@@ -70,7 +70,7 @@ FROM MAP-CallHandlingOperations {
 	ActivateSS,
 	DeactivateSS,
 	InterrogateSS,
---<B--	InvokeSS,--B>--
+	InvokeSS,
 	ProcessUnstructuredSS-Data,
 	ProcessSS-Request,
 	SS-GetDigits,
@@ -89,8 +89,8 @@ FROM MAP-SupplementaryServiceOperations {
 	NoteSubscriberPresent,
 	AlertServiceCentre,
 	InformServiceCentre,
---<B--	SendInfoForMT-SMS,--B>--
---<B--	SendInfoForMO-SMS,--B>--
+	SendInfoForMT-SMS,
+	SendInfoForMO-SMS,
 	ReadyForSM
 FROM MAP-ShortMessageServiceOperations {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
@@ -104,9 +104,9 @@ FROM MAP-ShortMessageServiceOperations {
 	NumberChanged,
 	UnknownBaseStation,
 	UnknownMSC,
---<B--	UnknownLocArea,--B>--
+	UnknownLocArea,
 	UnidentifiedSubscriber,
---<B--	UnallocatedRoamingNumber,--B>--
+	UnallocatedRoamingNumber,
 	UnknownEquipment,
 	RoamingNotAllowed,
 	IllegalSubscriber,
@@ -120,10 +120,10 @@ FROM MAP-ShortMessageServiceOperations {
 	TracingBufferFull,
 	NoRoamingNumberAvailable,
 	AbsentSubscriber,
---<B--	BusySubscriber,--B>--
---<B--	NoSubscriberReply,--B>--
---<B--	RadioCongestion,--B>--
---<B--	ImpossibleCallCompletion,--B>--
+	BusySubscriber,
+	NoSubscriberReply,
+	RadioCongestion,
+	ImpossibleCallCompletion,
 	CallBarred,
 	ForwardingViolation,
 	CUG-Reject,

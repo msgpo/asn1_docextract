@@ -16,7 +16,7 @@ EXPORTS
 	RoutingInfoForSM-Arg,
 	RoutingInfoForSM-Res,
 	ForwardSM-Arg,
---<B--	SM-RP-DA,--B>--
+	SM-RP-DA,
 	ReportSM-DeliveryStatusArg,
 	AlertServiceCentreArg,
 	InformServiceCentreArg,

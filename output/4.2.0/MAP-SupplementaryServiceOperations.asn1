@@ -16,7 +16,7 @@ EXPORTS
 	ActivateSS,
 	DeactivateSS,
 	InterrogateSS,
---<B--	InvokeSS,--B>--
+	InvokeSS,
 	ProcessUnstructuredSS-Data,
 	ProcessSS-Request,
 	SS-GetDigits,
@@ -196,19 +196,19 @@ InterrogateSS ::= OPERATION				--Timer m--
 		SS-NotAvailable}
 		-- NU>1 SS-NotAvailable must not be used in version greater 1
 
---<B--InvokeSS ::= OPERATION					--Timer m----B>--
---<B--	ARGUMENT--B>--
---<B--		ss-ForBS	SS-ForBS-Code--B>--
---<B--	RESULT zzzz-Empty	NULL--B>--
---<B--	ERRORS {--B>--
---<B--		SystemFailure,--B>--
---<B--		DataMissing,--B>--
---<B--		UnexpectedDataValue,--B>--
---<B--		CallBarred,--B>--
---<B--		-- NU1 CallBarred must not be used in version 1----B>--
---<B--		IllegalSS-Operation,--B>--
---<B--		SS-ErrorStatus,--B>--
---<B--		SS-NotAvailable}--B>--
+InvokeSS ::= OPERATION					--Timer m--
+	ARGUMENT
+		ss-ForBS	SS-ForBS-Code
+	RESULT zzzz-Empty	NULL
+	ERRORS {
+		SystemFailure,
+		DataMissing,
+		UnexpectedDataValue,
+		CallBarred,
+		-- NU1 CallBarred must not be used in version 1--
+		IllegalSS-Operation,
+		SS-ErrorStatus,
+		SS-NotAvailable}
 
 ProcessUnstructuredSS-Data ::= OPERATION		--Timer m--
 	ARGUMENT

@@ -15,21 +15,21 @@ BEGIN
 EXPORTS
 
 	-- location registration types
---<B--	UpdateLocationAreaArg,--B>--
+	UpdateLocationAreaArg,
 	UpdateLocationArg,
 	UpdateLocationRes,
 	CancelLocationArg,
 	PurgeMS-Arg,
 	SendIdentificationRes,
---<B--	SRES,--B>--
+	SRES,
 
 	-- page management types
---<B--	PageArg,--B>--
---<B--	SearchForMS-Arg,--B>--
+	PageArg,
+	SearchForMS-Arg,
 
 	-- access management types
---<B--	ProcessAccessRequestArg,--B>--
---<B--	ProcessAccessRequestRes,--B>--
+	ProcessAccessRequestArg,
+	ProcessAccessRequestRes,
 
 	-- handover types
 	PerformHO-Arg,
@@ -37,12 +37,12 @@ EXPORTS
 	PerformSubsequentHO-Arg,
 
 	-- authentication management types
---<B--	AuthenticateArg,--B>--
+	AuthenticateArg,
 	SendAuthenticationInfoArg,
 	SendAuthenticationInfoRes,
 
 	-- security management types
---<B--	SetCipheringModeArg,--B>--
+	SetCipheringModeArg,
 	CheckIMEI-Arg,
 
 	-- subscriber management types
@@ -69,11 +69,11 @@ FROM MAP-SS-DataTypes {
 	ISDN-AddressString,
 	ExternalSignalInfo,
 	IMSI,
---<B--	TMSI,--B>--
+	TMSI,
 	SubscriberId,
 	IMEI,
---<B--	LocAreaId,--B>--
---<B--	LocAreaIdOrNone,--B>--
+	LocAreaId,
+	LocAreaIdOrNone,
 	LocationInfo,
 	HLR-List,
 	LMSI,
@@ -91,12 +91,12 @@ FROM MAP-CommonDataTypes {
 
 -- location registration types
 
---<B--UpdateLocationAreaArg ::= SEQUENCE {--B>--
---<B--	subscriberId	SubscriberId,--B>--
---<B--	previousLocAreaId	LocAreaIdOrNone,--B>--
---<B--	targetLocAreaId	LocAreaId,--B>--
---<B--	cksn			CKSN			OPTIONAL}--B>--
---<B--	-- OP1 cksn must be present in version 1----B>--
+UpdateLocationAreaArg ::= SEQUENCE {
+	subscriberId	SubscriberId,
+	previousLocAreaId	LocAreaIdOrNone,
+	targetLocAreaId	LocAreaId,
+	cksn			CKSN			OPTIONAL}
+	-- OP1 cksn must be present in version 1--
 
 UpdateLocationArg ::= SEQUENCE {
 	imsi		IMSI,
@@ -155,41 +155,41 @@ Kc ::= OCTET STRING (SIZE (8))
 
 -- page management types
 
---<B--PageArg ::= SEQUENCE {--B>--
---<B--	imsi			[0] IMSI,--B>--
---<B--	tmsi			[1] TMSI		OPTIONAL,--B>--
---<B--	locAreaId	[2] LocAreaId}--B>--
+PageArg ::= SEQUENCE {
+	imsi			[0] IMSI,
+	tmsi			[1] TMSI		OPTIONAL,
+	locAreaId	[2] LocAreaId}
 
---<B--SearchForMS-Arg ::= SEQUENCE {--B>--
---<B--	imsi			IMSI,--B>--
---<B--	storedLocAreaId	LocAreaIdOrNone}--B>--
+SearchForMS-Arg ::= SEQUENCE {
+	imsi			IMSI,
+	storedLocAreaId	LocAreaIdOrNone}
 
 
 -- access management types
 
---<B--ProcessAccessRequestArg ::= SEQUENCE {--B>--
---<B--	subscriberIdOrIMEI	SubscriberIdOrIMEI,--B>--
---<B--	cm-ServiceType	CM-ServiceType,--B>--
---<B--	accessConnectionStatus	AccessConnectionStatus,--B>--
---<B--	cksn			CKSN,--B>--
---<B--	targetLocArea	LocAreaId	OPTIONAL}--B>--
+ProcessAccessRequestArg ::= SEQUENCE {
+	subscriberIdOrIMEI	SubscriberIdOrIMEI,
+	cm-ServiceType	CM-ServiceType,
+	accessConnectionStatus	AccessConnectionStatus,
+	cksn			CKSN,
+	targetLocArea	LocAreaId	OPTIONAL}
 	-- OA1 targetLocAreas must be absent in version 1
 	-- OP>1 targetLocArea must be present in version greater 1
 
---<B--SubscriberIdOrIMEI ::= CHOICE {--B>--
---<B--	subscriberID	SubscriberId,--B>--
---<B--	imei			[2] IMEI}--B>--
+SubscriberIdOrIMEI ::= CHOICE {
+	subscriberID	SubscriberId,
+	imei			[2] IMEI}
 	-- NU1 imei must not be used in version 1
 
---<B--CM-ServiceType ::= ENUMERATED {--B>--
---<B--	mobileOriginatingCallorPacketMode  (1),--B>--
---<B--	emergencyCallEstablishment  (2),--B>--
---<B--	shortMessageService  (4),--B>--
---<B--	ss-Activation  (8),--B>--
---<B--	mobileOriginatingCallReestablishment  (9),--B>--
---<B--	mobileTerminatingCall  (10)}--B>--
+CM-ServiceType ::= ENUMERATED {
+	mobileOriginatingCallorPacketMode  (1),
+	emergencyCallEstablishment  (2),
+	shortMessageService  (4),
+	ss-Activation  (8),
+	mobileOriginatingCallReestablishment  (9),
+	mobileTerminatingCall  (10)}
 
---<B--AccessConnectionStatus ::= OCTET STRING (SIZE (1))--B>--
+AccessConnectionStatus ::= OCTET STRING (SIZE (1))
 
 	-- bits 87654: 00000 (unused)
 
@@ -205,13 +205,13 @@ Kc ::= OCTET STRING (SIZE (8))
 	--	0  MM-connection existing and authenticated
 	--	1  MM-connection existing and not authenticated
 
---<B--ProcessAccessRequestRes ::= SEQUENCE {--B>--
---<B--	imsi-OrIMEI	IMSI-OrIMEI,--B>--
---<B--	msisdn		ISDN-AddressString	OPTIONAL}--B>--
+ProcessAccessRequestRes ::= SEQUENCE {
+	imsi-OrIMEI	IMSI-OrIMEI,
+	msisdn		ISDN-AddressString	OPTIONAL}
 
---<B--IMSI-OrIMEI ::= CHOICE {--B>--
---<B--	imsi			IMSI,--B>--
---<B--	imei			[0] IMEI}--B>--
+IMSI-OrIMEI ::= CHOICE {
+	imsi			IMSI,
+	imei			[0] IMEI}
 	-- NU1 imei must not be used in version 1
 
 -- handover types
@@ -257,11 +257,11 @@ PerformSubsequentHO-Arg ::= SEQUENCE {
 
 -- authentication management types
 
---<B--AuthenticateArg ::= SEQUENCE {--B>--
---<B--	rand			RAND,--B>--
---<B--	cksn			CKSN}--B>--
+AuthenticateArg ::= SEQUENCE {
+	rand			RAND,
+	cksn			CKSN}
 
---<B--CKSN ::= OCTET STRING (SIZE (1))--B>--
+CKSN ::= OCTET STRING (SIZE (1))
 
 	-- bits 87654: 00000 (unused)
 
@@ -276,13 +276,13 @@ Ki ::= OCTET STRING (SIZE (16))
 
 -- security management types
 
---<B--SetCipheringModeArg ::= SEQUENCE {--B>--
---<B--	cipheringMode	CipheringMode,--B>--
---<B--	kc			Kc			OPTIONAL}--B>--
+SetCipheringModeArg ::= SEQUENCE {
+	cipheringMode	CipheringMode,
+	kc			Kc			OPTIONAL}
 
---<B--CipheringMode ::= ENUMERATED {--B>--
---<B--	noEncryption  (1),--B>--
---<B--	version1-GSM  (2)}--B>--
+CipheringMode ::= ENUMERATED {
+	noEncryption  (1),
+	version1-GSM  (2)}
 
 CheckIMEI-Arg ::= CHOICE {
 	equipmentStatus	EquipmentStatus,

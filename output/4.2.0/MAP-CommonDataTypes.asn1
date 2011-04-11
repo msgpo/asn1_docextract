@@ -28,8 +28,8 @@ EXPORTS
 	TMSI,
 	SubscriberId,
 	IMEI,
---<B--	LocAreaId,--B>--
---<B--	LocAreaIdOrNone,--B>--
+	LocAreaId,
+	LocAreaIdOrNone,
 	LocationInfo,
 	HLR-List,
 	LMSI,
@@ -172,7 +172,7 @@ IMEI ::= TBCD-STRING (SIZE (8))
 	--	individual serial number: 6 digits
 	--	unassigned: 1 digit
 
---<B--LocAreaId ::= OCTET STRING (SIZE (2..5))--B>--
+LocAreaId ::= OCTET STRING (SIZE (2..5))
 	-- Octets are coded according to GSM 04.08.
 	-- The internal structure is defined as follows:
 	--	Mobile Country Code:	3 digits according to Rec E.212
@@ -180,9 +180,9 @@ IMEI ::= TBCD-STRING (SIZE (8))
 	--	Mobile Network Code:	2 digits according to Rec E.212
 	--	Location Area Code:	2 octets according to GSM 04.08
 
---<B--LocAreaIdOrNone ::= CHOICE {--B>--
---<B--	locAreaId	LocAreaId,--B>--
---<B--	noLocAreaId	NULL}--B>--
+LocAreaIdOrNone ::= CHOICE {
+	locAreaId	LocAreaId,
+	noLocAreaId	NULL}
 
 LocationInfo ::= CHOICE {
 	roamingNumber	[0] ISDN-AddressString,

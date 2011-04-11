@@ -13,21 +13,21 @@ IMPLICIT TAGS
 BEGIN
 
 EXPORTS
---<B--	InfoForIC-Arg,--B>--
---<B--	ConnectToFollowingAddressArg,--B>--
---<B--	ProcessCallWaitingArg,--B>--
---<B--	InfoForOC-Arg,--B>--
+	InfoForIC-Arg,
+	ConnectToFollowingAddressArg,
+	ProcessCallWaitingArg,
+	InfoForOC-Arg,
 	SendRoutingInfoArg,
 	SendRoutingInfoRes,
-	ProvideRoamingNumberArg--<B--,--B>--
---<B--	CompleteCallArg--B>--
+	ProvideRoamingNumberArg,
+	CompleteCallArg
 ;
 
 IMPORTS
---<B--	NoReplyConditionTime,--B>--
---<B--	CUG-Index,--B>--
+	NoReplyConditionTime,
+	CUG-Index,
 	CUG-Interlock,
---<B--	SS-DataList,--B>--
+	SS-DataList,
 	ForwardingData
 FROM MAP-SS-DataTypes {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
@@ -36,23 +36,23 @@ FROM MAP-SS-DataTypes {
 	ISDN-AddressString,
 	ExternalSignalInfo,
 	IMSI,
---<B--	IMEI,--B>--
-	LMSI--<B--,--B>--
---<B--	Category,--B>--
---<B--	BasicServiceCode--B>--
+	IMEI,
+	LMSI,
+	Category,
+	BasicServiceCode
 FROM MAP-CommonDataTypes {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-CommonDataTypes (18) version2 (2)}
 ;
 
 
---<B--InfoForIC-Arg ::= SEQUENCE {--B>--
---<B--	roamingNumber	[0] ISDN-AddressString,--B>--
---<B--	basicService	BasicServiceCode	OPTIONAL,--B>--
---<B--		dialledNumber	[5] ISDN-AddressString	OPTIONAL,--B>--
---<B--	cug-CheckInfo	[6] CUG-CheckInfo	OPTIONAL,--B>--
+InfoForIC-Arg ::= SEQUENCE {
+	roamingNumber	[0] ISDN-AddressString,
+	basicService	BasicServiceCode	OPTIONAL,
+		dialledNumber	[5] ISDN-AddressString	OPTIONAL,
+	cug-CheckInfo	[6] CUG-CheckInfo	OPTIONAL,
 	-- OA1 cug-CHeckInfo must be absent in version 1
---<B--	numberOfForwarding	[7] NumberOfForwarding	OPTIONAL}--B>--
+	numberOfForwarding	[7] NumberOfForwarding	OPTIONAL}
 
 CUG-CheckInfo ::= SEQUENCE {
 	cug-Interlock	CUG-Interlock,
@@ -60,28 +60,28 @@ CUG-CheckInfo ::= SEQUENCE {
 
 NumberOfForwarding ::= INTEGER (1..5)
 
---<B--ConnectToFollowingAddressArg ::= SEQUENCE {--B>--
---<B--	forwardingData	ForwardingData,--B>--
---<B--	msisdn		ISDN-AddressString	OPTIONAL,--B>--
---<B--	cug-CheckInfo	CUG-CheckInfo	OPTIONAL}--B>--
+ConnectToFollowingAddressArg ::= SEQUENCE {
+	forwardingData	ForwardingData,
+	msisdn		ISDN-AddressString	OPTIONAL,
+	cug-CheckInfo	CUG-CheckInfo	OPTIONAL}
 	-- OA1 cug-CheckInfo must be absent in version 1
 
---<B--ProcessCallWaitingArg ::= SEQUENCE {--B>--
---<B--	msisdn		[0] ISDN-AddressString,--B>--
---<B--	cug-Index	[1] CUG-Index	OPTIONAL,--B>--
---<B--	gsm-BearerCapability	[2] ExternalSignalInfo	OPTIONAL,--B>--
---<B--	networkSignalInfo	[3] ExternalSignalInfo	OPTIONAL,--B>--
---<B--	noReplyConditionTime	[4] NoReplyConditionTime	OPTIONAL,--B>--
---<B--	ss-DataList	[5] SS-DataList	OPTIONAL}--B>--
+ProcessCallWaitingArg ::= SEQUENCE {
+	msisdn		[0] ISDN-AddressString,
+	cug-Index	[1] CUG-Index	OPTIONAL,
+	gsm-BearerCapability	[2] ExternalSignalInfo	OPTIONAL,
+	networkSignalInfo	[3] ExternalSignalInfo	OPTIONAL,
+	noReplyConditionTime	[4] NoReplyConditionTime	OPTIONAL,
+	ss-DataList	[5] SS-DataList	OPTIONAL}
 
---<B--InfoForOC-Arg ::= SEQUENCE {--B>--
---<B--	calledNumber	[0] ISDN-AddressString,--B>--
---<B--	basicService	BasicServiceCode	OPTIONAL,--B>--
---<B--	cug-Index	[4] CUG-Index	OPTIONAL,--B>--
+InfoForOC-Arg ::= SEQUENCE {
+	calledNumber	[0] ISDN-AddressString,
+	basicService	BasicServiceCode	OPTIONAL,
+	cug-Index	[4] CUG-Index	OPTIONAL,
 	-- OA1 cug-Index must be absent in version 1
---<B--	supressPrefCUG	[5] NULL		OPTIONAL,--B>--
+	supressPrefCUG	[5] NULL		OPTIONAL,
 	-- OA1 supressPrefCUG must be absent in version 1
---<B--	supressOutgoingAccess	[6] NULL		OPTIONAL}--B>--
+	supressOutgoingAccess	[6] NULL		OPTIONAL}
 	-- OA1 supressOutgoingAccess must be absent in version 1
 
 SendRoutingInfoArg ::= SEQUENCE {
@@ -111,22 +111,22 @@ ProvideRoamingNumberArg ::= SEQUENCE {
 	gsm-BearerCapability	[5] ExternalSignalInfo	OPTIONAL,
 	networkSignalInfo	[6] ExternalSignalInfo	OPTIONAL}
 
---<B--CompleteCallArg ::= SEQUENCE {--B>--
---<B--	msisdnOrIMEI	MSISDN-OrIMEI,--B>--
---<B--	category		[1] Category	OPTIONAL,--B>--
---<B--	cug-Index	[2] CUG-Index	OPTIONAL,--B>--
+CompleteCallArg ::= SEQUENCE {
+	msisdnOrIMEI	MSISDN-OrIMEI,
+	category		[1] Category	OPTIONAL,
+	cug-Index	[2] CUG-Index	OPTIONAL,
 	-- NU1 cug-INDEX must not be used in version 1
---<B--	gsm-BearerCapability	[3] ExternalSignalInfo	OPTIONAL,--B>--
---<B--	networkSignalInfo	[7] ExternalSignalInfo	OPTIONAL,--B>--
+	gsm-BearerCapability	[3] ExternalSignalInfo	OPTIONAL,
+	networkSignalInfo	[7] ExternalSignalInfo	OPTIONAL,
 	-- OA1 networkSignalInfo must be absent in version 1
---<B--	noReplyConditionTime	[4] NoReplyConditionTime	OPTIONAL,--B>--
---<B--	ss-DataList	[5] SS-DataList	OPTIONAL,--B>--
---<B--	cug-CheckInfo	[6] CUG-CheckInfo	OPTIONAL}--B>--
+	noReplyConditionTime	[4] NoReplyConditionTime	OPTIONAL,
+	ss-DataList	[5] SS-DataList	OPTIONAL,
+	cug-CheckInfo	[6] CUG-CheckInfo	OPTIONAL}
 	-- OA1 cug-CheckInfo must be absent in version 1
 
---<B--MSISDN-OrIMEI ::= CHOICE {--B>--
---<B--	msisdn		[0] ISDN-AddressString,--B>--
---<B--	imei			[8] IMEI}--B>--
+MSISDN-OrIMEI ::= CHOICE {
+	msisdn		[0] ISDN-AddressString,
+	imei			[8] IMEI}
 	-- NU1 imei must not be used in version 1
 
 

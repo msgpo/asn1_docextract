@@ -14,7 +14,7 @@ BEGIN
 
 EXPORTS
 	RoamingNotAllowedCause,
---<B--	BusySubscriberCause,--B>--
+	BusySubscriberCause,
 	CallBarringCause,
 	CUG-RejectCause,
 	SS-IncompatibilityCause,
@@ -46,10 +46,10 @@ RoamingNotAllowedCause ::= ENUMERATED {
 	locationAreaNotAllowed  (2),
 	operatorDeterminedBarring  (3)}
 
---<B--BusySubscriberCause ::= ENUMERATED {--B>--
---<B--	networkDeterminedUserBusy  (0),--B>--
---<B--	moreCallsAllowed  (1),--B>--
---<B--	userDeterminedUserBusy  (2)}--B>--
+BusySubscriberCause ::= ENUMERATED {
+	networkDeterminedUserBusy  (0),
+	moreCallsAllowed  (1),
+	userDeterminedUserBusy  (2)}
 
 CallBarringCause ::= ENUMERATED {
 	barringServiceActive  (0),

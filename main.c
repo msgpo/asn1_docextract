@@ -132,6 +132,10 @@ restart:
 	} else {
 		/* output already enabled */
 		dump_start = start_offs;
+		/* skip strange markers that worked around ancient asn1 tools */
+		if (!strncmp(wh->base_addr+dump_start, "--<B--", 6) ||
+		    !strncmp(wh->base_addr+dump_start, "--B>--", 6))
+			dump_start += 6;
 	}
 
 	if (dump_start > 0) {

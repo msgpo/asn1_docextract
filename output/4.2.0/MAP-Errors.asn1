@@ -23,9 +23,9 @@ EXPORTS
 	NumberChanged,
 	UnknownBaseStation,
 	UnknownMSC,
---<B--	UnknownLocArea,--B>--
+	UnknownLocArea,
 	UnidentifiedSubscriber,
---<B--	UnallocatedRoamingNumber,--B>--
+	UnallocatedRoamingNumber,
 	UnknownEquipment,
 
 	-- subscription errors
@@ -47,10 +47,10 @@ EXPORTS
 	-- call handling errors
 	NoRoamingNumberAvailable,
 	AbsentSubscriber,
---<B--	BusySubscriber,--B>--
---<B--	NoSubscriberReply,--B>--
---<B--	RadioCongestion,--B>--
---<B--	ImpossibleCallCompletion,--B>--
+	BusySubscriber,
+	NoSubscriberReply,
+	RadioCongestion,
+	ImpossibleCallCompletion,
 	CallBarred,
 	ForwardingViolation,
 	CUG-Reject,
@@ -77,14 +77,14 @@ IMPORTS
 FROM TCAPMessages {ccitt recommendation q 773 modules(2) messages (1)}
 
 	SS-Status,
-	SS-SubscriptionOption--<B--,--B>--
---<B--	SS-List--B>--
+	SS-SubscriptionOption,
+	SS-List
 FROM MAP-SS-DataTypes {
    ccitt identified-organization (4) etsi (0) mobileDomainId (0) gsmNetworkId(1)
    moduleId (3) map-SS-DataTypes (14) version2 (2)}
 
 	RoamingNotAllowedCause,
---<B--	BusySubscriberCause,--B>--
+	BusySubscriberCause,
 	CallBarringCause,
 	CUG-RejectCause,
 	SS-IncompatibilityCause,
@@ -125,11 +125,11 @@ UnknownBaseStation ::= ERROR
 
 UnknownMSC ::= ERROR
 
---<B--UnknownLocArea ::= ERROR--B>--
+UnknownLocArea ::= ERROR
 
 UnidentifiedSubscriber ::= ERROR
 
---<B--UnallocatedRoamingNumber ::= ERROR--B>--
+UnallocatedRoamingNumber ::= ERROR
 
 UnknownEquipment ::= ERROR
 
@@ -178,19 +178,19 @@ AbsentSubscriber ::= ERROR
 		-- optional
 		-- OA>1 mwd-Set must be absent in version greater 1
 
---<B--BusySubscriber ::= ERROR--B>--
---<B--	PARAMETER--B>--
---<B--		busySubscriberCause	BusySubscriberCause--B>--
---<B--		-- optional----B>--
+BusySubscriber ::= ERROR
+	PARAMETER
+		busySubscriberCause	BusySubscriberCause
+		-- optional--
 
---<B--NoSubscriberReply ::= ERROR--B>--
+NoSubscriberReply ::= ERROR
 
---<B--RadioCongestion ::= ERROR--B>--
+RadioCongestion ::= ERROR
 
---<B--ImpossibleCallCompletion ::= ERROR--B>--
---<B--	PARAMETER--B>--
---<B--		ss-List	SS-List--B>--
---<B--		-- optional----B>--
+ImpossibleCallCompletion ::= ERROR
+	PARAMETER
+		ss-List	SS-List
+		-- optional--
 
 CallBarred ::= ERROR
 	PARAMETER

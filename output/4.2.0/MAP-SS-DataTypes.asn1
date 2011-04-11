@@ -14,10 +14,10 @@ BEGIN
 
 EXPORTS
 	RegisterSS-Arg,
---<B--	NoReplyConditionTime,--B>--
+	NoReplyConditionTime,
 	SS-Info,
 	SS-Status,
---<B--	CUG-Index,--B>--
+	CUG-Index,
 	CUG-Interlock,
 	SS-SubscriptionOption,
 	SS-ForBS-Code,
@@ -35,7 +35,7 @@ EXPORTS
 
 	SS-List,
 	SS-InfoList,
---<B--	SS-DataList,--B>--
+	SS-DataList,
 	ForwardingData
 ;
 
@@ -306,8 +306,8 @@ maxNumOfSS  INTEGER ::= 30
 SS-InfoList ::= SEQUENCE SIZE (1..maxNumOfSS) OF
 				SS-Info
 
---<B--SS-DataList ::= SEQUENCE SIZE (1..maxNumOfSS) OF--B>--
---<B--				SS-Data--B>--
+SS-DataList ::= SEQUENCE SIZE (1..maxNumOfSS) OF
+				SS-Data
 
 ForwardingData ::= SEQUENCE {
 	forwardedToNumber	[5] ISDN-AddressString	OPTIONAL,
