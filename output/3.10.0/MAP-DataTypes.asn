@@ -1,0 +1,628 @@
+MAP-DataTypes   DEFINITIONS ::=
+
+BEGIN
+
+-- exports all data types defined in this module
+
+IMPORTS
+	-- imports upper boundaries for data types
+	maxSignalInfoLength, maxNumberOfTeleServices,
+	maxNumberOfBearerServices, maxNumberOfSupplServices,
+	maxNumberOfCUG, maxNumberOfBasicServices,
+	maxNumberOfForwardingFeatures, maxNumberOfCallBarringFeatures,
+	maxNumberOfHlrId, maxPacketDataVolume,
+	maxNumberOfChargingUnit, maxCallDuration,
+	maxAddressLength, maxNumberOfSentParameters
+FROM 
+	MAP-Constants;
+
+-- common data types
+
+TBCD-STRING	 ::= OCTET STRING
+		-- digits 0 through 9, two digits per octet,
+		-- each digit encoded 0000 to 1001,
+		-- 1111 used as filler when there is an odd number of digit.
+
+
+AddressString	 ::= OCTET STRING (SIZE (1..maxAddressLength))
+		-- see internal description in section 6.4.1
+
+IsdnAddressString	 ::= AddressString (SIZE (1..10))
+
+ExternalSignalInfo ::= SEQUENCE {
+			protocolId	ProtocolId,
+			signalInfo	SignalInfo}
+
+SignalInfo	 ::= OCTET STRING (SIZE (1..maxSignalInfoLength))
+
+ProtocolId	 ::= ENUMERATED{
+		gsm-0408		(1),
+		gsm-0806		(2),
+		gsm-0808-bssmap		(3),
+		ets300102-1		(4)}
+
+
+-- data types for numbering and identification
+
+IMSI	 ::= TBCD-STRING (SIZE (2..8))
+		-- MCC, MNC, MSIN concatenated in this order
+
+
+TMSI	::= OCTET STRING (SIZE(1..4))
+
+SubscriberId	 ::= CHOICE {
+		imsi	[0] IMPLICIT IMSI,
+		tmsi	[1] IMPLICIT TMSI}
+
+--
+IMEI	::= TBCD-STRING (SIZE(8))
+		-- Internal Structure
+		-- Type Approval Code : 6 digits
+		-- manufacturer place : 2 digits
+		-- individual serial number : 6 digits
+		-- unassigned : 1 digit
+
+LocAreaId	 ::= OCTET STRING (SIZE (2..5))
+		-- Recommendation GSM 04.08
+		-- Internal structure
+		-- Mobile Country Code	: 3 digits according to Rec E.212
+		--		: 1 filler (1111)
+		-- Mobile Network Code	: 2 digits according to Rec E.212
+		-- Location Area Code	: 2 octets according to GSM 04.08
+
+LocationInfo	::= CHOICE {
+		roamingNumber	[0] IMPLICIT IsdnAddressString,
+		mscNumber		[1] IMPLICIT IsdnAddressString}
+
+HlrId	 ::= IMSI
+		-- leading digits of IMSI
+
+HlrList	 ::= SEQUENCE 
+		     SIZE(1.. maxNumberOfHlrId) OF HlrId
+
+LMsId	 ::= OCTET STRING (SIZE (4))
+
+
+GlobalCellId	 ::= OCTET STRING (SIZE (5..7))
+		-- Octets coded according to
+		-- Recommendation GSM 04.08
+		-- Mobile Country Code	: 3 digits according to Rec E.212
+		--		: 1 filler (1111)
+		-- Mobile Network Code	: 2 digits according to Rec E.212
+		-- Location Area Code	: 2 octets (LAC) according 
+		-- to GSM 04.08
+		-- Cell identity	: 2 octets (CI) according to GSM 04.08
+
+-- data types for subscriber management
+--
+Category	 ::= OCTET STRING (SIZE (1))
+		-- internal structure defined in CCITT Rec Q.763
+
+EquipStatus	 ::= ENUMERATED {
+		white-listed	(0),
+		black-listed	(1),
+		grey-listed	(2)}
+
+
+BearerServiceCode	 ::= OCTET STRING (SIZE (1))
+		-- Internal structure according to table 6.4/1
+		-- BIT 8 Transparency indicator (if applicable)
+		--     0 transparent
+		--     1 non transparent
+		-- BIT 7654  Bearer service group
+		--    0001 3.1 kHz ex PLMN
+		--    0010 Circuit data asynchronous
+		--    0011 Circuit data synchronous
+		--    0100 PAD access c.d.a
+		--    0101 Packet data synchrounous
+		--    0110 Alternate speech/c.d.a
+		--    1000 Speech followed by data c.d.a
+		--    1001 Speech followed by data c.d.s
+		--    1111 12.6 kb/s unrestricted digital
+
+		-- BIT 321  Rate (when applicable)
+		--    000 Any
+		--    001 300-300 b/s
+		--    011 1200-75 b/s
+		--    100 2400-2400 b/s
+		--    101 4800-4800 b/s
+		--    110 9600-9600 b/s
+
+
+		-- Bits 321 = 000 can be used to refer to all
+		-- Value "00000000" can be used to refer to all the defined
+		-- bearer services.
+		-- For the codes referring to a group or all bearer services
+		-- the Transparency Indicator is not applicable and has to be set to "0"
+
+
+BearerServiceList	 ::= SEQUENCE
+		     OF BearerServiceCode
+
+
+-- BearerServiceCode
+
+-- 7564321		Meaning			
+
+-- TeleServiceCode
+
+-- 00000000		All teleservices
+
+-- 00010000		Speech transmission
+-- 00010001		Telephony
+-- 00010010		Emergency calls
+
+-- 00100000		Short messages services
+-- 00100001		Short message MT/PP
+-- 00100010		Short message MO/PP
+
+-- 00110000		Data MHS
+-- 00110001		Advanced MHS access
+
+-- 01000000		Videotex access services
+-- 01000001		Videotex access profile 1
+-- 01000010		Videotex access profile 2
+-- 01000011		Videotex access profile 3
+
+-- 01010000		Teletex service
+-- 01010001		Teletex CS
+-- 01010010		Teletex PS
+
+-- 01100000		Facsimile 
+-- 01100001		Facsimile Group 3 and alternate speech
+-- 01100010		Automatic Facsimile Group 3
+
+TeleserviceCode	 ::= OCTET STRING (SIZE (1))
+		-- Internal structure according to table 6.4/2
+		-- Bit 8-5 encode the teleservice group
+
+		-- Bit 4-1 = 0000 can be used to refer to all the
+		-- teleservices of the corresponding group.
+		-- Value "00000000" can be used to refer to all the defined
+
+TeleserviceList	 ::= SEQUENCE
+		     SIZE(1 .. maxNumberOfTeleServices)
+		     OF TeleserviceCode
+
+
+BasicServiceCode	 ::= CHOICE {
+		bearerService		[2] IMPLICIT BearerServiceCode,
+		teleservice		[3] IMPLICIT TeleserviceCode}
+
+BasicServiceList	 ::= SEQUENCE
+		     SIZE(1 .. maxNumberOfBasicServices)
+		     OF BasicServiceCode
+
+--
+SubscriberStatus	::= ENUMERATED{
+		serviceGranted	(0),
+		operatorOGCallBarring	(1)}
+
+
+-- SS-Code
+
+-- 00010001		Calling number identification presentation
+-- 00010010		Calling number identification restriction
+-- 00010011		Called number identification presentation
+-- 00010100		Called number identification restriction
+-- 00010101		Malicious call identification
+-- 00100001		Call forwarding unconditional
+-- 00101000		All conditional forwarding services
+-- 00101001		Call forwarding on mobile subscriber busy
+-- 00101010		Call forwarding on no reply
+-- 00101011		Call forwarding on subscriber not reachable
+-- 00110001		Call transfer
+-- 00110010		Mobile access hunting
+-- 01000001		Call waiting
+-- 01000010		Call hold
+-- 01000011		Completion of calls to busy subscribers
+-- 01010001		Three party service
+-- 01010010		Conference calling
+-- 01100001		Closed user group
+-- 01110001		Advice of charge
+-- 01110010		Freephone service
+-- 01110011		Reverse charging
+-- 10000001		User to user signalling
+-- 10010001		Barring of outgoing calls
+-- 10010010		Barring of all outgoing calls 
+-- 10010011		Barring of all outgoing international calls
+-- 10010100		Barring of all OG international non-HPLMN directed calls
+-- 10011001		Barring of incoming calls
+-- 10011010		Barring of all incoming calls
+-- 10011011		Barring of all IC calls when outside HPLMN
+
+
+SS-Code	 ::= OCTET STRING (SIZE(1))
+		-- Internal structure according to
+		-- table 6.4/3
+		-- Bit 8-5
+		-- 0001 Number Identification services
+		-- 0010 Forwarding services
+		-- 0100 Call completion services
+		-- 0101 Multi-party services
+		-- 0110 Community of interest services
+		-- 0111 Charging services
+		-- 1000 Additional information transfer services
+		-- 1001 Call restriction services
+		-- Bit 4-1 = 0000 can be use to refer to
+		-- eg, "00100000" can be used to refer to all
+		-- forwarding services
+		-- "00101000" can be used to refer to all
+		-- conditional forwarding services
+		-- "00000000" can be used to refer to all
+		-- supplementary services
+
+SS-CodeList	::= SEQUENCE
+		     SIZE(1 .. maxNumberOfSupplServices)
+		     OF SS-Code
+
+
+SS-Status	 ::= OCTET STRING (SIZE (1))
+		-- Bit 8-4 Unused
+		-- Bit 3   Provision indicator
+		--     1 : Provisioned
+		-- Bit 2   Registration indicator (if applicable)
+		--     0 : Not Registered
+		--     1 : Registered
+		-- Bit 1   Activation indicator (If applicable)
+		--     0 : Not Active
+		--     1 : Active
+SS-Information	 ::= CHOICE{
+		forwardingInfo	[0] IMPLICIT ForwardingInfo,
+		callBarringInfo	[1] IMPLICIT CallBarringInfo,
+		cug-Information	[2] IMPLICIT CUG-Information,
+		ss-Data		[3] IMPLICIT SS-Data}
+
+SS-InfoList	 ::= SEQUENCE
+		     OF SS-Information
+
+
+--
+SS-Data	 ::= SEQUENCE{
+	ss-Code		SS-Code,
+	ss-Status		[4] IMPLICIT SS-Status OPTIONAL,
+	ss-SubscriptionOption	SS-SubscriptionOption OPTIONAL}
+
+SS-DataList	 ::= SEQUENCE
+		     SIZE(1 .. maxNumberOfSupplServices)
+		     OF SS-Data
+
+
+SS-Request	 ::= ENUMERATED{
+		registration (0),
+		erasure (1),
+		activation (2),
+		deactivation(3),
+		interrogation (4),
+		invoke (5)}
+
+
+SS-SubscriptionOption	::= CHOICE{
+	perCallBasis			[5] IMPLICIT BOOLEAN,
+	notificationToHeldRetrievedParty [6] IMPLICIT BOOLEAN,
+	userToUserServiceIndicator	[7] IMPLICIT UserToUserServiceIndicator,
+	maximumConfereesNumber		[8] IMPLICIT MaximumConfereesNumber,
+	huntGroupAccessSelectionOrder	[9] IMPLICIT HuntGroupAccessSelectionOrder}
+
+
+ForwardingOptions	 ::= OCTET STRING (SIZE(1))
+		-- Bit 8-7  Notification to forwarding party
+		--          00  No notification
+		--          01  notification with calling number identity
+		--          10  notification without calling number identity
+		-- Bit 6-5  Notification to calling party
+		--          00 No notification
+		--          10 Notification without forwarded-to number
+
+
+UserToUserServiceIndicator	 ::= OCTET STRING (SIZE(1))
+		-- Bit 8   : service 1
+		-- Bit 7   : service 2
+		-- Bit 6   : service 3
+		-- Bit 8 to 6 coded "1" if the service
+		-- is available to the subscriber
+
+
+MaximumConfereesNumber	 ::= INTEGER (1..10)
+
+
+HuntGroupAccessSelectionOrder ::= ENUMERATED{
+		random		(0),
+		sequential	(1)}
+
+
+NoReplyConditionTime	 ::= INTEGER (5..30)
+
+
+NumberOfConferees	::= INTEGER (1..10)
+
+
+CUG-Facilities	 ::=  OCTET STRING (SIZE (1))
+		-- Bit 8-3 000000 (Unused)
+		-- Bit 2-1
+		--   00 CUG only facilities
+		--   01 CUG with outgoing access
+		--   11 CUG with both outgoing and incoming access
+
+CUG-Interlock	 ::= OCTET STRING (SIZE (4))
+		-- Internal structure defined in Rec CCITT Q.763
+
+CUG-Index	 ::=  OCTET STRING (SIZE (1))
+		-- Internal structure defined in Rec CCITT Q.763
+CUG-Options	 ::=  OCTET STRING (SIZE (1))
+		-- BIT 8-4 00000 (Unused)
+		-- BIT 3 preferential CUG indicator
+		-- 0 no preferential
+		-- 1 preferential CUG
+		-- BIT 2 barring of incoming calls within the CUG
+		-- 0 no barring
+		-- BIT 1 barring of outgoing calls within the CUG
+		-- 0 no barring
+		-- 1 barring
+
+CUG-Feature	 ::= SEQUENCE {
+	cug-interlock		CUG-Interlock,
+	cug-Index		CUG-Index,
+	cug-Options		CUG-Options,
+	ss-Status		SS-Status}
+
+
+CUG-FeatureList ::= 	SEQUENCE SIZE (
+		1..maxNumberOfCUG) OF CUG-Feature
+
+CUG-Information	 ::= SEQUENCE{
+	cug-Facilities		CUG-Facilities,
+			choice CHOICE{
+	cug-Feature		[0] IMPLICIT CUG-Feature,
+	cug-FeatureList		[1] IMPLICIT CUG-FeatureList}}
+		-- the first alternative of the choice should be used
+		-- for the preferred CUG.
+
+--
+ForwardingInfo	::= SEQUENCE{
+	ss-Code		SS-Code OPTIONAL,
+	forwardingFeatureList	ForwardingFeatureList}
+
+ForwardingData	 ::= SEQUENCE{
+	forwardedToNumber	[5] IMPLICIT IsdnAddressString,
+	forwardingOptions	[6] IMPLICIT ForwardingOptions OPTIONAL}
+
+ForwardingFeature	 ::=  SEQUENCE {
+	basicService	BasicServiceCode OPTIONAL,
+	ss-Status		[4] IMPLICIT SS-Status,
+	forwardedToNumber	[5] IMPLICIT IsdnAddressString OPTIONAL,
+	forwardingOptions	[6] IMPLICIT ForwardingOptions OPTIONAL,
+	noReplyConditionTime	[7] IMPLICIT NoReplyConditionTime  OPTIONAL}
+ForwardingFeatureList	 ::= SEQUENCE SIZE (1.. maxNumberOfForwardingFeatures) 
+	OF ForwardingFeature
+
+CallBarringInfo	 ::= SEQUENCE {
+	ss-Code		SS-Code,
+	callBarringFeatureList	CallBarringFeatureList}
+
+CallBarringFeature ::= SEQUENCE{
+	basicServiceCode	BasicServiceCode OPTIONAL,
+	ss-Status		[4] IMPLICIT SS-Status }
+
+CallBarringFeatureList	 ::= SEQUENCE SIZE (1.. maxNumberOfCallBarringFeatures) 
+OF CallBarringFeature
+
+SubscriberData	 ::= SEQUENCE{
+	msIsdn			[1] IMPLICIT IsdnAddressString OPTIONAL,
+	category		[2] IMPLICIT Category OPTIONAL,
+	subscriberStatus	[3] IMPLICIT SubscriberStatus OPTIONAL,
+	bearerServiceList	[4] IMPLICIT BearerServiceList OPTIONAL,
+	teleserviceList		[6] IMPLICIT TeleserviceList OPTIONAL, 	
+	provisionedSupplServices [7] IMPLICIT SS-InfoList OPTIONAL}
+
+SS-Notification	 ::= OCTET STRING (SIZE (1))
+		-- 1 bit per defined indication
+
+
+Password	 ::= CHOICE {
+		printable	PrintableString (SIZE(4..8)),
+		numeric		NumericString (FROM ("0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9")|SIZE(4))}
+		-- only the second form is used for GSM systems.
+
+
+GuidanceInfo	 ::=   ENUMERATED{
+		guidance0 (0),
+		guidance1 (1),
+		guidance2 (2),
+		guidance3 (3),
+		guidance4 (4)}
+
+		-- the identifiers used in this description represent
+		-- the information which has to be delivered to the subscriber
+		-- according to table 6.4/4.
+		-- (display, announcement, ...) is not part of this specification.
+
+SS-UserData	 ::= IA5String (SIZE (1.. maxSignalInfoLength))
+
+
+-- number		Information to be provided	
+-- guidance0		enter password
+-- guidance1		enter new password
+-- guidance2		enter new password again
+-- guidance3		bad password try again
+-- guidance4		bad password format try again
+
+-- Data types for call parameters
+
+CallReference	 ::= OCTET STRING (SIZE (1..3))
+
+CallType	 ::= ENUMERATED{
+		incomingCall		(0),
+		forwardedCallPortion	(1),
+		reroutedCallPortion	(2),
+		outgoingCall		(3),
+		ss-Request		(4)}
+
+SS-ChargingData	 ::= SEQUENCE {
+	ss-Code		[1] IMPLICIT SS-Code,
+	ss-Request	[2] IMPLICIT SS-Request,
+	charge		[3] IMPLICIT Charge OPTIONAL}
+
+SS-ChargingInfo	 ::= SEQUENCE
+		     SIZE(1..maxNumberOfSupplServices)
+		     OF SS-ChargingData
+
+CallDuration	 ::= INTEGER (0..maxCallDuration)
+
+CallDateTime	 ::= GeneralizedTime (SIZE (14 .. 24))
+		-- to UTC time
+
+PacketDataVolume	 ::= INTEGER (1..maxPacketDataVolume)
+
+Charge	 ::= INTEGER (1.. maxNumberOfChargingUnit)
+
+ChargingUnit	 ::= ENUMERATED {
+		swpecialDrawingRights (0)}
+
+CallStatus	 ::= ENUMERATED
+		{undetermined 				(0),
+		successfulNormalTermination		(1),
+		successfulAbnormalTermination		(2),
+		forwarded				(4),
+		forwardedWithAbnormalTermination	(5),
+		rerouted				(6),
+		reroutedWithAbnormalTermination 	(7),
+		unsuccessfulNoRadioContact 		(8),
+		unsuccessfulNoResponse			(9),
+		unsuccessfulBusySubscriber 		(10),
+		unsuccessfulSystemFailed 		(11),
+		unsuccessfulSusbcriptionViolation 	(12),
+		unsuccessfulUnsupportedFacility 	(13)}
+
+NumberOfForwarding	 ::= INTEGER (1..5)
+
+
+-- Data types for radio parameters
+
+ChannelType	 ::= OCTET STRING (SIZE (1..10))
+		-- Concatenation of
+		-- Speech data indicator
+		-- Speech encoding algorithm/data rate
+		-- + transparency indicator
+		-- as defined in Recommendation GSM 08.08
+
+
+ClassmarkInformation	 ::= OCTET STRING (SIZE (1..2))
+		-- classmark information element type 1 or 2
+
+
+HandoverPriority	 ::= OCTET STRING (SIZE (1))
+		-- internal structure defined in Recommendation GSM 08.08
+
+
+
+HandoverType	 ::= ENUMERATED
+		{interBSS (0),
+		 intraBSS (1)}
+
+
+-- Data types for security procedures
+
+AuthenticationSet	::= SEQUENCE {
+	rand	Rand,
+	sres	Sres,
+	kc	Kc}
+
+
+Rand	 ::= OCTET STRING (SIZE (16))
+
+Sres	::= OCTET STRING (SIZE (4))
+
+Kc	 ::= OCTET STRING (SIZE (8))
+
+Ki	 ::= OCTET STRING (SIZE (16))
+
+CKSN	 ::= OCTET STRING (SIZE (1))
+		-- bits 8-4 unused
+
+
+CipheringMode	 ::= ENUMERATED{
+		noEncryption (1),
+		version1-GSM (2)}
+
+
+-- Data types for short message services
+SM-RP-DA	 ::= CHOICE{
+	imsi			[0] IMPLICIT IMSI,
+	lMsId			[1] IMPLICIT LMsId,
+	roamingNumber		[3] IMPLICIT IsdnAddressString,
+	serviceCentreAddress	[4] IMPLICIT AddressString}
+
+SM-RP-OA	::= CHOICE{
+	msIsdn			[2] IMPLICIT IsdnAddressString,
+	serviceCentreAddress	[4] IMPLICIT AddressString}
+
+
+SM-RP-UI	 ::= OCTET STRING (SIZE (1..maxSignalInfoLength))
+
+-- fault recovery, call tracing
+
+TraceReference	 ::= OCTET STRING (SIZE (1..2))
+
+TraceType	 ::= INTEGER{
+		allEvents (0),
+		onlyCalls (1),
+		eventSet1 (2),
+		eventSet254 (255)}
+		(0..255)
+		-- Identifiers eventSet1 to eventSet254 corresponds to
+		-- sets of events pre-defined by each operator.
+
+NetworkResource	 ::= ENUMERATED {
+		pLMN		(0),
+		hLR		(1),
+		vLR 		(2),
+		previous-VLR 	(3),
+		controlling-MSC	(4),
+		vMSC 		(5),
+		eIR 		(6),
+		radioSubSystem	(7)}
+
+-- other data types
+
+RequestParameter	 ::= ENUMERATED{
+		request-IMSI 			(0),
+		request-AuthenticationSet 	(1),
+		request-SubscriberData 		(2),
+		request-CUG-Information 	(3),
+		request-Ki			(4)}
+
+RequestParameters	 ::= SEQUENCE SIZE (1..2) OF RequestParameter
+
+SentParameter	 ::= CHOICE{
+	imsi			[0] IMPLICIT IMSI,
+	authenticationSet	[1] IMPLICIT AuthenticationSet,
+	subscriberData		[2] IMPLICIT SubscriberData,
+	cug-information		[3] IMPLICIT CUG-Information,
+	ki			[4] IMPLICIT Ki}
+	
+
+SentParameters	 ::= SEQUENCE
+		     SIZE(1..maxNumberOfSentParameters)
+		     OF SentParameter
+
+CmServiceType	 ::= ENUMERATED{
+		mobileOriginatingCall			(1),
+		emergencyCallEstablishment 		(2),
+		shortMessageService 			(4),
+		ss-request 				(8),
+		mobileOriginatingCallRe-establishment	(9),
+		mobileTerminatingCall 			(10)}
+--
+AccessConnectionStatus	 ::= OCTET STRING (SIZE (1))
+		-- Bit 8-4 Reserved
+		-- Bit 3
+		--     0 No RR- connection
+		--     1 RR-connection established
+		-- Bit 2
+		--     1 Ciphering mode on
+		-- Bit 1
+		--     0 MM-connection existing and authenticated
+		--     1 MM-connection existing and not authenticated
+
+END -- End of data types specifications

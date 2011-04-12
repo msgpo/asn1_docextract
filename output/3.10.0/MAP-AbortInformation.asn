@@ -1,0 +1,25 @@
+MAP-AbortInformation  DEFINITIONS ::=
+
+BEGIN
+
+IMPORTS
+	maxSignalInfoLength
+FROM 
+	MAP-Constants;
+
+MAPAbortInformation	 ::= SEQUENCE{
+		abortCause ENUMERATED{
+			unspecifiedReason (0),
+			versionNotSupported (1),
+			userResourceLimitation (2),
+			resourceUnavailableLongTermProblem (3),
+			resourceUnavailableTemporaryProblem (4),
+			networkPathRelease (6),
+			callRelease (7),
+			associatedProcedureFailed (8),
+			remoteOperationFailure (9)},
+		additionalInformation OCTET STRING (SIZE(1..maxSignalInfoLength))}
+		--
+		-- is up to the operator
+		
+END

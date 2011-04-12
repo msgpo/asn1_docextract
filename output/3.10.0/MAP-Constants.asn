@@ -1,0 +1,50 @@
+MAP-Constants DEFINITIONS ::=
+
+BEGIN
+
+EXPORTS
+	maxSignalInfoLength,
+	maxNumberOfTeleServices,
+	maxNumberOfBearerServices,
+	maxNumberOfSupplServices,
+
+	maxNumberOfCUG,
+	maxNumberOfBasicServices,
+	maxNumberOfForwardingFeatures,
+	maxNumberOfCallBarringFeatures,
+	maxNumberOfHlrId,
+	maxPacketDataVolume,
+	maxNumberOfChargingUnit,
+	maxCallDuration,
+	maxAddressLength,
+	maxNumberOfSentParameters;
+
+-- value assignment
+
+maxSignalInfoLength INTEGER  ::= 200
+-- this NamedValue represent the theoretical maximum number
+-- of octets which available to carry a single data type, without
+-- requiring segmentation to cope with the network layer service.
+-- may be lower, especially when other information elements have
+-- to be included in the same component
+
+
+-- value assignment continuation
+
+maxNumberOfTeleServices 		INTEGER ::=  20
+maxNumberOfBearerServices 		INTEGER ::=  50
+maxNumberOfSupplServices 		INTEGER ::=  30
+maxNumberOfCUG			INTEGER ::=  10
+maxNumberOfBasicServices 		INTEGER ::=  70
+maxNumberOfForwardingFeatures		INTEGER ::=  13
+maxNumberOfCallBarringFeatures 		INTEGER ::=  13
+maxNumberOfHlrId				INTEGER ::= 50
+maxPacketDataVolume 		INTEGER ::= 100
+maxNumberOfChargingUnit 		INTEGER ::= 16777215
+maxCallDuration 			INTEGER ::= 16777215
+maxAddressLength 			INTEGER ::=  20
+
+maxNumberOfSentParameters 		INTEGER ::=  10
+-- this named value should correspond to the maximum of
+-- set which may be returned by a HLR plus 1.
+END

@@ -1,0 +1,209 @@
+MAP-Errors DEFINITIONS ::=
+
+BEGIN
+
+EXPORTS
+	unknownSubscriber, unknownBaseStation, unknownMSC, unknownLocArea,
+	unidentifiedSubscriber, unallocatedRoamingNumber, unknownEquipment,
+	roamingNotAllowed, illegalMS, bearerServiceNotProvisioned,
+	teleServiceNotProvisioned, insufficientBearerCapabilities,
+	callBarred, forwardingViolation, cug-Reject,
+	illegalSS-Operation, ss-ErrorStatus, ss-NotAvailable,
+	ss-SubscriptionViolation, ss-Incompatibility, facilityNotSupported,
+	invalidTargetBaseStation, noRadioResourceAvailable,
+	noHandoverNumberAvailable, subsequentHandoverFailure,
+	absentSubscriber, busySubscriber, noSubscriberReply,
+	radioCongestion, impossibleCallCompletion, sm-DeliveryFailure,
+	messageWaitingListFull, systemFailure, dataMissing,
+	unexpectedDataValue, passwordRegistrationFailure,
+	negativePasswordCheck, noRoamingNumberAvailable, tracingBufferFull;
+
+IMPORTS
+	ERROR
+FROM Remote-Operations-Information-Objects
+	{joint-iso-itu-t remote-operations(4) informationObjects(5) version1(0) }
+
+	SS-Code, SS-CodeList, SS-Status, SS-SubscriptionOption, BasicServiceCode,
+	NetworkResource
+FROM
+	MAP-DataTypes;
+
+-- error types definitions
+
+unknownSubscriber ERROR ::= {
+	CODE	local:1 }
+
+unknownBaseStation ERROR ::= {
+	CODE	local:2 }
+
+unknownMSC ERROR ::= {
+	CODE	local:3 }
+
+unknownLocArea ERROR ::= {
+	CODE	local:4 }
+
+unidentifiedSubscriber ERROR ::= {
+	CODE	local:5 }
+
+unallocatedRoamingNumber ERROR ::= {
+	CODE	local:6 }
+
+unknownEquipment ERROR ::= {
+	CODE	local:7 }
+
+roamingNotAllowed ERROR ::= {
+	CODE	local:8 }
+
+illegalMS ERROR ::= {
+	CODE	local:9 }
+
+bearerServiceNotProvisioned ERROR ::= {
+	CODE	local:10 }
+
+teleServiceNotProvisioned ERROR ::= {
+	CODE	local:11 }
+
+insufficientBearerCapabilities ERROR ::= {
+	CODE	local:12 }
+
+CallBarredParam ::= ENUMERATED {
+		barringServiceActive (0),
+		operatorBarring (1)} -- optional
+
+callBarred ERROR ::= {
+	PARAMETER
+		CallBarredParam
+	CODE	local: 13 }
+
+--
+forwardingViolation ERROR ::= {
+	CODE	local: 14 }
+
+--
+CugRejectParam ::= ENUMERATED {
+		incomingCallBarred(0),
+		nonCUGmember (1)} -- optional
+
+cug-Reject ERROR ::= {
+	PARAMETER
+		CugRejectParam
+	CODE	local: 15 }
+
+--
+illegalSS-Operation ERROR ::= {
+	CODE	local: 16 }
+
+--
+ss-ErrorStatus ERROR ::= {
+	PARAMETER
+		SS-Status -- optional
+	CODE	local: 17 }
+
+--
+ss-NotAvailable ERROR ::= {
+	CODE	local: 18 }
+
+ss-SubscriptionViolation ERROR ::= {
+	PARAMETER	
+		SS-SubscriptionOption -- optional
+	CODE	local: 19 }
+
+
+--
+SS-IncompatibilityParam ::= SEQUENCE{
+	ss-Code		[1] IMPLICIT SS-Code OPTIONAL,
+	basicService 	BasicServiceCode OPTIONAL,
+	ss-Status	[4] IMPLICIT SS-Status OPTIONAL} -- optional
+
+ss-Incompatibility ERROR ::= {
+	PARAMETER
+		SS-IncompatibilityParam
+	CODE	local: 20 }
+
+--
+facilityNotSupported ERROR ::= {
+	CODE	local: 21 }
+--
+invalidTargetBaseStation ERROR ::= {
+	CODE	local: 23 }
+
+noRadioResourceAvailable ERROR ::= {
+	CODE	local: 24 }
+
+noHandoverNumberAvailable ERROR ::= {
+	CODE	local: 25 }
+
+subsequentHandoverFailure ERROR ::= {
+	CODE	local: 26 }
+
+
+absentSubscriber ERROR ::= {
+	PARAMETER	
+		BOOLEAN -- optional
+	CODE	local: 27 }
+
+busySubscriber ERROR ::= {
+	CODE	local: 28 }
+
+noSubscriberReply ERROR ::= {
+	CODE	local: 29 }
+
+radioCongestion ERROR ::= {
+	CODE	local: 30 }
+
+impossibleCallCompletion ERROR ::= {
+	PARAMETER		
+		SS-CodeList -- optional
+	CODE	local : 31 }
+
+SM-DeliveryFailureParam ::= ENUMERATED {
+		memoryCapacityExceeded (0),
+		msProtocolError (1),
+		msNotEquiped (2),
+		unknownServiceCentre (3),
+		invalidSmeAddress (5),
+		msNotScSubscriber (6)}
+
+sm-DeliveryFailure ERROR ::= {
+	PARAMETER
+		SM-DeliveryFailureParam
+	CODE	local : 32 }
+
+
+messageWaitingListFull ERROR ::= {
+	CODE	local : 33 }
+
+
+--
+systemFailure ERROR ::= {
+	PARAMETER
+		NetworkResource -- optional
+	CODE	local : 34 }
+
+dataMissing ERROR ::= {
+	CODE	local : 35 }
+
+unexpectedDataValue ERROR ::= {
+	CODE	local : 36 }
+
+PasswordRegistrationFailureParam ::= ENUMERATED{
+		undetermined (0),
+		invalidFormat (1),
+		newPasswordsMismatch (2)}
+passwordRegistrationFailure ERROR ::= {
+	PARAMETER
+		PasswordRegistrationFailureParam
+	CODE	local : 37 }
+
+
+negativePasswordCheck ERROR ::= {
+	CODE	local : 38 }
+
+noRoamingNumberAvailable ERROR ::= {
+	CODE	local : 39 }
+
+tracingBufferFull ERROR ::= {
+	CODE	local : 40 }
+
+
+END  -- End of error types definitions

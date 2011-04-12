@@ -1,0 +1,103 @@
+MAP-Protocol DEFINITIONS ::=
+
+BEGIN
+IMPORTS
+	OPERATION
+FROM 
+	Remote-Operations-Information-Objects
+	{ joint-iso-itu-t remote-operations(4) informationObjects(5) version1(0)}
+
+	-- Location management
+	updateLocationArea, updateLocation, cancelLocation, detachIMSI,
+	attachIMSI, deregisterMobileSubscriber,
+
+	-- Data management
+	sendParameters, insertSubscriberData, deleteSubscriberData,
+
+	-- Supplementary Services Handling
+	registerSS, eraseSS, activateSS, deactivateSS, interrogateSS, invokeSS,
+	forwardSsNotification, registerPassword, getPassword,
+	processUnstructuredSsData,
+
+	-- Call set-up
+	sendInfoForIncomingCall, sendInfoForOutgoingCall,
+	sendRoutingInformation, provideRoamingNumber,
+
+	-- Paging
+	page, searchForMobileSubscriber,
+
+	-- Handover
+	performHandover, sendEndSignal,
+	performSubsequentHandover, allocateHandoverNumber, sendHandoverReport,
+
+	-- Charging
+	registerChargingInformation,
+
+	-- Restoration
+	reset, forwardCheckSsIndication,
+
+	-- Authentication and security
+	forwardNewTMSI, setCipheringMode,
+
+	-- Equipment management
+	checkIMEI,
+
+	-- Short messages
+	noteMSPresent, alertServiceCentre,
+
+	-- Tracing
+	activateTraceMode, deactivateTraceMode, traceSubscriberActivity,
+
+	-- Others
+	processAccessRequest
+FROM
+	MAP-Operations
+
+	-- imports error types
+	unknownSubscriber, unknownBaseStation, unknownMSC, unknownLocArea,
+	unidentifiedSubscriber, unallocatedRoamingNumber, unknownEquipment,
+	roamingNotAllowed, teleServiceNotProvisioned,
+	insufficientBearerCapabilities, callBarred, forwardingViolation,
+	cug-Reject, illegalSS-Operation, ss-ErrorStatus, ss-NotAvailable,
+	ss-SubscriptionViolation, ss-Incompatibility, facilityNotSupported,
+	invalidTargetBaseStation, noRadioResourceAvailable,
+	noHandoverNumberAvailable, subsequentHandoverFailure, absentSubscriber,
+	busySubscriber, noSubscriberReply, radioCongestion,
+	unexpectedDataValue, passwordRegistrationFailure,
+	negativePasswordCheck, noRoamingNumberAvailable, tracingBufferFull
+FROM
+	MAP-Errors;
+
+Supported-MAP-Operations OPERATION ::= {
+	updateLocationArea | updateLocation | cancelLocation |
+	detachIMSI | attachIMSI | deregisterMobileSubscriber |
+	-- Data management
+	sendParameters | insertSubscriberData | deleteSubscriberData |
+	-- Supplementary Services Handling
+	registerSS | eraseSS | activateSS |
+	deactivateSS | interrogateSS | invokeSS | forwardSsNotification |
+	registerPassword | getPassword | processUnstructuredSsData |
+	-- Call set-up
+	sendInfoForIncomingCall | sendInfoForOutgoingCall | sendRoutingInformation | provideRoamingNumber |
+	-- Paging
+	page | searchForMobileSubscriber |
+	-- Handover
+	performHandover | sendEndSignal |
+	performSubsequentHandover | allocateHandoverNumber | sendHandoverReport |
+	-- Charging
+	registerChargingInformation |
+	-- Restoration
+	reset | forwardCheckSsIndication |
+	-- Authentication and security
+	forwardNewTMSI | setCipheringMode |
+	-- Equipment management
+	checkIMEI |
+	-- Short messages
+	noteMSPresent | alertServiceCentre |
+	-- Tracing
+	activateTraceMode | deactivateTraceMode | traceSubscriberActivity |
+	-- Others
+	processAccessRequest
+}
+
+END

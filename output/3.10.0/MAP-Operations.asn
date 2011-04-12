@@ -1,0 +1,951 @@
+MAP-Operations DEFINITIONS ::=
+
+BEGIN
+
+EXPORTS
+	-- Location management
+	updateLocationArea, updateLocation, cancelLocation, detachIMSI, attachIMSI,
+	deregisterMobileSubscriber,
+
+	-- Subscriber data management
+	insertSubscriberData, deleteSubscriberData, sendParameters,
+	
+	-- Supplementary Services Handling
+	registerSS, eraseSS, activateSS,
+	deactivateSS, interrogateSS, invokeSS, forwardSsNotification,
+	registerPassword, getPassword, processUnstructuredSsData,
+
+	-- Call set-up
+	sendInfoForIncomingCall, sendInfoForOutgoingCall,
+	sendRoutingInformation, provideRoamingNumber, completeCall,
+	connectToFollowingAddress, processCallWaiting,
+
+	-- Paging
+	page, searchForMobileSubscriber,
+
+	-- Handover
+	performHandover, sendEndSignal,
+	performSubsequentHandover, allocateHandoverNumber,
+	sendHandoverReport, processAccessSignalling,
+	forwardAccessSignalling,
+
+	-- Charging
+	registerChargingInformation,
+
+	-- Fault recovery
+	reset, forwardCheckSsIndication,
+
+	-- Tracing
+	activateTraceMode, deactivateTraceMode, traceSubscriberActivity,
+	noteInternalHandover,
+
+	-- Equipment management
+	checkIMEI,
+
+	-- Authentication and security
+	authenticate, provideIMSI, forwardNewTMSI, setCipheringMode,
+
+	-- Short messages
+	sendRoutingInfoForSM, forwardShortMessage, setMessageWaitingData, noteMSPresent, alertServiceCentre,
+
+	-- Access request
+	processAccessRequest;
+
+
+IMPORTS
+	OPERATION
+FROM
+	Remote-Operations-Information-Objects 
+		{joint-iso-itu-t remote-operations(4) informationObjects(5) version1(0)}
+
+	-- imports data types
+	AddressString, IsdnAddressString, ExternalSignalInfo,
+	IMSI, TMSI, SubscriberId, IMEI, LMsId, LocAreaId, GlobalCellId,
+	LocationInfo, HlrList, Category, EquipStatus, BasicServiceList,
+	BasicServiceCode, BearerServiceCode, TeleserviceCode, SubscriberData,
+	SS-Information, SS-DataList, SS-Code, SS-CodeList, SS-Status,
+	SS-Notification, Password, ChannelType, NoReplyConditionTime,
+	UserToUserServiceIndicator, CUG-Index, CUG-Interlock,
+	NumberOfConferees, NumberOfForwarding, ForwardingData,
+	ForwardingFeatureList, ForwardingOptions, ClassmarkInformation,
+	HandoverType, HandoverPriority, CallReference, CallType, CallDateTime,
+	CallStatus, CallDuration, PacketDataVolume, ChargingUnit, Charge,
+	SS-ChargingInfo, TraceReference, TraceType, NetworkResource,
+	CmServiceType, AccessConnectionStatus, Rand, Sres, CipheringMode, Kc,
+	CKSN, SS-UserData, RequestParameters, SentParameters, SM-RP-OA,
+	SM-RP-DA, SM-RP-UI, GuidanceInfo
+FROM
+	MAP-DataTypes
+
+	-- imports errors types
+	unknownSubscriber, unknownBaseStation, unknownMSC,
+	unknownLocArea, unidentifiedSubscriber,
+	unallocatedRoamingNumber, unknownEquipment, roamingNotAllowed,
+	illegalMS, bearerServiceNotProvisioned, teleServiceNotProvisioned,
+	insufficientBearerCapabilities, callBarred, forwardingViolation,
+	cug-Reject, illegalSS-Operation, ss-ErrorStatus, ss-NotAvailable,
+	ss-SubscriptionViolation, ss-Incompatibility, invalidTargetBaseStation,
+	noRadioResourceAvailable, noHandoverNumberAvailable, subsequentHandoverFailure,
+	absentSubscriber, busySubscriber, noSubscriberReply,
+	radioCongestion, impossibleCallCompletion, systemFailure, dataMissing,
+	unexpectedDataValue, passwordRegistrationFailure,
+	negativePasswordCheck, noRoamingNumberAvailable, tracingBufferFull,
+	facilityNotSupported, sm-DeliveryFailure, messageWaitingListFull
+FROM
+	MAP-Errors;
+
+-- operation types definitions
+UpdateLocationAreaArg ::= SEQUENCE {
+	subscriberId	SubscriberId,
+	previousLocAreaId	CHOICE{
+				locAreaId	LocAreaId,
+				null		NULL},
+	cksn		CKSN }
+
+updateLocationArea OPERATION ::= {		--Timer m
+ARGUMENT
+	UpdateLocationAreaArg
+ERRORS
+	{unknownSubscriber |
+	unknownLocArea |
+	illegalMS |
+	systemFailure |
+	unexpectedDataValue}
+CODE	local:1 }
+
+--
+UpdateLocationArg ::= SEQUENCE{
+	locationInfo		LocationInfo,	
+	vlrNumber		IsdnAddressString,
+	lmsId		[10] IMPLICIT LMsId OPTIONAL}
+
+updateLocation OPERATION ::= {			--Timer m
+ARGUMENT
+	UpdateLocationArg
+RESULT
+	IsdnAddressString
+ERRORS
+	{unknownSubscriber |
+	roamingNotAllowed |
+	systemFailure |
+	unexpectedDataValue}
+CODE	local:2 }
+
+--
+CancelLocationArg ::= SEQUENCE {
+	imsi		IMSI,
+	seq		SEQUENCE{
+	imsi			IMSI,
+	lMsId			LMsId}}
+
+cancelLocation OPERATION ::= {
+ARGUMENT
+	CancelLocationArg
+ERRORS
+	{unidentifiedSubscriber |
+	unexpectedDataValue}
+CODE	local:3}
+
+
+--
+detachIMSI OPERATION ::= {
+ARGUMENT
+	SubscriberId
+CODE	local:5}
+
+attachIMSI OPERATION ::= {
+ARGUMENT
+	SubscriberId
+ERRORS
+	{unidentifiedSubscriber |
+	illegalMS |
+	roamingNotAllowed |
+	systemFailure |
+	unexpectedDataValue}
+CODE	local:6}
+
+--
+deregisterMobileSubscriber OPERATION ::= {
+ARGUMENT
+	IMSI
+ERRORS
+	{absentSubscriber |
+	unknownSubscriber |
+	facilityNotSupported |
+	unexpectedDataValue}
+}
+
+-- Subscriber data management
+
+InsertSubscriberDataArg ::= SEQUENCE{
+	imsi		[0] IMPLICIT IMSI OPTIONAL,
+			COMPONENTS OF SubscriberData}
+
+insertSubscriberData OPERATION ::= {
+ARGUMENT
+	InsertSubscriberDataArg
+ERRORS
+	{unidentifiedSubscriber |
+	dataMissing |
+	unexpectedDataValue}
+CODE	local:7}
+
+--
+DeleteSubscriberDataArg ::= SEQUENCE{
+	imsi 		[0] IMPLICIT IMSI,
+	ss-Code		[2] IMPLICIT SS-CodeList OPTIONAL}
+
+deleteSubscriberData OPERATION ::= {
+ARGUMENT
+	DeleteSubscriberDataArg
+ERRORS
+	{unidentifiedSubscriber |
+	dataMissing |
+	unexpectedDataValue}
+CODE	local:8}
+
+
+--
+SendParametersArg ::= SEQUENCE{
+	subscriberId	SubscriberId,
+	requestParameters	RequestParameters}
+
+SendParametersRes ::= SEQUENCE{
+	sentParameters	SentParameters
+	-- optional (nothing is returned, if the requested
+	-- parameters are not available or do not exist)
+	}
+
+
+sendParameters OPERATION ::= {
+ARGUMENT
+	SendParametersArg
+RESULT
+	SendParametersRes
+ERRORS
+	{unknownSubscriber |
+	unidentifiedSubscriber |
+	unexpectedDataValue}
+CODE	local:9}
+
+
+-- Supplementary services handling
+--
+RegisterSSArg ::= SEQUENCE{
+	ss-Code		SS-Code,
+	forwardedToNumber	[4] IMPLICIT IsdnAddressString OPTIONAL,
+	noReplyConditionTime	[5] IMPLICIT NoReplyConditionTime OPTIONAL}
+
+registerSS OPERATION ::= {
+ARGUMENT
+	RegisterSSArg
+RESULT
+	SS-Information
+ERRORS
+	{unknownSubscriber |
+	illegalSS-Operation |
+	ss-ErrorStatus |
+	ss-NotAvailable |
+	bearerServiceNotProvisioned |
+	teleServiceNotProvisioned |
+	ss-SubscriptionViolation |
+	ss-Incompatibility |
+	unexpectedDataValue |
+	dataMissing |
+	systemFailure}
+CODE	local:10}
+
+
+--
+SS-ForBS-Code ::= SEQUENCE{
+	ss-Code		SS-Code,
+	basicService	BasicServiceCode OPTIONAL}
+
+eraseSS OPERATION ::= {
+ARGUMENT
+	SS-ForBS-Code
+RESULT
+	SS-Information
+ERRORS
+	{unknownSubscriber |
+	negativePasswordCheck |
+	illegalSS-Operation |
+	ss-ErrorStatus |
+	ss-SubscriptionViolation |
+	unexpectedDataValue |
+	systemFailure}
+CODE	local:11}
+
+--
+activateSS OPERATION ::= {
+ARGUMENT
+	SS-ForBS-Code
+RESULT
+	SS-Information
+ERRORS
+	{unknownSubscriber |
+	negativePasswordCheck |
+	illegalSS-Operation |
+	ss-ErrorStatus |
+	ss-NotAvailable |
+	ss-SubscriptionViolation |
+	ss-Incompatibility |
+	systemFailure}
+CODE	local:12}
+
+--
+deactivateSS OPERATION ::= {
+ARGUMENT
+	SS-ForBS-Code
+RESULT
+	SS-Information
+ERRORS
+	{unknownSubscriber |
+	illegalSS-Operation |
+	ss-SubscriptionViolation |
+	negativePasswordCheck |
+	unexpectedDataValue |
+	systemFailure}
+CODE	local:13}
+
+--
+InterrogateSSRes ::= CHOICE{
+	ss-Status		[0] IMPLICIT SS-Status,
+	forwardedToNumber	[1] IMPLICIT IsdnAddressString,	
+	forwardingFeatureList	[3] IMPLICIT ForwardingFeatureList}
+
+interrogateSS OPERATION ::= {
+ARGUMENT
+	SS-ForBS-Code
+RESULT 
+	InterrogateSSRes
+ERRORS
+	{unknownSubscriber |
+	negativePasswordCheck |
+	illegalSS-Operation |
+	unexpectedDataValue |
+	systemFailure}
+CODE	local:14}
+
+--
+InvokeSSArg ::= SEQUENCE{
+	ss-Code		SS-Code,
+	userToUserServiceIndicator	[4] IMPLICIT UserToUserServiceIndicator OPTIONAL, 	
+	cug-Index			[5] IMPLICIT CUG-Index OPTIONAL,
+	numberOfConferees		[6] IMPLICIT NumberOfConferees OPTIONAL}
+
+invokeSS OPERATION ::= {
+ARGUMENT
+	InvokeSSArg
+RESULT
+	CUG-Interlock
+ERRORS
+	{illegalSS-Operation |
+	ss-ErrorStatus |
+	ss-NotAvailable |
+	ss-SubscriptionViolation |
+	ss-Incompatibility |
+	cug-Reject |
+	unexpectedDataValue |
+	systemFailure}
+CODE	local:15}
+
+--
+ForwardSSNotificationArg ::= SEQUENCE{
+	imsi		[0] IMPLICIT IMSI OPTIONAL,
+	ss-Code		[1] IMPLICIT SS-Code OPTIONAL,
+	teleservice	[2] IMPLICIT TeleserviceCode OPTIONAL,
+	ss-Status	[4] IMPLICIT SS-Status OPTIONAL,
+	ss-Notification	[5] IMPLICIT SS-Notification OPTIONAL}
+
+forwardSsNotification OPERATION ::= {
+ARGUMENT
+	ForwardSSNotificationArg
+CODE	local:16}
+--
+registerPassword OPERATION ::= {
+ARGUMENT
+	SS-Code
+RESULT
+	Password
+ERRORS
+	{negativePasswordCheck | 
+	passwordRegistrationFailure |
+	ss-SubscriptionViolation |
+	unexpectedDataValue |
+	systemFailure}
+LINKED
+	{getPassword}
+CODE	local:17}
+
+--
+getPassword OPERATION ::= {
+ARGUMENT
+	GuidanceInfo
+RESULT
+	Password
+CODE	local:18}
+
+--
+processUnstructuredSsData OPERATION ::= {
+ARGUMENT
+	SS-UserData	
+RESULT
+	SS-UserData
+ERRORS
+	{unexpectedDataValue |
+	systemFailure}
+	-- UnexpectedDataValue is used when data from MS does not correspond
+	-- to any service implemented in HLR
+CODE	local:19}
+
+
+-- Call set-up
+--
+SendInfoForIncomingCallArg ::=	SEQUENCE{
+	incomingId		CHOICE{
+	roamingNumber		[0] IMPLICIT IsdnAddressString,
+	imsi			[1] IMPLICIT IMSI},
+	bearerService		[2] IMPLICIT BearerServiceCode OPTIONAL,
+	teleservice		[3] IMPLICIT TeleserviceCode OPTIONAL,
+	lMsId			[4] IMPLICIT LMsId OPTIONAL,
+	cug-Interlock		[6] IMPLICIT CUG-Interlock OPTIONAL,
+	numberOfForwarding	[7] IMPLICIT NumberOfForwarding OPTIONAL}
+
+sendInfoForIncomingCall OPERATION ::= {
+ARGUMENT
+	SendInfoForIncomingCallArg
+ERRORS
+	{unallocatedRoamingNumber |
+	unknownSubscriber |
+	unidentifiedSubscriber |
+	impossibleCallCompletion |
+	forwardingViolation |
+	unexpectedDataValue |
+	dataMissing |
+	systemFailure}
+LINKED
+	{completeCall |
+	processCallWaiting |
+	connectToFollowingAddress}
+CODE	local:20}
+
+--
+SendInfoForOutgoingCallArg ::= SEQUENCE{
+	calledNumber	[0] IMPLICIT IsdnAddressString,
+	teleService	[3] IMPLICIT TeleserviceCode OPTIONAL}
+
+sendInfoForOutgoingCall OPERATION ::= {
+ARGUMENT
+	SendInfoForOutgoingCallArg
+ERRORS
+	{unknownSubscriber |
+	bearerServiceNotProvisioned |
+	teleServiceNotProvisioned |
+	callBarred |
+	dataMissing |
+	unexpectedDataValue |
+	systemFailure}
+LINKED
+	{completeCall}
+CODE	local:21}
+
+--
+SendRoutingInfoArg ::= SEQUENCE {
+	msIsdn			[0]  IMPLICIT IsdnAddressString,
+	cug-Interlock		[1]  IMPLICIT CUG-Interlock OPTIONAL,
+	numberOfForwarding	[2]  IMPLICIT NumberOfForwarding OPTIONAL,
+	networkSignalInfo	[10] IMPLICIT ExternalSignalInfo OPTIONAL}
+
+SendRoutingInfoRes ::= SEQUENCE{
+	imsi		IMSI,
+	routingInfo		CHOICE{
+	roamingNumber		IsdnAddressString,
+	forwardingData		ForwardingData}}
+
+-- If available from the network the ISDN Bearer Capabilities and the ISDN High Layer
+-- Compatibility and Low Layer Compatibility information elements are included in
+-- The information is passed according to the rules specified in GSM 09.07.
+
+sendRoutingInformation OPERATION ::= {
+ARGUMENT
+	SendRoutingInfoArg
+RESULT
+	SendRoutingInfoRes
+ERRORS
+	{unknownSubscriber |
+	callBarred |
+	cug-Reject |
+	bearerServiceNotProvisioned |
+	teleServiceNotProvisioned |
+	facilityNotSupported |
+	forwardingViolation |
+	systemFailure |
+	dataMissing |
+	unexpectedDataValue}
+CODE	local:22}
+
+--
+ProvideRoamingNumberArg ::= SEQUENCE{
+	imsi			[0] IMPLICIT IMSI,
+	mscNumber		[1] IMPLICIT IsdnAddressString OPTIONAL,
+	msIsdn			[2] IMPLICIT IsdnAddressString OPTIONAL,
+	previousRoamingNumber	[3] IMPLICIT IsdnAddressString OPTIONAL,
+	lMsId			[4] IMPLICIT LMsId OPTIONAL,
+	gSM-BearerCapability	[5] IMPLICIT ExternalSignalInfo OPTIONAL,
+	networkSignalInfo	[6] IMPLICIT ExternalSignalInfo OPTIONAL}
+
+-- If available from the network the ISDN High Layer Compatibility information element is
+-- carried in the networkSignalInfo parameter as shown in section 6.4.3.8.9.
+-- The information is passed according to the rules specified in GSM 09.07.
+
+provideRoamingNumber OPERATION ::= {
+ARGUMENT
+	ProvideRoamingNumberArg
+RESULT
+	IsdnAddressString
+ERRORS
+	{absentSubscriber |
+	noRoamingNumberAvailable |
+	facilityNotSupported |
+	systemFailure |
+	dataMissing |
+	unexpectedDataValue}
+CODE	local:4}
+
+--
+CompleteCallArg ::= SEQUENCE{
+	msIsdn			[0] IMPLICIT IsdnAddressString,
+	category		[1] IMPLICIT Category OPTIONAL,
+	cug-Index		[2] IMPLICIT CUG-Index OPTIONAL,
+	gSM-BearerCapability	[3] IMPLICIT ExternalSignalInfo OPTIONAL,
+	noReplyConditionTime	[4] IMPLICIT NoReplyConditionTime OPTIONAL,
+	ss-DataList		[5] IMPLICIT SS-DataList OPTIONAL}
+
+completeCall OPERATION ::= {
+ARGUMENT
+	CompleteCallArg
+ERRORS
+	{noSubscriberReply |
+	radioCongestion |
+	busySubscriber |
+	dataMissing |
+	unexpectedDataValue}
+CODE	local:23}
+
+--
+ConnectToFollowingAddressArg ::= SEQUENCE{
+	forwardingData	ForwardingData,
+	msIsdn 		IsdnAddressString OPTIONAL}
+
+connectToFollowingAddress OPERATION ::= {
+ARGUMENT
+	ConnectToFollowingAddressArg
+CODE	local:24}
+
+--
+processCallWaiting OPERATION ::= {
+CODE	local:25}
+
+-- Paging
+PageArg ::= SEQUENCE{
+	imsi		[0] IMPLICIT IMSI,
+	tmsi		[1] IMPLICIT TMSI OPTIONAL,
+	locAreaId	[2] IMPLICIT LocAreaId}
+
+page OPERATION ::= {
+ARGUMENT
+	PageArg
+ERRORS
+	{absentSubscriber |
+	unknownLocArea |
+	busySubscriber |
+	systemFailure |
+	unexpectedDataValue}
+CODE	local:26}
+
+--
+SearchForMobileSubscriberArg ::= SEQUENCE{
+	imsi		IMSI,
+	storedLocationArea	CHOICE {
+				locAreaId LocAreaId,
+				null NULL}}
+
+searchForMobileSubscriber OPERATION ::= {
+ARGUMENT
+	SearchForMobileSubscriberArg
+RESULT
+	LocAreaId
+ERRORS
+	{absentSubscriber |
+	busySubscriber |
+	systemFailure |
+	unexpectedDataValue}
+CODE	local:27}
+
+
+-- Handover
+PerformHandoverArg ::= SEQUENCE{
+	targetCellId		GlobalCellId,
+	channelType		ChannelType,
+	classmarkInformation	ClassmarkInformation,
+	handoverPriority 	[11] IMPLICIT HandoverPriority OPTIONAL,
+	kc			[12] IMPLICIT Kc OPTIONAL}
+
+PerformHandoverRes ::= SEQUENCE{
+	handoverNumber		IsdnAddressString,
+	accessSignalInfo	ExternalSignalInfo
+	-- protocolId for ExternalSignalInfo
+	-- should indicate "gsm-04.08-version1"
+	}
+
+performHandover OPERATION ::= {
+ARGUMENT
+	PerformHandoverArg
+RESULT
+	PerformHandoverRes
+ERRORS
+	{unknownBaseStation |
+	invalidTargetBaseStation |
+	noRadioResourceAvailable |
+	systemFailure |
+	unexpectedDataValue}
+CODE	local:28}
+
+--
+sendEndSignal OPERATION ::= {
+CODE	local:29}
+
+
+--
+PerformSubsequentHandoverArg ::= SEQUENCE{
+	targetCellId		GlobalCellId,
+	servingCellId	GlobalCellId,
+	classmarkInformation	[10] IMPLICIT ClassmarkInformation OPTIONAL}
+
+performSubsequentHandover OPERATION ::= {
+ARGUMENT
+	PerformSubsequentHandoverArg
+RESULT
+	ExternalSignalInfo
+	-- protocolId should indicate "gsm-04.08-version1"}
+ERRORS
+	{unknownBaseStation |
+	invalidTargetBaseStation |
+	unknownMSC |
+	subsequentHandoverFailure |
+	unexpectedDataValue}
+CODE	local:30}
+
+--
+allocateHandoverNumber OPERATION ::= {
+ERRORS
+	{noHandoverNumberAvailable}
+LINKED
+	{sendHandoverReport}
+CODE	local:31}
+
+--
+sendHandoverReport OPERATION ::= {
+ARGUMENT
+	IsdnAddressString
+CODE	local:32}
+
+--
+processAccessSignalling OPERATION ::= {
+ARGUMENT
+	ExternalSignalInfo
+-- protocolId should indicate "gsm-0806-version1"
+CODE	local:33}
+
+
+
+--
+forwardAccessSignalling OPERATION ::= {
+ARGUMENT
+	ExternalSignalInfo
+-- protocolId should indicate "gsm-0806-version1"
+CODE	local:34}
+
+
+-- Charging
+--
+RegisterChargingInfoArg ::= SEQUENCE{
+	msIsdn		IsdnAddressString,
+	mscNumber		IsdnAddressString,
+	imsi		IMSI,
+	callType		CallType,
+	callStatus		CallStatus,
+	callDateTime	CallDateTime,
+	callDuration		CallDuration,
+	bearerServiceCode	[10] IMPLICIT BearerServiceCode OPTIONAL,
+	teleServiceCode 	[11] IMPLICIT TeleserviceCode OPTIONAL,
+	calledNumber 		[12] IMPLICIT IsdnAddressString OPTIONAL,
+	packetDataVolume	[14] IMPLICIT PacketDataVolume OPTIONAL,
+	chargingUnit		[15] IMPLICIT ChargingUnit OPTIONAL,
+	charge			[16] IMPLICIT Charge OPTIONAL,
+	ss-ChargingInfo		[17] IMPLICIT SS-ChargingInfo OPTIONAL}
+
+registerChargingInformation OPERATION ::= {
+ARGUMENT
+	RegisterChargingInfoArg
+ERRORS
+	{unknownSubscriber |
+	dataMissing |
+	unexpectedDataValue}
+CODE	local:36}
+
+
+-- Fault recovery
+ResetArg ::= SEQUENCE{
+	networkResource	NetworkResource,
+	originatingEntityNumber	IsdnAddressString,
+	hlrId		HlrList OPTIONAL}
+
+reset OPERATION ::= {
+ARGUMENT
+	ResetArg
+CODE	local:37}
+
+
+--
+forwardCheckSsIndication OPERATION ::= {
+CODE	local:38}
+
+
+-- Tracing
+--
+ActivateTraceModeArg ::= SEQUENCE{
+	imsi		[0] IMPLICIT IMSI OPTIONAL,
+	traceReference	[1] IMPLICIT TraceReference ,
+	traceType	[2] IMPLICIT TraceType,
+	omcId 		[3] IMPLICIT AddressString OPTIONAL}
+
+activateTraceMode OPERATION ::= {
+ARGUMENT
+	ActivateTraceModeArg
+ERRORS
+	{unidentifiedSubscriber |
+	facilityNotSupported |
+	tracingBufferFull |
+	systemFailure |
+	dataMissing |
+	unexpectedDataValue}
+CODE	local:50}
+
+--
+DeactivateTraceModeArg ::= SEQUENCE{
+	imsi		[0] IMPLICIT IMSI OPTIONAL,
+	traceReference	[1] IMPLICIT TraceReference}
+
+
+deactivateTraceMode OPERATION ::= {
+ARGUMENT
+	DeactivateTraceModeArg
+ERRORS
+	{unidentifiedSubscriber |
+	facilityNotSupported |
+	systemFailure |
+	dataMissing |
+	unexpectedDataValue}
+CODE	local:51}
+
+--
+TraceSubscriberActivityArg ::= SEQUENCE{
+	imsi		[0] IMPLICIT IMSI OPTIONAL,
+	traceReference	[1] IMPLICIT TraceReference,
+	traceType	[2] IMPLICIT TraceType,
+	callReference	[4] IMPLICIT CallReference OPTIONAL}
+
+traceSubscriberActivity OPERATION ::= {
+ARGUMENT
+	TraceSubscriberActivityArg
+CODE	local:52}
+--
+
+NoteInternalHandoverArg ::= SEQUENCE{
+	handoverType	HandoverType,
+	channelId	[2] IMPLICIT ExternalSignalInfo OPTIONAL}
+
+noteInternalHandover OPERATION ::= {
+ARGUMENT
+	NoteInternalHandoverArg
+CODE	local:35}
+
+
+-- Equipment management
+--
+checkIMEI OPERATION ::= {
+ARGUMENT
+	IMEI
+RESULT
+	EquipStatus
+ERRORS
+	{unknownEquipment |
+	systemFailure |
+	unexpectedDataValue}
+CODE	local:43}
+
+
+-- Authentication and security
+--
+AuthenticateArg ::= SEQUENCE{
+	rand		Rand,
+	cksn		CKSN}
+
+authenticate OPERATION ::= {
+ARGUMENT
+	AuthenticateArg
+RESULT
+	Sres
+CODE	local:39}
+
+--
+provideIMSI OPERATION ::= {
+RESULT
+	IMSI
+ERRORS
+	{absentSubscriber}
+CODE	local:40}
+
+
+--
+forwardNewTMSI OPERATION ::= {
+ARGUMENT
+	TMSI
+CODE	local:41}
+
+--
+SetCipheringModeArg ::= SEQUENCE{
+	cipheringMode	CipheringMode,
+	kc		Kc OPTIONAL}
+-- Kc should be included when cipheringMode indicates
+-- that ciphering must be performed
+setCipheringMode OPERATION ::= {
+ARGUMENT
+	SetCipheringModeArg
+CODE	local:42}
+
+-- Short messages
+SendRoutingInfoForSMArg ::= SEQUENCE{
+	msIsdn			[0] IMPLICIT IsdnAddressString,
+	sm-RP-PRI		[1] IMPLICIT BOOLEAN,
+	serviceCentreAddress	[2] IMPLICIT AddressString,
+	cug-Interlock		[3] IMPLICIT CUG-Interlock OPTIONAL,
+	teleserviceCode		[5] IMPLICIT TeleserviceCode OPTIONAL}
+
+SendRoutingInfoForSMRes ::= SEQUENCE{
+	imsi		IMSI,
+	choice		CHOICE{
+	seq			[0] IMPLICIT SEQUENCE{
+	locationInfo				LocationInfo,
+	lMsId				LMsId OPTIONAL},
+	forwardingData		[1] IMPLICIT ForwardingData},
+	mwd-Set			[2] IMPLICIT BOOLEAN OPTIONAL}
+
+sendRoutingInfoForSM OPERATION ::= {
+ARGUMENT
+	SendRoutingInfoForSMArg
+RESULT
+	SendRoutingInfoForSMRes
+ERRORS
+	{unknownSubscriber |
+	callBarred |
+	cug-Reject |
+	teleServiceNotProvisioned |
+	absentSubscriber |
+	systemFailure |
+	dataMissing |
+	unexpectedDataValue}
+CODE	local:45}
+
+
+--
+ForwardShortMessageArg ::= SEQUENCE{
+	sm-RP-DA		SM-RP-DA,
+	sm-RP-OA		SM-RP-OA,
+	sm-RP-UI		SM-RP-UI}
+
+forwardShortMessage OPERATION ::= {
+ARGUMENT
+	ForwardShortMessageArg
+ERRORS
+	{unidentifiedSubscriber |
+	absentSubscriber |
+	facilityNotSupported |
+	illegalMS |
+	systemFailure |
+	unexpectedDataValue |
+	sm-DeliveryFailure}
+CODE	local:46}
+
+--
+SetMessageWaitingDataArg ::= SEQUENCE{
+	msIsdn		IsdnAddressString,
+	serviceCentreAddress	AddressString}
+
+setMessageWaitingData OPERATION ::= {
+ARGUMENT
+	SetMessageWaitingDataArg
+ERRORS
+	{unknownSubscriber |
+	messageWaitingListFull |
+	unexpectedDataValue}
+CODE	local:47}
+
+
+--
+noteMSPresent OPERATION ::= {
+ARGUMENT
+	IMSI
+CODE	local:48}
+
+
+--
+AlertServiceCentreArg ::= SEQUENCE {
+	msIsdn		IsdnAddressString,
+	serviceCentreAddress	AddressString}
+
+alertServiceCentre OPERATION ::= {
+ARGUMENT
+	AlertServiceCentreArg
+CODE	local:49}
+
+
+
+-- Access request
+ProcessAccessRequestArg ::= SEQUENCE{
+	subscriberId		SubscriberId,
+	cmServiceType	CmServiceType,
+	accessConnectionStatus	AccessConnectionStatus,
+	cksn		CKSN}
+
+ProcessAccessRequestRes ::= SEQUENCE{
+	imsi 		IMSI,
+	msIsdn 		IsdnAddressString OPTIONAL}
+
+processAccessRequest OPERATION ::= {
+ARGUMENT
+	ProcessAccessRequestArg
+RESULT
+	ProcessAccessRequestRes
+ERRORS
+	{illegalMS |
+	unknownSubscriber |
+	unidentifiedSubscriber |
+	unexpectedDataValue }
+CODE	local:53}
+
+
+--
+BeginSubscriberActivityArg ::= SEQUENCE{
+	originatingEntityNumber	IsdnAddressString}
+
+beginSubscriberActivity OPERATION ::= {
+ARGUMENT
+	BeginSubscriberActivityArg
+CODE	local:54}
+
+
+
+END   -- End of operation types definitions --
