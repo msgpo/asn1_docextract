@@ -1,3 +1,20 @@
+-- ASN.1 definition for GSM MAP (Version 1)
+--
+-- Taken from GSM/3GPP TS 09.02 Version 3.10.0 (October 1994) from
+-- http://www.3gpp.org/ftp/Specs/archive/09_series/09.02/0902-3a0.zip
+-- (C) Copyright 1991-1994 by ETSI
+--
+-- Extracted using asn1_docextract as it is available from
+--	http://cgit.osmocom.org/cgit/asn1_docextract/
+--
+-- Manual fixups and conversion from OPERATION MACRO to OPERATION CLASS
+-- (C) 2011 by Harald Welte <laforge@gnumonks.org>
+--
+-- For more history, see the following blog posts
+--	http://laforge.gnumonks.org/weblog/2011/03/26
+--	http://laforge.gnumonks.org/weblog/2011/03/27
+--	http://laforge.gnumonks.org/weblog/2011/04/09
+--
 MAP-AbortInformation  DEFINITIONS ::=
 
 BEGIN
